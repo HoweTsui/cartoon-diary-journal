@@ -1,0 +1,40 @@
+{
+  "atlas": {
+    "src": "character-lineup.png",
+    "cols": 2,
+    "rows": 1
+  },
+  "nodes": [
+    {
+      "id": "actual-person-01",
+      "name": "实际人物一",
+      "role": "本次任务中的实际身份",
+      "col": 0,
+      "row": 0,
+      "x": -160,
+      "y": 0,
+      "anchors": ["实际脸型与鼻型", "实际眼嘴与表情", "实际发型或配饰", "实际头身比与服装鞋形"],
+      "notes": []
+    },
+    {
+      "id": "actual-person-02",
+      "name": "实际人物二",
+      "role": "本次任务中的实际身份",
+      "col": 1,
+      "row": 0,
+      "x": 160,
+      "y": 0,
+      "anchors": ["实际脸型与鼻型", "实际眼嘴与表情", "实际发型或配饰", "实际头身比与服装鞋形"],
+      "notes": []
+    }
+  ],
+  "edges": [
+    {
+      "source": "actual-person-01",
+      "target": "actual-person-02",
+      "label": "实际关系",
+      "type": "friend",
+      "curve": 0
+    }
+  ]
+}

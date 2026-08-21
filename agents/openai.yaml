@@ -1,0 +1,4 @@
+interface:
+  display_name: "小屁孩日记风格 Skill"
+  short_description: "生成原创极简黑白日记页，并按人物关系图保持角色一致"
+  default_prompt: "Use $cartoon-diary-journal to 先检索本次任务人物关系图，再将今天的经历整理为一页带日期和周几的原创极简黑白日记页；缺失角色先补图入库。"

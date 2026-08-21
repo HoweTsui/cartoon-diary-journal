@@ -1,0 +1,14 @@
+# 本地任务数据：包含真实姓名、关系或用户生成头像，不提交到公开仓库
+.DS_Store
+assets/character-library/character-graph.html
+assets/character-library/character-lineup.png
+assets/templates/character-data-aha-ayan-naicheese.json
+
+# 生成物和临时输入
+outputs/
+generated/
+task-output/
+*.prompt.txt
+*.brief.local.json
+*.jpg
+*.jpeg

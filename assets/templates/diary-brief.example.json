@@ -1,0 +1,27 @@
+{
+  "date": "2026-08-20",
+  "title": "今天又绕了远路",
+  "events": [
+    {
+      "scene": "人物一出门时被大风吹乱头发",
+      "caption": "风先到了",
+      "characters": ["actual-person-01"]
+    },
+    {
+      "scene": "人物一伸手追车，车刚好驶出画面",
+      "caption": "又差一点",
+      "characters": ["actual-person-01"]
+    },
+    {
+      "scene": "人物一和人物二看着向一边塌掉的三明治",
+      "caption": "午饭歪了",
+      "characters": ["actual-person-01", "actual-person-02"]
+    },
+    {
+      "scene": "两人并排坐着复盘绕远的路线",
+      "caption": "路线有想法",
+      "characters": ["actual-person-01", "actual-person-02"]
+    }
+  ],
+  "summary": "计划没完成，素材倒是够了。"
+}
