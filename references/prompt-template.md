@@ -24,13 +24,19 @@ exactly 14-18 evenly spaced very pale cyan notebook rules. Every human keeps the
 face shape, nose shape and placement, eye and mouth treatment, body proportion,
 and default expression. Each human has exactly one nose. Do not give every person a long nose;
 use a prominent silhouette-breaking nose only when that person's identity anchors specify it.
-Rounded, button, and tiny noses must have a small deliberate open break in the nose's own contour;
-this must not be rendered as a fully closed O. For every human, also preserve the long open break in
+Rounded, button, and tiny noses must use a slightly flattened small ellipse / half-ellipse contour;
+the nose's own contour must be deliberately broken at the UPPER side, with the upper endpoint ending
+just below the two eyes and creating only slight overlap. Never make it a perfect circle, fully closed O,
+long bridge, brow, or forehead line.
+For every human, also preserve the long open break in
 the front outer head contour beside the forward eye, running from hairline height to the nose root;
-do not draw an eyebrow or any line that closes this gap. The nose itself may connect to the face naturally.
+do not draw an eyebrow or any line that closes this gap. The visible face outline from forehead through
+nose root, cheek, and chin must remain one smooth continuous organic curve; no angular kinks, stepped
+cheeks, flat jaw corners, or abrupt turns. The nose itself may connect to the face naturally.
 Use two minimal dot eyes with a slightly wider eye gap, tiny ears, no eyebrows, two to eight sparse hair strokes
-or one solid-black hair shape, a narrow tube torso, readable arms, slender two-line lower legs with
-a visible white gap, simple four-finger hands, and oversized flat oval shoes. Put the mouth clearly
+or one solid-black hair shape, a narrow tube torso, extremely thin double-line tube arms and forearms,
+slightly enlarged but still small hands (palm width no more than 1.3 times forearm width), short 3–4 finger arcs,
+slender two-line lower legs with a visible white gap, and oversized flat oval shoes. Put the mouth clearly
 lower beneath the nose.
 Every human face must visibly retain two open eyes, one nose, and one mouth. Dogs may use one solid-
 black animal nose at the front of the muzzle; cats retain two ears, two eyes, one smaller solid-black
@@ -65,7 +71,8 @@ ratio drifts. Pets must remain a flat simplified silhouette with two ears, two e
 single solid-black nose (for cats: smaller and centered below the eyes; for dogs: a single abstract black oval at the muzzle tip),
 a tiny mouth, species-appropriate torso, clear legs/paws and a simple tail. Dogs use a head visibly larger than the torso,
 widely spaced equal black dot eyes, and short thick rounded paws with only one to three simple toe notches per paw; never render realistic fur strands,
-whiskers, eye reflections or fur shading. Use at most three flat fur-color areas. Long-haired animals may use
+whiskers, eye reflections or fur shading. Use no colored fur areas; all animals remain pure black-and-white.
+Long-haired animals may use
 only three to five broad rounded contour notches for coat volume, never individual spikes or dense ruffs.
 Expression changes may alter only eye openness/roundness, mouth shape, and up to two small external emotion marks;
 the neutral face has no brows, and anger/confusion may use only one or two temporary short expression lines.

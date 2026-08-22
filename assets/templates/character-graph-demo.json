@@ -1,0 +1,94 @@
+{
+  "atlas": {
+    "src": "character-lineup-demo.svg",
+    "cols": 3,
+    "rows": 1
+  },
+  "nodes": [
+    {
+      "id": "demo-main",
+      "name": "主角",
+      "role": "日记记录者",
+      "col": 0,
+      "row": 0,
+      "avatarFocusX": 0.5,
+      "avatarFocusY": 0.36,
+      "x": 0,
+      "y": 120,
+      "anchors": [
+        "轻微半侧面且双眼可见",
+        "黑色短发与简化圆角头部",
+        "细线手臂、细长小腿与扁平鞋",
+        "低位小嘴和简化半椭圆鼻"
+      ],
+      "notes": [
+        "把普通小事写成简短吐槽"
+      ]
+    },
+    {
+      "id": "demo-partner",
+      "name": "搭档",
+      "role": "共同记录者",
+      "col": 1,
+      "row": 0,
+      "avatarFocusX": 0.5,
+      "avatarFocusY": 0.36,
+      "x": -240,
+      "y": -140,
+      "anchors": [
+        "轻微半侧面且双眼可见",
+        "长发轮廓用大块线面概括",
+        "细线手臂、细长小腿与扁平鞋",
+        "低位小嘴和简化半椭圆鼻"
+      ],
+      "notes": [
+        "负责提醒主角补充细节"
+      ]
+    },
+    {
+      "id": "demo-cat",
+      "name": "猫咪",
+      "role": "宠物伙伴",
+      "kind": "animal",
+      "species": "cat",
+      "col": 2,
+      "row": 0,
+      "avatarFocusX": 0.5,
+      "avatarFocusY": 0.62,
+      "x": 240,
+      "y": -140,
+      "anchors": [
+        "大头、略胖身体和完整双耳",
+        "双眼下方中央的小黑色猫鼻",
+        "细腿、小爪、简化尾巴",
+        "无写实毛发和眼睛高光"
+      ],
+      "notes": [
+        "经常把纸张踩出新的故事"
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "source": "demo-main",
+      "target": "demo-partner",
+      "label": "搭档",
+      "type": "partner",
+      "curve": 0
+    },
+    {
+      "source": "demo-main",
+      "target": "demo-cat",
+      "label": "照顾",
+      "type": "care",
+      "curve": 0
+    },
+    {
+      "source": "demo-partner",
+      "target": "demo-cat",
+      "label": "陪伴",
+      "type": "friend",
+      "curve": 0
+    }
+  ]
+}

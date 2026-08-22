@@ -131,6 +131,13 @@ def normalize_data(data: dict) -> dict:
                     f"nodes[{index}].avatarFocusX must be a number between 0 and 1"
                 )
             node["avatarFocusX"] = focus_x
+        if "avatarFocusY" in raw:
+            focus_y = raw["avatarFocusY"]
+            if not isinstance(focus_y, (int, float)) or not 0 <= focus_y <= 1:
+                raise ValueError(
+                    f"nodes[{index}].avatarFocusY must be a number between 0 and 1"
+                )
+            node["avatarFocusY"] = focus_y
         nodes.append(node)
 
     raw_edges = data.get("edges")
