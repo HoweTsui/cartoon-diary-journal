@@ -24,9 +24,38 @@
 
 ## 30 秒安装
 
-### 推荐：使用 Skills CLI
+Skill 本身在 Codex 本地运行，不要求 Node.js。下面的 AI Agent 安装方式只需要本机能执行 `git`。
 
-需要 Node.js 和 npm。打开终端执行：
+### 推荐：让 AI Agent 帮你安装
+
+把下面这段话直接发给有本地终端权限的 AI Agent：
+
+```text
+请帮我安装 Codex Skill：
+https://github.com/HoweTsui/cartoon-diary-journal
+
+请按以下要求执行：
+1. 安装到 ${CODEX_HOME:-$HOME/.codex}/skills/cartoon-diary-journal。
+2. 如果目录已经存在，执行 git -C "${CODEX_HOME:-$HOME/.codex}/skills/cartoon-diary-journal" pull --ff-only；如果不存在，执行 mkdir -p "${CODEX_HOME:-$HOME/.codex}/skills"，再将仓库克隆到 "${CODEX_HOME:-$HOME/.codex}/skills/cartoon-diary-journal"。
+3. 安装后确认目录中存在 SKILL.md、agents/、references/ 和 assets/。
+4. 告诉我最终安装路径和检查结果。
+```
+
+也可以手动执行下面的等价命令：
+
+```bash
+skill_dir="${CODEX_HOME:-$HOME/.codex}/skills/cartoon-diary-journal"
+if [ -d "$skill_dir/.git" ]; then
+  git -C "$skill_dir" pull --ff-only
+else
+  mkdir -p "$(dirname "$skill_dir")"
+  git clone https://github.com/HoweTsui/cartoon-diary-journal.git "$skill_dir"
+fi
+```
+
+### 可选：使用 Skills CLI
+
+只有选择这种安装器时才需要 Node.js 和 npm：
 
 ```bash
 npx skills add https://github.com/HoweTsui/cartoon-diary-journal \
@@ -35,30 +64,12 @@ npx skills add https://github.com/HoweTsui/cartoon-diary-journal \
   --global
 ```
 
-安装完成后检查：
+检查或更新：
 
 ```bash
 npx skills list --global
-```
-
-更新同一 Skill：
-
-```bash
 npx skills update cartoon-diary-journal --global
 ```
-
-### 备用：手动安装
-
-如果当前环境没有 `skills` 命令，先克隆仓库，再复制整个 Skill 目录：
-
-```bash
-git clone https://github.com/HoweTsui/cartoon-diary-journal.git
-mkdir -p "${CODEX_HOME:-$HOME/.codex}/skills"
-cp -R ./cartoon-diary-journal \
-  "${CODEX_HOME:-$HOME/.codex}/skills/"
-```
-
-这里的 `./cartoon-diary-journal` 来自上一条 `git clone`，不能省略 clone 步骤，也不要在不存在该目录的位置直接执行 `cp`。
 
 ## 安装后怎么用
 
@@ -112,11 +123,7 @@ python3 scripts/build_character_graph.py \
   --output /path/to/task-output/character-graph.html
 ```
 
-任务 HTML 和图集只保存本次任务的实际数据；不要把私人照片、真实关系或旧任务角色提交到公开仓库。
-
-## 公开示例
-
-示例只使用公开占位角色，不包含任何私人姓名、照片或真实关系。
+## 示例
 
 ### 日记海报
 
@@ -124,9 +131,9 @@ python3 scripts/build_character_graph.py \
 
 ### 人物关系图谱
 
-![公开人物关系图谱 HTML 页面截图](assets/style-reference/character-graph-concept.png)
+![人物关系图谱 HTML 页面截图](assets/style-reference/character-graph-concept.png)
 
-[打开公开关系图谱示例 HTML](assets/style-reference/character-graph-demo.html)
+[打开人物关系图谱示例 HTML](assets/style-reference/character-graph-demo.html)
 
 ## 目录
 
@@ -155,6 +162,6 @@ cartoon-diary-journal/
 - 复制已出版作品的具体角色、字体、页面或构图。
 - 需要逐像素编辑的矢量插画或商业品牌主视觉。
 
-## 许可与隐私
+## 许可与本地运行
 
-代码与文档沿用仓库中的 MIT 许可。公开仓库只保留原创生成的风格参考和通用模板；不要提交真人原图、宠物原图、真实关系、地点、私人日期或未脱敏任务 HTML。
+代码与文档沿用仓库中的 MIT 许可。Skill 安装后在用户本机运行，读取的输入、人物图谱和生成的海报默认保存在本地工作区；用户可以自行决定是否导出或分享这些文件。
