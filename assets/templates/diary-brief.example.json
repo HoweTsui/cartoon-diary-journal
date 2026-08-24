@@ -5,11 +5,13 @@
     {
       "scene": "人物一出门时被大风吹乱头发",
       "caption": "风先到了",
+      "bubble": "哎呀",
       "characters": ["actual-person-01"]
     },
     {
       "scene": "人物一伸手追车，车刚好驶出画面",
       "caption": "又差一点",
+      "bubble": "等等",
       "characters": ["actual-person-01"]
     },
     {

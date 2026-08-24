@@ -208,14 +208,29 @@ def normalize_brief(
         if not isinstance(event, dict):
             raise ValueError(f"event {index} must be an object")
         scene = require_text(event, "scene", 120)
-        caption = require_text(event, "caption", 12)
+        caption = require_text(event, "caption", 10)
+        if len(caption) < 4:
+            raise ValueError(f"event {index} caption must contain 4 to 10 characters")
+        bubble = event.get("bubble", "")
+        if bubble:
+            if not isinstance(bubble, str) or not 1 <= len(bubble.strip()) <= 6:
+                raise ValueError(f"event {index} bubble must contain 1 to 6 characters")
+            bubble = bubble.strip()
         character_ids = event.get("characters", [])
         if not isinstance(character_ids, list) or not character_ids:
             raise ValueError(f"event {index} characters must be a non-empty list")
         resolved_ids = [resolve_character(item, characters) for item in character_ids]
         normalized.append(
-            {"scene": scene, "caption": caption, "characters": resolved_ids}
+            {
+                "scene": scene,
+                "caption": caption,
+                "bubble": bubble,
+                "characters": resolved_ids,
+            }
         )
+
+    if sum(bool(event["bubble"]) for event in normalized) > 3:
+        raise ValueError("a diary page may contain at most three dialogue bubbles")
 
     summary = data.get("summary", "")
     if summary:
@@ -247,8 +262,12 @@ def build_prompt(
             if character_id not in used_ids:
                 used_ids.append(character_id)
         names = "、".join(characters[item]["name"] for item in event["characters"])
+        bubble_suffix = (
+            f'；optional bubble "{event["bubble"]}"' if event["bubble"] else ""
+        )
         event_lines.append(
-            f'{index}. {names}；{event["scene"]}；caption "{event["caption"]}"'
+            f'{index}. {names}；{event["scene"]}；mandatory 4-10 character '
+            f'caption "{event["caption"]}"{bubble_suffix}'
         )
 
     identity_lines = [f"- {character_description(characters[item])}" for item in used_ids]
@@ -287,23 +306,40 @@ def build_prompt(
         *(relationship_lines or ["- 本页只出现单人动作，不引入未登记关系"]),
         "",
         (
+            "P0 geometry lock: every human and animal in every scene is shown in "
+            "a clear 35-45 degree half-side / three-quarter view. The nose points "
+            "toward the facing direction while BOTH same-size perfect-round solid-black "
+            "dot eyes remain fully visible. Reject front-facing, near-front-facing, "
+            "portrait-like poses and one-eye full profiles. For every human, preserve "
+            "a LONG EMPTY BREAK in the outer face contour beside the forward eye, from "
+            "hairline / eyebrow height down to the nose root. Draw no eyebrow, forehead "
+            "line, bridge line, or head-outline segment inside this break. This is a hard "
+            "gate, not a preference."
+        ),
+        (
             "Style lock: original minimalist black-ink diary cartoon on smooth "
             "pure-white paper with exactly 14-18 evenly spaced very pale cyan "
             "notebook rules. Match the current atlas's medium-thick, slightly "
             "wobbly line weight and deliberately reduced detail. Every human keeps "
             "the atlas head silhouette (varied round-ish, pear, soft wedge, or "
-            "rounded trapezoid), exactly two complete separated dot eyes with a "
-            "slightly wider gap, one nose between eyes and mouth, and one mouth "
-            "placed lower beneath the nose. Nose shapes may vary by identity: a "
-            "small rounded, button-like, short curved, or longer silhouette-breaking "
-            "nose; a rounded nose has a small open break in its own contour and is "
-            "never a closed O or square block. Use readable arms, slender two-line "
-            "lower legs with a visible white gap, readable hands/paws, oversized "
-            "flat shoes, sparse hair strokes or "
+            "rounded trapezoid), exactly two complete perfect-round solid-black dot eyes "
+            "with a slightly wider gap, one nose between eyes and mouth, and one mouth "
+            "placed clearly lower beneath the nose. Every HUMAN nose is an unfilled "
+            "black-line, non-circular, slightly flattened open half-ellipse. Its own "
+            "contour is broken at the UPPER side; the upper endpoint stops just below "
+            "the two eyes and creates only slight overlap. A human nose is never a "
+            "solid-black dot or oval, animal nose, closed O, square block, wet nose, "
+            "nostril, long bridge, brow, or forehead line. Keep the torso narrow, no "
+            "wider than about 55% of head width. Use extremely thin double-line upper "
+            "arms, forearms, thighs, calves and animal limb shafts, each tube about "
+            "1/16-1/12 of head width with a visible white gap. Hands and paws may be "
+            "slightly larger than the limb ends, but the limbs themselves remain thin. "
+            "Use oversized flat shoes, sparse hair strokes or "
             "one solid-black hair shape, and a few solid-black fills only. Pets keep "
             "their complete ears, eyes, nose, mouth and tail. No gray modeling, "
             "shading, realistic texture, or decorative color. Pets are flat simplified "
-            "silhouettes with two ears, two eyes, a species-correct single solid-black "
+            "half-side silhouettes with a large head, narrow torso, two ears, two "
+            "perfect-round eyes, a species-correct single solid-black "
             "nose (for cats: smaller and centered below the eyes; for dogs: at the "
             "muzzle tip), a tiny mouth, compact "
             "torso, clear legs/paws and a simple tail; dogs keep a visibly oversized "
@@ -320,7 +356,15 @@ def build_prompt(
             "Composition: strict 9:16 tall portrait; date and weekday are the first "
             "and highest content; subtitle immediately below; three to six airy "
             "scenes flowing continuously from top to bottom on the ruled lines; one "
-            "action per scene; wide margins; no panel borders."
+            "action per scene. EVERY scene has one mandatory 4-10 Chinese-character "
+            "action summary in the same rounded cute handwritten cartoon Chinese "
+            "lettering, positioned beside or below that scene. This caption is "
+            "separate from dialogue. Leave at least one full notebook-rule height "
+            "of completely empty space between the bounding boxes of neighboring "
+            "scenes, preferably 1.5 rule heights. Use wide margins and no panel "
+            "borders. Optional dialogue or thought bubbles contain only 1-6 Chinese "
+            "characters; use at most three bubbles on the page. Do not reproduce a "
+            "published signature font."
         ),
         (
             "Identity lock: preserve every listed head shape, nose direction, hair "
@@ -345,16 +389,21 @@ def build_prompt(
             "location, brand, or product."
         ),
         (
-            "Avoid: photorealism, semi-realism, realistic anatomy, cinematic "
+            "Avoid: front-facing or near-front-facing people or animals, one-eye "
+            "profiles, missing face-contour breaks, photorealism, semi-realism, realistic anatomy, cinematic "
             "lighting, 3D, gradients, glossy surfaces, skin shading, realistic food, "
             "painterly rendering, watercolor, pencil grain, crosshatching, paper "
             "fibers, film grain, noise, speckles, vintage distress, generic identical "
-            "noses, closed circular noses, square noses, hard right-angle heads, "
-            "single-eye profiles, missing facial features, human noses on animals, human nose bridges on animals, thick realistic legs, hair-thin "
+            "noses, solid-black human noses, animal noses on humans, human open noses "
+            "on animals, closed circular noses, square noses, hard right-angle heads, "
+            "missing facial features, human nose bridges on animals, thick torsos, "
+            "thick arms, thick thighs, thick calves, thick animal limbs, hair-thin "
             "broken legs, realistic pet fur, realistic pet eyes, chibi "
             "proportions, pastel storybook art, kawaii sticker art, manga, polished "
-            "commercial vector art, thick uniform outlines, perfect curves, dense "
-            "backgrounds, missing date, wrong weekday, copied copyrighted characters, "
+            "commercial vector art, bulky soft outlines, mixed line weights, "
+            "mechanically perfect vector curves, dense "
+            "backgrounds, missing per-scene captions, cramped or touching neighboring "
+            "scenes, missing date, wrong weekday, copied copyrighted characters, "
             "identity drift, photorealistic user uploads, and mixed rendering styles."
         ),
     ]

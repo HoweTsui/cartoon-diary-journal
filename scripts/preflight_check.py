@@ -65,6 +65,30 @@ def check_package(failures: list[str]) -> None:
         if not (SKILL_ROOT / reference).exists():
             fail(f"SKILL.md points to missing path: {reference}", failures)
 
+    required_skill_guards = (
+        "35°-45° 半侧面",
+        "人物鼻子绝不能实心填黑",
+        "动物使用符合物种的单一实心黑鼻",
+        "4-10 字短总结",
+        "至少留出 1 条完整横线高度",
+    )
+    for guard in required_skill_guards:
+        if guard not in skill_text:
+            fail(f"SKILL.md is missing style guard: {guard}", failures)
+
+    prompt_builder_text = (SKILL_ROOT / "scripts" / "build_diary_prompt.py").read_text(
+        encoding="utf-8"
+    )
+    required_prompt_guards = (
+        "P0 geometry lock",
+        "solid-black human noses",
+        "mandatory 4-10 character",
+        "one full notebook-rule height",
+    )
+    for guard in required_prompt_guards:
+        if guard not in prompt_builder_text:
+            fail(f"prompt builder is missing style guard: {guard}", failures)
+
     for path in (SKILL_ROOT / "scripts").glob("*.py"):
         try:
             ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
