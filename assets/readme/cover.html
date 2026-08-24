@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>小屁孩日记风格 Skill</title>
+  <style>
+    * { box-sizing: border-box; }
+    html, body { margin: 0; width: 1600px; height: 720px; overflow: hidden; }
+    body {
+      color: #111;
+      font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      background:
+        repeating-linear-gradient(to bottom, transparent 0, transparent 63px, #d9f1f6 64px, transparent 65px),
+        #fff;
+    }
+    .cover { position: relative; width: 100%; height: 100%; padding: 72px 78px; }
+    .eyebrow {
+      display: inline-flex; gap: 12px; align-items: center;
+      border: 3px solid #111; border-radius: 999px; padding: 9px 18px;
+      font-size: 22px; font-weight: 700; background: #fff;
+    }
+    .dot { width: 13px; height: 13px; border-radius: 50%; background: #62c5d8; }
+    h1 { margin: 30px 0 14px; font-size: 76px; line-height: 1.1; letter-spacing: 2px; }
+    .lead { margin: 0; width: 660px; font-size: 29px; line-height: 1.55; font-weight: 600; }
+    .chips { display: flex; gap: 14px; margin-top: 28px; }
+    .chip { padding: 10px 17px; border: 2px solid #111; border-radius: 12px; background: #fff; font-size: 19px; font-weight: 650; }
+    .lineup { position: absolute; left: 52px; bottom: -10px; width: 650px; height: 300px; object-fit: contain; object-position: center bottom; }
+    .graph {
+      position: absolute; right: 62px; top: 76px; width: 635px; height: 395px;
+      object-fit: cover; object-position: left top; border: 4px solid #111; border-radius: 22px;
+      box-shadow: 15px 15px 0 #cfeef4; background: #fff;
+    }
+    .poster {
+      position: absolute; right: 93px; bottom: -135px; width: 285px; height: 505px;
+      object-fit: cover; object-position: top; border: 4px solid #111; border-radius: 18px;
+      transform: rotate(2.5deg); box-shadow: 12px 12px 0 rgba(17,17,17,.12); background: #fff;
+    }
+    .caption {
+      position: absolute; right: 408px; bottom: 108px; width: 290px;
+      padding: 16px 18px; border: 3px solid #111; border-radius: 18px; background: #fff;
+      font-size: 22px; font-weight: 700; line-height: 1.45;
+    }
+    .caption::after {
+      content: ""; position: absolute; right: -17px; top: 34px; width: 28px; height: 28px;
+      border-top: 3px solid #111; border-right: 3px solid #111; background: #fff; transform: rotate(45deg);
+    }
+  </style>
+</head>
+<body>
+  <main class="cover">
+    <div class="eyebrow"><span class="dot"></span> Codex Skill · 黑白日记插画</div>
+    <h1>小屁孩日记风格 Skill</h1>
+    <p class="lead">把一天的小事，整理成角色一致、从上到下讲故事的 9:16 黑白日记海报。</p>
+    <div class="chips">
+      <span class="chip">日期与周几</span>
+      <span class="chip">角色一致性</span>
+      <span class="chip">可编辑关系图</span>
+    </div>
+    <img class="lineup" src="../style-reference/character-lineup-demo.png" alt="公共示例角色图集">
+    <img class="graph" src="../style-reference/character-graph-concept.png" alt="人物关系图谱">
+    <div class="caption">先查角色图谱，再画日记。<br>同一个人，每一格都认得出来。</div>
+    <img class="poster" src="../style-reference/diary-style-anchor.png" alt="日记海报示例">
+  </main>
+</body>
+</html>

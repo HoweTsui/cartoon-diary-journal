@@ -37,9 +37,9 @@ git push origin main --follow-tags
 版本号写入 `VERSION`，变更写入 `CHANGELOG.md`。示例：
 
 ```bash
-printf '0.1.2\n' > VERSION
+printf '0.1.3\n' > VERSION
 git add VERSION CHANGELOG.md
 git commit -m "fix: tighten character matching"
-git tag -a v0.1.2 -m "小屁孩日记风格 Skill v0.1.2"
+git tag -a v0.1.3 -m "小屁孩日记风格 Skill v0.1.3"
 git push origin main --follow-tags
 ```
