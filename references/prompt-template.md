@@ -35,7 +35,7 @@ use a prominent silhouette-breaking nose only when that person's identity anchor
 Every human nose must be an unfilled black-line, non-circular, slightly flattened open half-ellipse;
 the nose's own contour must be deliberately broken at the UPPER side, with the upper endpoint ending
 just below the two eyes and creating only slight overlap. Never make it a perfect circle, fully closed O,
-solid-black button, animal nose, long bridge, brow, or forehead line.
+solid-black button, animal nose, long bridge, brow, or forehead line. Never place a black nostril dot inside, above, below, or beside a human nose, and never add a third facial dot to imply a nostril.
 For every human, also preserve the long open break in
 the front outer head contour beside the forward eye, running from hairline height to the nose root;
 do not draw an eyebrow or any line that closes this gap. The visible face outline from forehead through
@@ -46,6 +46,7 @@ or one solid-black hair shape. Keep the torso narrow (no wider than about 55% of
 double-line upper arms, forearms, thighs and calves, each tube about 1/16-1/12 of head width with a visible white gap;
 use slightly enlarged simple hands, short 3–4 finger arcs, and oversized flat oval shoes. Put the mouth clearly
 lower beneath the nose.
+Every full-body or seated human visibly wears shorts or trousers. Draw a clear waistband, crotch separation and two distinct trouser legs; never connect a shirt directly to bare-looking legs. Thin calves begin below the trouser cuffs, and trousers must not be faked by thickening the legs.
 Every human face must visibly retain two eyes, one line-drawn open nose, and one mouth. Dogs use one solid-
 black animal nose at the front of the muzzle; cats retain two ears, two eyes, one smaller solid-black
 cat nose centered below the eyes, and a mouth. Animals also keep the same 35-45 degree half-side view,
