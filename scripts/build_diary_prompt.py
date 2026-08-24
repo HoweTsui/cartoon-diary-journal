@@ -286,8 +286,10 @@ def build_prompt(
         "Use case: illustration-story",
         "Asset type: one original vertical Chinese diary-journal page",
         (
-            "Input images: Image 1 is the current style anchor; Image 2 is this "
-            "task's actual identity atlas. Any later user-uploaded photo is an "
+            "Input images: Image 1 is this task's actual identity atlas and is "
+            "identity-only; Image 2 is the public diary page anchor and is layout-only "
+            "(ruled paper, header, vertical rhythm, whitespace). Never inherit Image 2's "
+            "sample-character face, limb, pet, or pose structure. Any later user-uploaded photo is an "
             "identity-only reference and must be converted into this same atlas style "
             "before it is used."
         ),
@@ -306,15 +308,36 @@ def build_prompt(
         *(relationship_lines or ["- 本页只出现单人动作，不引入未登记关系"]),
         "",
         (
+            "Atlas gate: inspect this task's identity atlas before generating the diary page. "
+            "If any atlas character is near-front-facing, has a generic C-shaped or closed "
+            "human nose, lacks the human contour break, has thick limbs, or turns an animal "
+            "into a humanoid/realistic pet, rebuild the atlas first. Never propagate a failed "
+            "atlas into a diary page."
+        ),
+        (
             "P0 geometry lock: every human and animal in every scene is shown in "
-            "a clear 35-45 degree half-side / three-quarter view. The nose points "
+            "a clear 25-35 degree, slightly forward half-side view (animals keep a species-correct "
+            "half-side view). The nose points "
             "toward the facing direction while BOTH same-size perfect-round solid-black "
             "dot eyes remain fully visible. Reject front-facing, near-front-facing, "
             "portrait-like poses and one-eye full profiles. For every human, preserve "
-            "a LONG EMPTY BREAK in the outer face contour beside the forward eye, from "
-            "hairline / eyebrow height down to the nose root. Draw no eyebrow, forehead "
+            "a VISIBLE EMPTY BREAK in the outer face contour beside the forward eye: draw only a short "
+            "curve from the hairline/fringe end toward eyebrow level (without drawing an eyebrow), then leave a "
+            "clean blank gap about 1.5 eye-dot heights down to the nose root. This contour is a short curve hugging the head, "
+            "never a long straight line. Draw no eyebrow, forehead "
             "line, bridge line, or head-outline segment inside this break. This is a hard "
             "gate, not a preference."
+        ),
+        (
+            "P0 visual gate: render only after all five conditions are simultaneously true: "
+            "(1) both complete equal perfect-round black dot eyes and one rear ear are visible "
+            "in a 25-35 degree half-side view, with the outer eye clear of the outline; (2) each human keeps the visible empty forward-face "
+            "contour break; (3) humans use exactly one unfilled upper-open half-ellipse nose while "
+            "animals use one species-correct solid-black nose; (4) torso and every limb shaft stay "
+            "deliberately narrow with visible-white-channel double-line limbs; (5) every repeated "
+            "character matches the atlas head, eye spacing, nose direction, hair/ears, clothing blocks, "
+            "limbs and shoes/paws. If any scene fails one condition, regenerate the whole page; do not "
+            "accept a close approximation."
         ),
         (
             "Style lock: original minimalist black-ink diary cartoon on smooth "
@@ -323,7 +346,7 @@ def build_prompt(
             "wobbly line weight and deliberately reduced detail. Every human keeps "
             "the atlas head silhouette (varied round-ish, pear, soft wedge, or "
             "rounded trapezoid), exactly two complete perfect-round solid-black dot eyes "
-            "with a slightly wider gap, one nose between eyes and mouth, and one mouth "
+            "placed slightly high with a slightly wider gap and the outer eye clear of the outline, one nose between eyes and mouth, and one mouth "
             "placed clearly lower beneath the nose. Every HUMAN nose is an unfilled "
             "black-line, non-circular, slightly flattened open half-ellipse. Its own "
             "contour is broken at the UPPER side; the upper endpoint stops just below "
@@ -335,7 +358,7 @@ def build_prompt(
             "1/16-1/12 of head width with a visible white gap. Hands and paws may be "
             "slightly larger than the limb ends, but the limbs themselves remain thin. "
             "Every full-body or seated human visibly wears shorts or trousers with a "
-            "clear waistband, crotch separation and two distinct trouser legs. Never "
+            "clear waistband, crotch separation, lower hem and two distinct trouser legs, with visible white separation above each calf. Never "
             "connect a shirt directly to bare-looking legs. Thin calves begin below "
             "the trouser cuffs; do not fake trousers by thickening the legs. "
             "Use oversized flat shoes, sparse hair strokes or "
@@ -344,7 +367,8 @@ def build_prompt(
             "shading, realistic texture, or decorative color. Pets are flat simplified "
             "half-side silhouettes with a large head, narrow torso, two ears, two "
             "perfect-round eyes, a species-correct single solid-black "
-            "nose (for cats: smaller and centered below the eyes; for dogs: at the "
+            "nose (for cats: smaller and centered below the eyes with no human-style nose line or extra "
+            "protruding muzzle contour; for dogs: at the "
             "muzzle tip), a tiny mouth, compact "
             "torso, clear legs/paws and a simple tail; dogs keep a visibly oversized "
             "head, widely spaced dot eyes and short thick rounded paws with one to "

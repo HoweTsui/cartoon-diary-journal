@@ -5,7 +5,7 @@
 ```text
 Use case: illustration-story
 Asset type: one original vertical Chinese diary-journal page
-Input images: Image 1 is the current style anchor; Image 2 is this task's actual identity atlas. Optional Image 3 is a simplified pet-proportion reference and optional Image 4 is an expression reference sheet. Any later user-uploaded photos are identity-only references and must be transformed into the same atlas style before use.
+Input images: Image 1 is this task's actual identity atlas and is identity-only; Image 2 is the public diary page anchor and is layout-only (ruled paper, header, vertical rhythm, whitespace). Never inherit Image 2's sample-character face, limb, pet, or pose structure. Optional Image 3 is a simplified pet-proportion reference and optional Image 4 is an expression reference sheet. Any later user-uploaded photos are identity-only references and must be transformed into the same atlas style before use.
 
 Exact top header: "{YYYY.MM.DD 周X}"
 Exact subtitle: "{标题}"
@@ -19,13 +19,21 @@ ID, exact name, role, anchors, and atlas cell. List only relationships whose two
 appear in this page; preserve those relationship labels in the actions. If a character is
 missing or ambiguous, stop and request a reference image, then rebuild the graph and re-check.
 
-P0 geometry lock: every human and animal in every scene is shown in a clear
-35-45 degree three-quarter / half-side view. The nose points toward the facing
+Atlas gate: inspect this task's identity atlas before generating the diary page. If any atlas character is near-front-facing, has a generic C-shaped or closed human nose, lacks the human contour break, has thick limbs, or turns an animal into a humanoid/realistic pet, rebuild the atlas first. Never propagate a failed atlas into a diary page.
+
+P0 geometry lock: every human in every scene is shown in a clear 25-35 degree,
+slightly forward half-side view; animals keep a species-correct half-side view. The nose points toward the facing
 direction while BOTH same-size perfect-round black dot eyes remain fully visible.
 Reject front-facing, near-front-facing portrait poses and one-eye full profiles.
-For every human, preserve a LONG EMPTY BREAK in the outer face contour beside the
-forward eye, from hairline / eyebrow height down to the nose root. Draw no eyebrow,
+For every human, preserve a VISIBLE EMPTY BREAK in the outer face contour beside the
+forward eye: draw only a SHORT CURVED outer-head segment hugging the head shape from the hairline/fringe end toward eyebrow level (without drawing an eyebrow), then leave a clean blank gap of about 1.5 eye-dot heights down to the nose root. This contour is never a long straight line. Draw no eyebrow,
 forehead line, bridge line, or head-outline segment inside this break.
+
+P0 visual gate: render only after all five conditions are simultaneously true:
+(1) both complete equal round black dot eyes and one rear ear are visible in a 25-35 degree half-side view, with the outer eye clear of the outline;
+(2) the human forward outer-face contour has the visible empty break; (3) humans use exactly one unfilled upper-open half-ellipse nose while animals use one species-correct solid-black nose;
+(4) torso and every limb shaft stay deliberately narrow, with visible white-channel double-line limbs;
+(5) every repeated character matches its atlas head, eye spacing, nose direction, hair/ears, clothing blocks, limbs and shoes/paws. If any scene fails one condition, regenerate the whole page; do not accept a close approximation.
 
 Style lock: original black-ink diary cartoon on smooth pure-white paper with
 exactly 14-18 evenly spaced very pale cyan notebook rules. Every human keeps the identity atlas's
@@ -36,20 +44,20 @@ Every human nose must be an unfilled black-line, non-circular, slightly flattene
 the nose's own contour must be deliberately broken at the UPPER side, with the upper endpoint ending
 just below the two eyes and creating only slight overlap. Never make it a perfect circle, fully closed O,
 solid-black button, animal nose, long bridge, brow, or forehead line. Never place a black nostril dot inside, above, below, or beside a human nose, and never add a third facial dot to imply a nostril.
-For every human, also preserve the long open break in
-the front outer head contour beside the forward eye, running from hairline height to the nose root;
+For every human, also preserve the visible open break in
+the front outer head contour beside the forward eye: it must be a short curve from hairline to eyebrow level, then remain visibly open for about 1.5 eye-dot heights until the nose root;
 do not draw an eyebrow or any line that closes this gap. The visible face outline from forehead through
 nose root, cheek, and chin must remain one smooth continuous organic curve; no angular kinks, stepped
 cheeks, flat jaw corners, or abrupt turns. The nose itself may connect to the face naturally.
-Use two perfect-round dot eyes with a slightly wider eye gap, tiny ears, no eyebrows, two to eight sparse hair strokes
+Use two perfect-round dot eyes placed slightly high with a slightly wider eye gap; keep the outer eye clear of the outline. Use tiny ears, no eyebrows, two to eight sparse hair strokes
 or one solid-black hair shape. Keep the torso narrow (no wider than about 55% of head width). Use extremely thin
 double-line upper arms, forearms, thighs and calves, each tube about 1/16-1/12 of head width with a visible white gap;
 use slightly enlarged simple hands, short 3–4 finger arcs, and oversized flat oval shoes. Put the mouth clearly
 lower beneath the nose.
-Every full-body or seated human visibly wears shorts or trousers. Draw a clear waistband, crotch separation and two distinct trouser legs; never connect a shirt directly to bare-looking legs. Thin calves begin below the trouser cuffs, and trousers must not be faked by thickening the legs.
+Every full-body or seated human visibly wears shorts or trousers. Draw a clear waistband, crotch separation, lower hem, and two distinct trouser legs; leave visible white separation between the hem and each thin calf. Never connect a shirt directly to bare-looking legs. Thin calves begin below the trouser cuffs, and trousers must not be faked by thickening the legs.
 Every human face must visibly retain two eyes, one line-drawn open nose, and one mouth. Dogs use one solid-
 black animal nose at the front of the muzzle; cats retain two ears, two eyes, one smaller solid-black
-cat nose centered below the eyes, and a mouth. Animals also keep the same 35-45 degree half-side view,
+cat nose centered below the eyes, and a mouth. Cats never receive a human open nose, C-shaped nose line, or extra protruding muzzle contour. Animals also keep the same 25-35 degree half-side view,
 a large head, narrow torso, extremely thin limb shafts and slightly larger simple paws. Never give an animal the human open half-ellipse nose, nose
 bridge, nostrils, or a second nose. Nose direction must agree with face direction. Avoid square noses
 and hard right-angle heads.

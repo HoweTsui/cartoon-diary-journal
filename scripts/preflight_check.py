@@ -29,6 +29,7 @@ REQUIRED_FILES = (
     "agents/openai.yaml",
     "references/character-library.md",
     "references/style-system.md",
+    "references/visual-gate.md",
     "references/prompt-template.md",
     "references/qa-checklist.md",
     "scripts/build_character_graph.py",
@@ -66,11 +67,14 @@ def check_package(failures: list[str]) -> None:
             fail(f"SKILL.md points to missing path: {reference}", failures)
 
     required_skill_guards = (
-        "35°-45° 半侧面",
+        "25°-35° 的偏正半侧面",
+        "约 1.5 个眼点高度",
+        "外侧眼不贴轮廓",
         "人物鼻子绝不能实心填黑",
         "动物使用符合物种的单一实心黑鼻",
         "4-10 字短总结",
         "至少留出 1 条完整横线高度",
+        "P0 门禁",
     )
     for guard in required_skill_guards:
         if guard not in skill_text:
@@ -84,6 +88,8 @@ def check_package(failures: list[str]) -> None:
         "solid-black human noses",
         "mandatory 4-10 character",
         "one full notebook-rule height",
+        "P0 visual gate",
+        "Atlas gate",
     )
     for guard in required_prompt_guards:
         if guard not in prompt_builder_text:
