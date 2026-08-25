@@ -12,6 +12,9 @@ from pathlib import Path
 
 WEEKDAYS = ("周一", "周二", "周三", "周四", "周五", "周六", "周日")
 SKILL_ROOT = Path(__file__).resolve().parents[1]
+PUBLIC_GEOMETRY_ATLAS = SKILL_ROOT / "assets" / "style-reference" / "character-lineup-demo.png"
+PUBLIC_FACE_GEOMETRY = SKILL_ROOT / "assets" / "style-reference" / "face-geometry-closeup.png"
+PUBLIC_LAYOUT_ANCHOR = SKILL_ROOT / "assets" / "style-reference" / "diary-layout-only.png"
 GRAPH_DATA_PATTERN = re.compile(
     r'<script\s+id="graph-data"\s+type="application/json">\s*'
     r"(.*?)"
@@ -255,6 +258,14 @@ def build_prompt(
     characters: dict[str, dict],
     relationships: list[dict],
 ) -> str:
+    for asset, label in (
+        (PUBLIC_GEOMETRY_ATLAS, "public geometry atlas"),
+        (PUBLIC_FACE_GEOMETRY, "public face-geometry closeup"),
+        (PUBLIC_LAYOUT_ANCHOR, "public layout-only anchor"),
+    ):
+        if not asset.is_file():
+            raise ValueError(f"required {label} is missing: {asset}")
+
     used_ids: list[str] = []
     event_lines: list[str] = []
     for index, event in enumerate(events, start=1):
@@ -286,12 +297,29 @@ def build_prompt(
         "Use case: illustration-story",
         "Asset type: one original vertical Chinese diary-journal page",
         (
-            "Input images: Image 1 is this task's actual identity atlas and is "
-            "identity-only; Image 2 is the public diary page anchor and is layout-only "
-            "(ruled paper, header, vertical rhythm, whitespace). Never inherit Image 2's "
-            "sample-character face, limb, pet, or pose structure. Any later user-uploaded photo is an "
+            "REQUIRED image inputs, in order: Image 1 is this task's actual identity atlas and is "
+            "identity-only; Image 2 is assets/style-reference/character-lineup-demo.png and is the "
+            "confirmed public GEOMETRY reference only (head, eyes, nose, body, limbs, shorts hems); "
+            "Image 3 is assets/style-reference/face-geometry-closeup.png and is the enlarged facial and animal-nose gate only; "
+            "copy its eye size, front-face break, human half-ellipse nose, and animal nose grammar without copying identity. "
+            "Image 4 is assets/style-reference/diary-layout-only.png and is layout-only (ruled paper, header, vertical rhythm, "
+            "whitespace). Image 4 intentionally contains NO characters: never infer face, limb, pet, or pose structure from it. "
+            "Never inherit Image 2 or Image 3's identity. "
+            "If any required image is absent, stop instead of rendering. Any later user-uploaded photo is an "
             "identity-only reference and must be converted into this same atlas style "
             "before it is used."
+        ),
+        (
+            "Style trigger resolved: ORIGINAL BONE-THIN RULED-DIARY LOCK. This is "
+            "not a generic black-and-white cartoon: copy Image 1's identity and Image 2's geometry before composing scenes; enforce "
+            "the supplied atlas's "
+            "25-35 degree half-side heads, equal high round dot eyes with outer-eye "
+            "white margin, short outer-head curve plus 1.5-eye-dot blank break, "
+            "separate human/animal noses, narrow torsos, ultra-thin double-line limbs, "
+            "short sideways human half-ellipse noses (never downturned U/C noses), large heads "
+            "at least 30 percent of standing figure height, short lower legs, and shorts-hem-to-calf "
+            "white separation. If the atlas does not show these "
+            "properties, stop and rebuild the atlas before rendering the diary page."
         ),
         "",
         f'Exact top header (verbatim): "{header}"',
@@ -334,7 +362,8 @@ def build_prompt(
             "in a 25-35 degree half-side view, with the outer eye clear of the outline; (2) each human keeps the visible empty forward-face "
             "contour break; (3) humans use exactly one unfilled upper-open half-ellipse nose while "
             "animals use one species-correct solid-black nose; (4) torso and every limb shaft stay "
-            "deliberately narrow with visible-white-channel double-line limbs; (5) every repeated "
+            "deliberately narrow with visible-white-channel double-line limbs and a head at least 30 percent "
+            "of standing figure height; (5) every repeated "
             "character matches the atlas head, eye spacing, nose direction, hair/ears, clothing blocks, "
             "limbs and shoes/paws. If any scene fails one condition, regenerate the whole page; do not "
             "accept a close approximation."
@@ -352,7 +381,8 @@ def build_prompt(
             "contour is broken at the UPPER side; the upper endpoint stops just below "
             "the two eyes and creates only slight overlap. A human nose is never a "
             "solid-black dot or oval, animal nose, closed O, square block, wet nose, "
-            "nostril, long bridge, brow, or forehead line. Keep the torso narrow, no "
+            "nostril, long bridge, brow, forehead line, or downturned U/C shape. The human nose must be "
+            "wider than tall and point sideways toward the facing direction. Keep the torso narrow, no "
             "wider than about 55% of head width. Use extremely thin double-line upper "
             "arms, forearms, thighs, calves and animal limb shafts, each tube about "
             "1/16-1/12 of head width with a visible white gap. Hands and paws may be "
@@ -360,7 +390,7 @@ def build_prompt(
             "Every full-body or seated human visibly wears shorts or trousers with a "
             "clear waistband, crotch separation, lower hem and two distinct trouser legs, with visible white separation above each calf. Never "
             "connect a shirt directly to bare-looking legs. Thin calves begin below "
-            "the trouser cuffs; do not fake trousers by thickening the legs. "
+            "the trouser cuffs and must be no longer than about one head height; do not fake trousers by thickening the legs. "
             "Use oversized flat shoes, sparse hair strokes or "
             "one solid-black hair shape, and a few solid-black fills only. Pets keep "
             "their complete ears, eyes, nose, mouth and tail. No gray modeling, "
@@ -373,7 +403,7 @@ def build_prompt(
             "torso, clear legs/paws and a simple tail; dogs keep a visibly oversized "
             "head, widely spaced dot eyes and short thick rounded paws with one to "
             "three blunt toe notches. Never render realistic fur strands, whiskers, "
-            "eye reflections, or fur shading. Expression changes may alter only eye "
+            "eye reflections, fur shading, whiskers, or facial hair. A cat has ZERO whisker lines. Expression changes may alter only eye "
             "openness/roundness, mouth shape and up to two temporary emotion marks; "
             "neutral faces have no brows. Never give an animal a human C-shaped nose, dog-sized cat nose, misplaced "
             "cat nose, nose bridge, nostrils, or a "

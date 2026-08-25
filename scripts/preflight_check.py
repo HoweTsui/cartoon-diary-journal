@@ -34,6 +34,9 @@ REQUIRED_FILES = (
     "references/qa-checklist.md",
     "scripts/build_character_graph.py",
     "scripts/build_diary_prompt.py",
+    "assets/style-reference/character-lineup-demo.png",
+    "assets/style-reference/face-geometry-closeup.png",
+    "assets/style-reference/diary-layout-only.png",
 )
 PLACEHOLDER_NAMES = ("林芽", "江屿", "桃子", "阿岚", "林杏", "灰豆", "actual-person-")
 DATE_PATTERN = re.compile(r"\b20\d{2}[./-]\d{1,2}[./-]\d{1,2}\b")
@@ -70,6 +73,9 @@ def check_package(failures: list[str]) -> None:
         "25°-35° 的偏正半侧面",
         "约 1.5 个眼点高度",
         "外侧眼不贴轮廓",
+        "骨感黑白日记锁",
+        "四张图一同作为 `image_gen` 的图像输入",
+        "人头小于全身高度约 30%",
         "人物鼻子绝不能实心填黑",
         "动物使用符合物种的单一实心黑鼻",
         "4-10 字短总结",
@@ -90,6 +96,9 @@ def check_package(failures: list[str]) -> None:
         "one full notebook-rule height",
         "P0 visual gate",
         "Atlas gate",
+        "ORIGINAL BONE-THIN RULED-DIARY LOCK",
+        "REQUIRED image inputs, in order",
+        "downturned U/C noses",
     )
     for guard in required_prompt_guards:
         if guard not in prompt_builder_text:

@@ -5,7 +5,7 @@
 ```text
 Use case: illustration-story
 Asset type: one original vertical Chinese diary-journal page
-Input images: Image 1 is this task's actual identity atlas and is identity-only; Image 2 is the public diary page anchor and is layout-only (ruled paper, header, vertical rhythm, whitespace). Never inherit Image 2's sample-character face, limb, pet, or pose structure. Optional Image 3 is a simplified pet-proportion reference and optional Image 4 is an expression reference sheet. Any later user-uploaded photos are identity-only references and must be transformed into the same atlas style before use.
+Required input images, in order: Image 1 is this task's actual identity atlas and is identity-only; Image 2 is `assets/style-reference/character-lineup-demo.png` and is geometry-only (head, two eyes, human/animal nose grammar, limbs, shorts, shoes/paws); Image 3 is `assets/style-reference/face-geometry-closeup.png` and is the enlarged eye/break/nose grammar gate; Image 4 is `assets/style-reference/diary-layout-only.png` and is layout-only (ruled paper, header, vertical rhythm, whitespace) and contains no people or animals. Never infer character structure from Image 4 or inherit sample identities from Images 2–3. Optional Image 5 is a simplified pet-proportion reference and optional Image 6 is an expression reference sheet. Any later user-uploaded photos are identity-only references and must be transformed into the same atlas style before use. If Images 1–4 are not all attached, stop instead of generating.
 
 Exact top header: "{YYYY.MM.DD 周X}"
 Exact subtitle: "{标题}"
