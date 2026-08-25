@@ -81,24 +81,32 @@ def check_package(failures: list[str]) -> None:
         "4-10 字短总结",
         "至少留出 1 条完整横线高度",
         "P0 门禁",
+        "每个场景都要为每一名可见人物或宠物单独写出角色 ID",
     )
     for guard in required_skill_guards:
         if guard not in skill_text:
             fail(f"SKILL.md is missing style guard: {guard}", failures)
+    for legacy_guard in ("1/16-1/12", "眉线位置"):
+        if legacy_guard in skill_text:
+            fail(f"SKILL.md still contains conflicting legacy guard: {legacy_guard}", failures)
 
     prompt_builder_text = (SKILL_ROOT / "scripts" / "build_diary_prompt.py").read_text(
         encoding="utf-8"
     )
     required_prompt_guards = (
         "P0 geometry lock",
-        "solid-black human noses",
+        "PRIMARY DRAWING GATE",
+        "unfilled human nose",
         "mandatory 4-10 character",
         "one full notebook-rule height",
         "P0 visual gate",
         "Atlas gate",
-        "ORIGINAL BONE-THIN RULED-DIARY LOCK",
+        "BONE-THIN RULED-DIARY LOCK",
         "REQUIRED image inputs, in order",
-        "downturned U/C noses",
+        "downturned U/C shape",
+        "1/18 of head width",
+        "PER-SCENE CHARACTER-CARD LOCK",
+        "Never use the protagonist's head",
     )
     for guard in required_prompt_guards:
         if guard not in prompt_builder_text:

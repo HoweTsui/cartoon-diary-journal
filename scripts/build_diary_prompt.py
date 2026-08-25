@@ -250,6 +250,15 @@ def character_description(node: dict) -> str:
     return f"{node['name']}：{anchors}"
 
 
+def scene_character_card(character_id: str, node: dict) -> str:
+    """Return the identity data that must be applied to one visible character."""
+    anchors = "；".join(item.strip() for item in node["anchors"])
+    return (
+        f"[{character_id} | {node['name']} | atlas cell col={node['col']}, row={node['row']}] "
+        f"{anchors}"
+    )
+
+
 def build_prompt(
     header: str,
     title: str,
@@ -268,6 +277,7 @@ def build_prompt(
 
     used_ids: list[str] = []
     event_lines: list[str] = []
+    scene_card_lines: list[str] = []
     for index, event in enumerate(events, start=1):
         for character_id in event["characters"]:
             if character_id not in used_ids:
@@ -279,6 +289,13 @@ def build_prompt(
         event_lines.append(
             f'{index}. {names}；{event["scene"]}；mandatory 4-10 character '
             f'caption "{event["caption"]}"{bubble_suffix}'
+        )
+        scene_cards = " || ".join(
+            scene_character_card(character_id, characters[character_id])
+            for character_id in event["characters"]
+        )
+        scene_card_lines.append(
+            f"Scene {index} visible-character cards (apply EACH independently): {scene_cards}"
         )
 
     identity_lines = [f"- {character_description(characters[item])}" for item in used_ids]
@@ -304,27 +321,41 @@ def build_prompt(
             "copy its eye size, front-face break, human half-ellipse nose, and animal nose grammar without copying identity. "
             "Image 4 is assets/style-reference/diary-layout-only.png and is layout-only (ruled paper, header, vertical rhythm, "
             "whitespace). Image 4 intentionally contains NO characters: never infer face, limb, pet, or pose structure from it. "
-            "Never inherit Image 2 or Image 3's identity. "
+            "Never inherit Image 2 or Image 3's identity, and never redraw any input atlas as a character sheet, grid, lineup, or scene content. "
             "If any required image is absent, stop instead of rendering. Any later user-uploaded photo is an "
             "identity-only reference and must be converted into this same atlas style "
             "before it is used."
         ),
         (
-            "Style trigger resolved: ORIGINAL BONE-THIN RULED-DIARY LOCK. This is "
-            "not a generic black-and-white cartoon: copy Image 1's identity and Image 2's geometry before composing scenes; enforce "
-            "the supplied atlas's "
-            "25-35 degree half-side heads, equal high round dot eyes with outer-eye "
-            "white margin, short outer-head curve plus 1.5-eye-dot blank break, "
-            "separate human/animal noses, narrow torsos, ultra-thin double-line limbs, "
-            "short sideways human half-ellipse noses (never downturned U/C noses), large heads "
-            "at least 30 percent of standing figure height, short lower legs, and shorts-hem-to-calf "
-            "white separation. If the atlas does not show these "
-            "properties, stop and rebuild the atlas before rendering the diary page."
+            "PRIMARY DRAWING GATE — apply this before story composition. This is an ORIGINAL "
+            "BONE-THIN RULED-DIARY LOCK, never a generic cute cartoon. Every neutral HUMAN face "
+            "contains ONLY two geometrically perfect, identical-diameter, solid-black CIRCULAR eye dots — "
+            "unoutlined filled disks, never oval, almond-shaped, hollow, or irregular — one unfilled human nose, "
+            "and one low mouth: add NO other face marks above, between, or beside the eyes. Keep a "
+            "short curved outer-head contour from the hairline to just ABOVE the forward eye, then "
+            "leave a completely BLANK vertical channel of about 1.5 eye-dot heights down to the nose root; "
+            "no line may cross or fill this channel. The HUMAN nose is exactly one sideways, unfilled, "
+            "flattened half-oval wider than tall, open at its own top edge and pointing with the face — "
+            "never a downward U/C, black button, nostril dot, or animal nose. Every arm, forearm, thigh "
+            "and calf is a hair-thin two-parallel-stroke tube with a white interior, at most 1/18 of head "
+            "width; hands may be slightly wider but arms never widen. Heads remain near-round and at least "
+            "30 percent of standing height; torsos stay narrow. Animals use one species-correct solid-black "
+            "nose only. If the atlas does not show these properties, stop and rebuild it before rendering."
         ),
         "",
         f'Exact top header (verbatim): "{header}"',
         f'Exact subtitle (verbatim): "{title}"',
         summary_line,
+        "",
+        (
+            "PER-SCENE CHARACTER-CARD LOCK — before composing each scene, use that scene's "
+            "visible-character cards one by one. Every visible human or animal must match its OWN "
+            "atlas cell and ALL of its listed anchors. Never use the protagonist's head, face, nose, "
+            "hair, clothing, body, limbs, shoes, paws, ears, or tail as a default for another character. "
+            "A supporting character or pet must never become a generic bystander. If even one visible "
+            "character fails its own card, regenerate the whole page."
+        ),
+        *scene_card_lines,
         "",
         "Story moments:",
         *event_lines,
@@ -346,26 +377,27 @@ def build_prompt(
             "P0 geometry lock: every human and animal in every scene is shown in "
             "a clear 25-35 degree, slightly forward half-side view (animals keep a species-correct "
             "half-side view). The nose points "
-            "toward the facing direction while BOTH same-size perfect-round solid-black "
+            "toward the facing direction while BOTH same-size geometrically circular solid-black "
             "dot eyes remain fully visible. Reject front-facing, near-front-facing, "
             "portrait-like poses and one-eye full profiles. For every human, preserve "
             "a VISIBLE EMPTY BREAK in the outer face contour beside the forward eye: draw only a short "
-            "curve from the hairline/fringe end toward eyebrow level (without drawing an eyebrow), then leave a "
-            "clean blank gap about 1.5 eye-dot heights down to the nose root. This contour is a short curve hugging the head, "
-            "never a long straight line. Draw no eyebrow, forehead "
-            "line, bridge line, or head-outline segment inside this break. This is a hard "
+            "curve from the hairline/fringe end to just ABOVE the forward eye, then leave a clean blank "
+            "gap about 1.5 eye-dot heights down to the nose root. This contour is a short curve hugging the "
+            "head, never a long straight line. Do not place any extra facial mark, forehead line, bridge "
+            "line, or head-outline segment inside this break. This is a hard "
             "gate, not a preference."
         ),
         (
             "P0 visual gate: render only after all five conditions are simultaneously true: "
-            "(1) both complete equal perfect-round black dot eyes and one rear ear are visible "
+            "(1) both complete identical-diameter geometrically circular black dot eyes and one rear ear are visible "
             "in a 25-35 degree half-side view, with the outer eye clear of the outline; (2) each human keeps the visible empty forward-face "
             "contour break; (3) humans use exactly one unfilled upper-open half-ellipse nose while "
             "animals use one species-correct solid-black nose; (4) torso and every limb shaft stay "
-            "deliberately narrow with visible-white-channel double-line limbs and a head at least 30 percent "
+            "deliberately narrow: every limb shaft is two parallel lines with a white channel, no more than "
+            "1/18 of head width, while hands/paws alone may be slightly wider; the head is at least 30 percent "
             "of standing figure height; (5) every repeated "
-            "character matches the atlas head, eye spacing, nose direction, hair/ears, clothing blocks, "
-            "limbs and shoes/paws. If any scene fails one condition, regenerate the whole page; do not "
+            "character matches its OWN scene card and atlas cell for head, eye spacing, nose direction, "
+            "hair/ears, clothing blocks, limbs and shoes/paws. If any scene fails one condition, regenerate the whole page; do not "
             "accept a close approximation."
         ),
         (
@@ -374,18 +406,18 @@ def build_prompt(
             "notebook rules. Match the current atlas's medium-thick, slightly "
             "wobbly line weight and deliberately reduced detail. Every human keeps "
             "the atlas head silhouette (varied round-ish, pear, soft wedge, or "
-            "rounded trapezoid), exactly two complete perfect-round solid-black dot eyes "
+            "rounded trapezoid), exactly two complete identical-diameter geometrically circular solid-black dot eyes "
             "placed slightly high with a slightly wider gap and the outer eye clear of the outline, one nose between eyes and mouth, and one mouth "
             "placed clearly lower beneath the nose. Every HUMAN nose is an unfilled "
             "black-line, non-circular, slightly flattened open half-ellipse. Its own "
             "contour is broken at the UPPER side; the upper endpoint stops just below "
             "the two eyes and creates only slight overlap. A human nose is never a "
             "solid-black dot or oval, animal nose, closed O, square block, wet nose, "
-            "nostril, long bridge, brow, forehead line, or downturned U/C shape. The human nose must be "
+            "nostril, long bridge, extra line above the eyes, forehead line, or downturned U/C shape. The human nose must be "
             "wider than tall and point sideways toward the facing direction. Keep the torso narrow, no "
             "wider than about 55% of head width. Use extremely thin double-line upper "
-            "arms, forearms, thighs, calves and animal limb shafts, each tube about "
-            "1/16-1/12 of head width with a visible white gap. Hands and paws may be "
+            "arms, forearms, thighs, calves and animal limb shafts, each tube no more than "
+            "1/18 of head width with a visible white gap. Hands and paws may be "
             "slightly larger than the limb ends, but the limbs themselves remain thin. "
             "Every full-body or seated human visibly wears shorts or trousers with a "
             "clear waistband, crotch separation, lower hem and two distinct trouser legs, with visible white separation above each calf. Never "
@@ -405,7 +437,7 @@ def build_prompt(
             "three blunt toe notches. Never render realistic fur strands, whiskers, "
             "eye reflections, fur shading, whiskers, or facial hair. A cat has ZERO whisker lines. Expression changes may alter only eye "
             "openness/roundness, mouth shape and up to two temporary emotion marks; "
-            "neutral faces have no brows. Never give an animal a human C-shaped nose, dog-sized cat nose, misplaced "
+            "neutral faces have only the two eyes, nose, and mouth. Never give an animal a human C-shaped nose, dog-sized cat nose, misplaced "
             "cat nose, nose bridge, nostrils, or a "
             "second nose. Do not alter identity head, nose placement, hair/ear shape, limb length, hands/"
             "paws, shoes, or head-to-body ratio."
