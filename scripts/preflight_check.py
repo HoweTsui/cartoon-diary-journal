@@ -29,6 +29,7 @@ REQUIRED_FILES = (
     "agents/openai.yaml",
     "references/character-library.md",
     "references/style-system.md",
+    "references/visual-atoms.md",
     "references/visual-gate.md",
     "references/prompt-template.md",
     "references/qa-checklist.md",
@@ -82,6 +83,8 @@ def check_package(failures: list[str]) -> None:
         "至少留出 1 条完整横线高度",
         "P0 门禁",
         "每个场景都要为每一名可见人物或宠物单独写出角色 ID",
+        "references/visual-atoms.md",
+        "背景环境出现不同档线宽",
     )
     for guard in required_skill_guards:
         if guard not in skill_text:
@@ -107,6 +110,7 @@ def check_package(failures: list[str]) -> None:
         "1/18 of head width",
         "PER-SCENE CHARACTER-CARD LOCK",
         "Never use the protagonist's head",
+        "background/environment strokes",
     )
     for guard in required_prompt_guards:
         if guard not in prompt_builder_text:

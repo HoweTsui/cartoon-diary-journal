@@ -59,7 +59,7 @@ a large head, narrow torso, extremely thin limb shafts and slightly larger simpl
 bridge, nostrils, or a second nose. Nose direction must agree with face direction. Avoid square noses
 and hard right-angle heads.
 Use crisp slightly wobbly black outlines at about 5–6 px on a 1024px-wide canvas (scale proportionally),
-with identical line weight across outline, face, clothes, and props. Both dot eyes must have identical diameter
+with identical line weight across people, animals, outline, face, clothes, props, furniture, architecture, and background environment; pale cyan notebook rules are the only exception. Never use thin technical, perspective, or gray background lines. Both dot eyes must have identical diameter
 and visual weight. Use a few solid-black fills for mouths,
 hair, shirts, or shoes. No gray modeling, no shading, and no decorative colors.
 Keep faces and clothing deliberately simple: no fine wrinkles, eyelashes, skin details, or accessory clutter.
@@ -93,8 +93,7 @@ widely spaced equal black dot eyes, and short thick rounded paws with only one t
 whiskers, eye reflections or fur shading. Use no colored fur areas; all animals remain pure black-and-white.
 Long-haired animals may use
 only three to five broad rounded contour notches for coat volume, never individual spikes or dense ruffs.
-Expression changes may alter only eye openness/roundness, mouth shape, and up to two small external emotion marks;
-the neutral face has no brows, and anger/confusion may use only one or two temporary short expression lines.
+Expression changes may alter only the low mouth shape and up to two small external emotion marks; both eyes always remain complete, equal-size, solid-black perfect circles. The neutral face has no brows, and anger/confusion may use only one or two temporary marks outside the head.
 Do not alter the identity head, nose placement,
 hair/ear shape, limb length, hands/paws, shoes or head-to-body ratio.
 
