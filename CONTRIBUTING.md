@@ -9,8 +9,9 @@ python3 scripts/preflight_check.py
 python3 scripts/preflight_check.py \
   --graph /path/to/task-output/character-graph.html \
   --brief /path/to/diary-brief.json
-UV_CACHE_DIR=/private/tmp/cartoon-diary-uv-cache uv run --no-project --with pyyaml \
-  python /Users/ftd/.codex/skills/.system/skill-creator/scripts/quick_validate.py \
+SKILL_CREATOR_DIR="${CODEX_HOME:-$HOME/.codex}/skills/.system/skill-creator"
+UV_CACHE_DIR="${TMPDIR:-/tmp}/cartoon-diary-uv-cache" uv run --no-project --with pyyaml \
+  python "$SKILL_CREATOR_DIR/scripts/quick_validate.py" \
   cartoon-diary-journal
 ```
 

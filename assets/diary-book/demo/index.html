@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>纸上小日子｜日记本</title>
+  <link rel="stylesheet" href="runtime/book.css">
+</head>
+<body>
+  <main class="book-shell" aria-label="可翻页日记本">
+    <header class="book-toolbar">
+      <div class="book-identity">
+        <p class="book-kicker">离线日记本</p>
+        <h1 id="book-title"></h1>
+      </div>
+      <nav class="book-nav" aria-label="日记本导航">
+        <button class="nav-button is-active" type="button" data-panel="reader">翻页阅读</button>
+        <button class="nav-button" type="button" data-panel="timeline">时间索引</button>
+        <button class="nav-button" type="button" data-panel="characters">人物介绍</button>
+      </nav>
+    </header>
+
+    <section class="book-workspace">
+      <aside class="side-panel timeline-panel" id="timeline-panel" hidden>
+        <div class="panel-heading">
+          <p class="book-kicker">快速定位</p>
+          <h2>时间索引</h2>
+        </div>
+        <label class="search-field">
+          <span class="sr-only">搜索日记</span>
+          <input id="entry-search" type="search" placeholder="搜索日期、标题、标签或人物" autocomplete="off">
+        </label>
+        <div id="timeline-results" class="timeline-results"></div>
+      </aside>
+
+      <section class="reader-panel" id="reader-panel">
+        <div class="book-stage" id="book-stage">
+          <div id="book-pages" aria-live="polite"></div>
+        </div>
+        <div class="reader-controls" aria-label="翻页控制">
+          <button id="previous-page" class="control-button" type="button">上一页</button>
+          <p id="page-status" class="page-status"></p>
+          <button id="next-page" class="control-button" type="button">下一页</button>
+        </div>
+      </section>
+
+      <aside class="side-panel characters-panel" id="characters-panel" hidden>
+        <div class="panel-heading">
+          <p class="book-kicker">全局角色</p>
+          <h2>人物介绍</h2>
+        </div>
+        <div id="character-results" class="character-results"></div>
+      </aside>
+    </section>
+  </main>
+
+  <script id="diary-book-data" type="application/json">{"schemaVersion":1,"book":{"id":"paper-days-2026","title":"纸上小日子","subtitle":"七件普通小事，慢慢翻成一册。","coverSrc":"cover.svg","graphHref":"character-graph.html","coverImageSrc":"cover-assets/cover-main-3x4.png","coverImageAlt":"纸上小日子原创黑白线稿封面主视觉","coverImagePosition":"50% 50%","coverEyebrow":"OFFLINE DIARY","coverTitle":"纸上小日子","coverSubtitle":"一些普通但值得记住的日子","coverTheme":"brick"},"periods":[{"id":"rainy-week","title":"雨后那一周","startDate":"2026-08-17","endDate":"2026-08-20","summary":"伞、晚饭和窗边的云。","coverSrc":"period-rainy.svg"},{"id":"slow-weekend","title":"慢一点的周末","startDate":"2026-08-22","endDate":"2026-08-25","summary":"把节奏交给早餐和散步。","coverSrc":"period-weekend.svg"}],"entries":[{"id":"2026-08-17","date":"2026-08-17","periodId":"rainy-week","title":"伞总比雨慢一步","posterSrc":"entries/2026-08-17.svg","summary":"出门以后，雨才认真开始。","characterIds":["paper-hao"],"tags":["下雨","出门"]},{"id":"2026-08-18","date":"2026-08-18","periodId":"rainy-week","title":"午饭被云抢了戏","posterSrc":"entries/2026-08-18.svg","summary":"窗外的云比饭菜更有存在感。","characterIds":["paper-hao","paper-lin"],"tags":["午饭","云"]},{"id":"2026-08-19","date":"2026-08-19","periodId":"rainy-week","title":"猫咪先占了椅子","posterSrc":"entries/2026-08-19.svg","summary":"真正的座位安排，从来不问人。","characterIds":["paper-hao","paper-miao"],"tags":["猫咪","居家"]},{"id":"2026-08-20","date":"2026-08-20","periodId":"rainy-week","title":"晚饭终于没迟到","posterSrc":"entries/2026-08-20.svg","summary":"今天唯一准时抵达的是热饭。","characterIds":["paper-hao","paper-lin"],"tags":["晚饭","朋友"]},{"id":"2026-08-22","date":"2026-08-22","periodId":"slow-weekend","title":"把闹钟留在床头","posterSrc":"entries/2026-08-22.svg","summary":"周末的第一件事，是不急着开始。","characterIds":["paper-hao"],"tags":["周末","睡觉"]},{"id":"2026-08-23","date":"2026-08-23","periodId":"slow-weekend","title":"散步绕回了原点","posterSrc":"entries/2026-08-23.svg","summary":"地图说前进，脚步说再看看。","characterIds":["paper-hao","paper-lin","paper-miao"],"tags":["散步","周末"]},{"id":"2026-08-24","date":"2026-08-24","periodId":"slow-weekend","title":"最后一口留给明天","posterSrc":"entries/2026-08-24.svg","summary":"把一点余地，也留给下一页。","characterIds":["paper-hao","paper-lin","paper-miao"],"tags":["晚饭","日记"]},{"id":"2026-08-25","date":"2026-08-25","periodId":"slow-weekend","title":"新的一页先留白","posterSrc":"entries/2026-08-25.svg","summary":"把今天的轻松，留给下一次翻页。","characterIds":["paper-hao","paper-miao"],"tags":["日记","留白"]}],"characters":[{"id":"paper-hao","name":"阿纸","role":"记录日常的人","col":0,"row":0,"x":-170,"y":20,"anchors":["偏正半侧面与两只正圆豆豆眼","短发、开放线描鼻与低位小嘴","窄身板、首轮目标约头宽1/32的极细四肢与深色短裤","总把小事写进横线纸"],"notes":["虚构公开示例角色"],"avatarSrc":"avatars/paper-hao.svg"},{"id":"paper-lin","name":"小林","role":"一起吃饭的朋友","col":1,"row":0,"x":150,"y":20,"anchors":["偏正半侧面与两只正圆豆豆眼","短发、圆眼镜与低位小嘴，镜框、镜桥和镜腿线宽与主体一致","窄身板、首轮目标约头宽1/32的极细四肢与浅色上衣","经常给日常补一句吐槽"],"notes":["虚构公开示例角色"],"avatarSrc":"avatars/paper-lin.svg"},{"id":"paper-miao","name":"墨团","role":"总在旁边围观的猫","col":2,"row":0,"x":0,"y":-180,"anchors":["猫咪偏正半侧面与双正圆黑点眼","两耳、单一小黑鼻与短尾巴","窄躯干、首轮目标约头宽1/32的极细四肢和略大爪掌","喜欢在桌边观察一切"],"notes":["虚构公开示例角色"],"avatarSrc":"avatars/paper-miao.svg","kind":"animal","species":"cat"}],"relationships":[{"source":"paper-hao","target":"paper-lin","label":"朋友","type":"friend","curve":0},{"source":"paper-hao","target":"paper-miao","label":"照顾","type":"care","curve":-18},{"source":"paper-lin","target":"paper-miao","label":"投喂","type":"care","curve":18}]}</script>
+  <script src="runtime/page-flip.browser.js"></script>
+  <script src="runtime/book.js"></script>
+</body>
+</html>

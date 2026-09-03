@@ -1,0 +1,117 @@
+{
+  "schemaVersion": 1,
+  "book": {
+    "id": "paper-days-2026",
+    "title": "纸上小日子",
+    "subtitle": "七件普通小事，慢慢翻成一册。",
+    "coverSrc": "cover.svg",
+    "graphHref": "character-graph.html",
+    "coverImageSrc": "cover-assets/cover-main-3x4.png",
+    "coverImageAlt": "纸上小日子原创黑白线稿封面主视觉",
+    "coverImagePosition": "50% 50%",
+    "coverEyebrow": "OFFLINE DIARY",
+    "coverTitle": "纸上小日子",
+    "coverSubtitle": "一些普通但值得记住的日子",
+    "coverTheme": "brick"
+  },
+  "periods": [
+    {
+      "id": "rainy-week",
+      "title": "雨后那一周",
+      "startDate": "2026-08-17",
+      "endDate": "2026-08-20",
+      "summary": "伞、晚饭和窗边的云。",
+      "coverSrc": "period-rainy.svg"
+    },
+    {
+      "id": "slow-weekend",
+      "title": "慢一点的周末",
+      "startDate": "2026-08-22",
+      "endDate": "2026-08-25",
+      "summary": "把节奏交给早餐和散步。",
+      "coverSrc": "period-weekend.svg"
+    }
+  ],
+  "entries": [
+    {
+      "id": "2026-08-17",
+      "date": "2026-08-17",
+      "periodId": "rainy-week",
+      "title": "伞总比雨慢一步",
+      "posterSrc": "entries/2026-08-17.svg",
+      "summary": "出门以后，雨才认真开始。",
+      "characterIds": ["paper-hao"],
+      "tags": ["下雨", "出门"]
+    },
+    {
+      "id": "2026-08-18",
+      "date": "2026-08-18",
+      "periodId": "rainy-week",
+      "title": "午饭被云抢了戏",
+      "posterSrc": "entries/2026-08-18.svg",
+      "summary": "窗外的云比饭菜更有存在感。",
+      "characterIds": ["paper-hao", "paper-lin"],
+      "tags": ["午饭", "云"]
+    },
+    {
+      "id": "2026-08-19",
+      "date": "2026-08-19",
+      "periodId": "rainy-week",
+      "title": "猫咪先占了椅子",
+      "posterSrc": "entries/2026-08-19.svg",
+      "summary": "真正的座位安排，从来不问人。",
+      "characterIds": ["paper-hao", "paper-miao"],
+      "tags": ["猫咪", "居家"]
+    },
+    {
+      "id": "2026-08-20",
+      "date": "2026-08-20",
+      "periodId": "rainy-week",
+      "title": "晚饭终于没迟到",
+      "posterSrc": "entries/2026-08-20.svg",
+      "summary": "今天唯一准时抵达的是热饭。",
+      "characterIds": ["paper-hao", "paper-lin"],
+      "tags": ["晚饭", "朋友"]
+    },
+    {
+      "id": "2026-08-22",
+      "date": "2026-08-22",
+      "periodId": "slow-weekend",
+      "title": "把闹钟留在床头",
+      "posterSrc": "entries/2026-08-22.svg",
+      "summary": "周末的第一件事，是不急着开始。",
+      "characterIds": ["paper-hao"],
+      "tags": ["周末", "睡觉"]
+    },
+    {
+      "id": "2026-08-23",
+      "date": "2026-08-23",
+      "periodId": "slow-weekend",
+      "title": "散步绕回了原点",
+      "posterSrc": "entries/2026-08-23.svg",
+      "summary": "地图说前进，脚步说再看看。",
+      "characterIds": ["paper-hao", "paper-lin", "paper-miao"],
+      "tags": ["散步", "周末"]
+    },
+    {
+      "id": "2026-08-24",
+      "date": "2026-08-24",
+      "periodId": "slow-weekend",
+      "title": "最后一口留给明天",
+      "posterSrc": "entries/2026-08-24.svg",
+      "summary": "把一点余地，也留给下一页。",
+      "characterIds": ["paper-hao", "paper-lin", "paper-miao"],
+      "tags": ["晚饭", "日记"]
+    },
+    {
+      "id": "2026-08-25",
+      "date": "2026-08-25",
+      "periodId": "slow-weekend",
+      "title": "新的一页先留白",
+      "posterSrc": "entries/2026-08-25.svg",
+      "summary": "把今天的轻松，留给下一次翻页。",
+      "characterIds": ["paper-hao", "paper-miao"],
+      "tags": ["日记", "留白"]
+    }
+  ]
+}

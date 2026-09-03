@@ -11,5 +11,6 @@ generated/
 task-output/
 *.prompt.txt
 *.brief.local.json
+diary-book-data.local.json
 *.jpg
 *.jpeg

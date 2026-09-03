@@ -1,0 +1,3115 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>人物关系图</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --paper: #ffffff;
+      --ink: #171715;
+      --muted: #77756f;
+      --rule: rgba(124, 207, 223, 0.24);
+      --border: rgba(23, 23, 21, 0.24);
+      --accent: #7ccfdf;
+      --relationship: #171715;
+      --panel: rgba(255, 255, 255, 0.96);
+      --ui-font: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
+        "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      --hand-font: "Kaiti SC", "STKaiti", "KaiTi", "Comic Sans MS", cursive;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: var(--ui-font);
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+    }
+
+    button,
+    select,
+    input,
+    textarea {
+      color: var(--ink);
+    }
+
+    .app {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) clamp(330px, 27vw, 408px);
+      width: 100%;
+      height: 100%;
+    }
+
+    .graph-pane {
+      position: relative;
+      min-width: 0;
+      overflow: hidden;
+      background:
+        repeating-linear-gradient(
+          to bottom,
+          transparent 0,
+          transparent 39px,
+          var(--rule) 40px,
+          transparent 41px
+        ),
+        var(--paper);
+      border-right: 2px solid var(--ink);
+    }
+
+    .graph-pane::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 54px;
+      width: 1px;
+      background: rgba(124, 207, 223, 0.28);
+      pointer-events: none;
+    }
+
+    .topbar {
+      position: absolute;
+      z-index: 4;
+      inset: 24px 24px auto 28px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 22px;
+      pointer-events: none;
+    }
+
+    .brand {
+      flex: 0 0 auto;
+      min-width: 208px;
+      pointer-events: auto;
+    }
+
+    .brand h1 {
+      position: relative;
+      z-index: 0;
+      display: inline-block;
+      margin: 0;
+      font-family: var(--hand-font);
+      font-size: clamp(30px, 3vw, 46px);
+      font-weight: 700;
+      line-height: 1.06;
+      letter-spacing: 0.04em;
+    }
+
+    .brand h1::after {
+      content: "";
+      position: absolute;
+      z-index: -1;
+      right: -8px;
+      bottom: 2px;
+      left: -5px;
+      height: 8px;
+      border-radius: 50%;
+      background: rgba(124, 207, 223, 0.68);
+      transform: rotate(-1deg);
+    }
+
+    .toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 10px;
+      pointer-events: auto;
+    }
+
+    .control {
+      height: 44px;
+      border: 1.5px solid var(--ink);
+      border-radius: 9px 11px 8px 10px;
+      background: rgba(255, 255, 255, 0.96);
+      box-shadow: 2px 2px 0 rgba(23, 23, 21, 0.12);
+    }
+
+    .search {
+      position: relative;
+      width: min(260px, 24vw);
+    }
+
+    .search svg {
+      position: absolute;
+      top: 12px;
+      left: 13px;
+      width: 19px;
+      height: 19px;
+      pointer-events: none;
+    }
+
+    .search input {
+      width: 100%;
+      height: 100%;
+      padding: 0 14px 0 40px;
+      border: 0;
+      outline: 0;
+      background: transparent;
+      font-size: 14px;
+    }
+
+    .search input::placeholder {
+      color: #8d8a82;
+    }
+
+    .filter {
+      min-width: 128px;
+      padding: 0 34px 0 13px;
+      appearance: none;
+      background-color: rgba(255, 255, 255, 0.96);
+      background-image:
+        linear-gradient(45deg, transparent 50%, var(--ink) 50%),
+        linear-gradient(135deg, var(--ink) 50%, transparent 50%);
+      background-position:
+        calc(100% - 16px) 18px,
+        calc(100% - 11px) 18px;
+      background-repeat: no-repeat;
+      background-size: 5px 5px, 5px 5px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .icon-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      min-width: 82px;
+      padding: 0 13px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 650;
+    }
+
+    .icon-button svg {
+      width: 18px;
+      height: 18px;
+      flex: 0 0 auto;
+    }
+
+    .history-button {
+      min-width: 44px;
+      width: 44px;
+      padding: 0;
+    }
+
+    .control:disabled {
+      cursor: not-allowed;
+      opacity: 0.42;
+      transform: none;
+      box-shadow: 2px 2px 0 rgba(23, 23, 21, 0.07);
+    }
+
+    .control:focus-visible {
+      outline: 3px solid rgba(124, 207, 223, 0.5);
+      outline-offset: 2px;
+    }
+
+    .control:hover {
+      transform: translateY(-1px);
+      box-shadow: 3px 4px 0 rgba(23, 23, 21, 0.12);
+    }
+
+    .graph-canvas {
+      display: block;
+      width: 100%;
+      height: 100%;
+      cursor: grab;
+      touch-action: none;
+    }
+
+    .graph-canvas.dragging {
+      cursor: grabbing;
+    }
+
+    .graph-canvas.connecting,
+    .graph-canvas.detaching {
+      cursor: crosshair;
+    }
+
+    .graph-canvas.label-hover {
+      cursor: text;
+    }
+
+    .edge-label-editor {
+      position: absolute;
+      z-index: 6;
+      min-width: 68px;
+      height: 34px;
+      padding: 3px 9px;
+      border: 2px solid #3899ad;
+      border-radius: 9px;
+      outline: 0;
+      background: #ffffff;
+      box-shadow: 3px 4px 0 rgba(23, 23, 21, 0.14);
+      font-family: var(--hand-font);
+      font-weight: 700;
+      line-height: 1;
+      text-align: center;
+      transform: translate(-50%, -50%);
+    }
+
+    .edge-label-editor:focus {
+      box-shadow: 0 0 0 4px rgba(124, 207, 223, 0.28), 3px 4px 0 rgba(23, 23, 21, 0.14);
+    }
+
+    .hint {
+      position: absolute;
+      z-index: 4;
+      bottom: 22px;
+      left: 30px;
+      padding: 8px 11px 7px;
+      border-bottom: 4px solid rgba(124, 207, 223, 0.62);
+      background: rgba(255, 255, 255, 0.9);
+      font-family: var(--hand-font);
+      font-size: 15px;
+      pointer-events: none;
+    }
+
+    .inspector {
+      position: relative;
+      z-index: 6;
+      overflow: auto;
+      padding: 24px 24px 32px;
+      background: var(--panel);
+    }
+
+    .inspector-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding-bottom: 14px;
+      border-bottom: 1.5px solid var(--ink);
+    }
+
+    .inspector-header h2 {
+      position: relative;
+      z-index: 0;
+      margin: 0;
+      font-family: var(--hand-font);
+      font-size: 28px;
+      line-height: 1;
+    }
+
+    .inspector-header h2::after {
+      content: "";
+      position: absolute;
+      z-index: -1;
+      right: -3px;
+      bottom: -4px;
+      left: -2px;
+      height: 6px;
+      border-radius: 50%;
+      background: rgba(124, 207, 223, 0.7);
+    }
+
+    .inspector-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .edit-toggle {
+      min-height: 36px;
+      padding: 0 11px;
+      border: 1.5px solid var(--ink);
+      border-radius: 7px 9px 7px 8px;
+      background: var(--paper);
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .edit-toggle[aria-pressed="true"] {
+      background: var(--ink);
+      color: #fff;
+    }
+
+    .close-inspector {
+      display: none;
+      width: 36px;
+      height: 36px;
+      padding: 0;
+      border: 1.5px solid var(--ink);
+      border-radius: 50%;
+      background: var(--paper);
+      cursor: pointer;
+    }
+
+    .profile {
+      display: grid;
+      grid-template-columns: 94px minmax(0, 1fr);
+      align-items: center;
+      gap: 18px;
+      padding: 22px 0 18px;
+    }
+
+    .profile-avatar {
+      display: grid;
+      place-items: center;
+      width: 94px;
+      height: 94px;
+      aspect-ratio: 1 / 1;
+      border: 2px solid var(--ink);
+      border-radius: 50%;
+      background-color: white;
+      background-image: none;
+      background-repeat: no-repeat;
+      background-size: cover;
+      background-position: center;
+      box-shadow: 0 0 0 5px rgba(124, 207, 223, 0.22);
+      font-family: var(--hand-font);
+      font-size: 32px;
+      font-weight: 700;
+    }
+
+    .profile-name {
+      margin: 0 0 4px;
+      font-family: var(--hand-font);
+      font-size: 32px;
+      line-height: 1;
+    }
+
+    .profile-role {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .editor {
+      display: grid;
+      gap: 14px;
+      padding: 18px 0;
+      border-top: 1px solid var(--border);
+    }
+
+    .details-view {
+      display: grid;
+    }
+
+    .field {
+      display: grid;
+      gap: 6px;
+    }
+
+    .field > span {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+
+    .field input,
+    .field textarea,
+    .field select {
+      width: 100%;
+      border: 1.5px solid var(--ink);
+      border-radius: 7px 9px 7px 8px;
+      outline: 0;
+      background: #fff;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .field input,
+    .field select {
+      min-height: 40px;
+      padding: 0 10px;
+    }
+
+    .field textarea {
+      min-height: 72px;
+      padding: 9px 10px;
+      resize: vertical;
+    }
+
+    .field input:focus,
+    .field textarea:focus,
+    .field select:focus {
+      box-shadow: 0 0 0 3px rgba(124, 207, 223, 0.34);
+    }
+
+    .field-help {
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.4;
+    }
+
+    .form-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .action-button {
+      min-height: 38px;
+      padding: 0 12px;
+      border: 1.5px solid var(--ink);
+      border-radius: 7px 9px 7px 8px;
+      background: #fff;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .action-button.primary {
+      background: var(--ink);
+      color: #fff;
+    }
+
+    .action-button.danger {
+      margin-left: auto;
+      border-style: dashed;
+    }
+
+    .action-button:hover,
+    .relation-remove:hover {
+      transform: translateY(-1px);
+      box-shadow: 2px 2px 0 rgba(23, 23, 21, 0.14);
+    }
+
+    .save-status {
+      min-height: 18px;
+      margin: 0;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.5;
+    }
+
+    .info-section {
+      padding: 18px 0;
+      border-top: 1px solid var(--border);
+    }
+
+    .info-section h3 {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0 0 10px;
+      font-family: var(--hand-font);
+      font-size: 19px;
+    }
+
+    .info-section h3::before {
+      content: "✦";
+      color: var(--accent);
+      font-family: var(--ui-font);
+      font-size: 16px;
+    }
+
+    .info-section.relationships h3::before {
+      content: "♥";
+      color: var(--relationship);
+    }
+
+    .info-list {
+      margin: 0;
+      padding: 0 0 0 20px;
+      color: #353430;
+      font-size: 13px;
+      line-height: 1.8;
+    }
+
+    .relation-list {
+      display: grid;
+      gap: 8px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      font-size: 13px;
+    }
+
+    .relation-list li {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 7px 0;
+      border-bottom: 1px dashed var(--border);
+    }
+
+    .relation-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .relation-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+    }
+
+    .relation-target {
+      color: var(--muted);
+    }
+
+    .relation-copy {
+      display: grid;
+      flex: 1;
+      gap: 2px;
+      min-width: 0;
+    }
+
+    .relation-remove {
+      flex: 0 0 auto;
+      width: 28px;
+      height: 28px;
+      padding: 0;
+      border: 1px solid var(--ink);
+      border-radius: 50%;
+      background: #fff;
+      cursor: pointer;
+      line-height: 1;
+    }
+
+    .relation-editor {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(72px, 0.65fr);
+      gap: 8px;
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border);
+    }
+
+    .relation-editor .wide {
+      grid-column: 1 / -1;
+    }
+
+    .relation-editor .action-button {
+      grid-column: 1 / -1;
+    }
+
+    .empty-note {
+      margin: 0;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .mobile-inspector {
+      display: none;
+    }
+
+    @media (max-width: 900px) {
+      .app {
+        display: block;
+      }
+
+      .graph-pane {
+        width: 100%;
+        height: 100%;
+        border-right: 0;
+      }
+
+      .topbar {
+        inset: 18px 16px auto 20px;
+        align-items: flex-start;
+      }
+
+      .brand {
+        min-width: 160px;
+      }
+
+      .brand h1 {
+        font-size: 31px;
+      }
+
+      .toolbar {
+        max-width: 56%;
+        flex-wrap: wrap;
+        gap: 7px;
+      }
+
+      .search {
+        width: min(240px, 48vw);
+      }
+
+      .filter {
+        min-width: 112px;
+      }
+
+      .mobile-inspector {
+        display: inline-flex;
+      }
+
+      .inspector {
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        width: min(408px, 92vw);
+        border-left: 2px solid var(--ink);
+        box-shadow: -16px 0 40px rgba(23, 23, 21, 0.12);
+        transform: translateX(105%);
+        transition: transform 180ms ease;
+      }
+
+      .inspector.open {
+        transform: translateX(0);
+      }
+
+      .close-inspector {
+        display: inline-grid;
+        place-items: center;
+      }
+    }
+
+    @media (max-width: 620px) {
+      .topbar {
+        display: block;
+      }
+
+      .brand h1 {
+        font-size: 28px;
+      }
+
+      .toolbar {
+        justify-content: flex-start;
+        max-width: none;
+        margin-top: 12px;
+      }
+
+      .search {
+        width: calc(100vw - 40px);
+      }
+
+      .control {
+        height: 40px;
+      }
+
+      .search svg {
+        top: 10px;
+      }
+
+      .filter {
+        background-position:
+          calc(100% - 16px) 16px,
+          calc(100% - 11px) 16px;
+      }
+
+      .hint {
+        right: 16px;
+        bottom: 14px;
+        left: 16px;
+        text-align: center;
+        font-size: 13px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .inspector,
+      .control {
+        transition: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <section class="graph-pane" id="graph-pane" aria-label="可拖拽人物关系图">
+      <header class="topbar">
+        <div class="brand">
+          <h1>人物关系图</h1>
+        </div>
+
+        <div class="toolbar" aria-label="图谱工具">
+          <label class="search control">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <circle cx="11" cy="11" r="7"></circle>
+              <path d="m20 20-4-4"></path>
+            </svg>
+            <input id="search" type="search" placeholder="搜索人物" autocomplete="off" aria-label="搜索人物">
+          </label>
+
+          <select id="relation-filter" class="filter control" aria-label="筛选关系">
+            <option value="all">关系：全部</option>
+            <option value="close">关系：亲密</option>
+            <option value="family">关系：家庭</option>
+            <option value="work">关系：工作</option>
+          </select>
+
+          <button id="add-node" class="icon-button control" type="button" hidden>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <circle cx="9" cy="8" r="3"></circle>
+              <path d="M3 20c.7-4 2.7-6 6-6 1.5 0 2.8.4 3.8 1.2"></path>
+              <path d="M18 12v8M14 16h8"></path>
+            </svg>
+            新增
+          </button>
+
+          <button id="auto-layout" class="icon-button control" type="button" aria-label="一键智能编排人物关系图" title="一键智能编排">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="6" cy="6" r="2"></circle>
+              <circle cx="18" cy="6" r="2"></circle>
+              <circle cx="12" cy="18" r="2"></circle>
+              <path d="M7.7 7.2 10.4 16M16.3 7.2 13.6 16M8 6h8"></path>
+            </svg>
+            编排
+          </button>
+
+          <button id="undo-layout" class="icon-button history-button control" type="button" aria-label="撤销编排或位置调整" title="撤销" disabled>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M9 7 4 12l5 5"></path>
+              <path d="M5 12h9a6 6 0 1 1 0 12"></path>
+            </svg>
+          </button>
+
+          <button id="redo-layout" class="icon-button history-button control" type="button" aria-label="重做编排或位置调整" title="重做" disabled>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="m15 7 5 5-5 5"></path>
+              <path d="M19 12h-9a6 6 0 1 0 0 12"></path>
+            </svg>
+          </button>
+
+          <button id="reset" class="icon-button control" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <path d="M4 4v6h6"></path>
+              <path d="M5.5 15a7 7 0 1 0 1.2-7.8L4 10"></path>
+            </svg>
+            复位
+          </button>
+
+          <button id="show-inspector" class="icon-button control mobile-inspector" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <circle cx="12" cy="8" r="3"></circle>
+              <path d="M5 21c.8-4 3.1-6 7-6s6.2 2 7 6"></path>
+            </svg>
+            人物卡
+          </button>
+        </div>
+      </header>
+
+      <canvas id="graph-canvas" class="graph-canvas" tabindex="0">
+        当前浏览器不支持 Canvas，无法显示人物关系图。
+      </canvas>
+
+      <input
+        id="edge-label-editor"
+        class="edge-label-editor"
+        type="text"
+        maxlength="12"
+        autocomplete="off"
+        aria-label="编辑关系名称"
+        hidden
+      >
+
+      <div id="graph-hint" class="hint">拖拽节点 · 滚轮缩放 · 空白处平移</div>
+    </section>
+
+    <aside class="inspector" id="inspector" aria-label="人物卡">
+      <div class="inspector-header">
+        <h2>人物卡</h2>
+        <div class="inspector-actions">
+          <button id="edit-toggle" class="edit-toggle" type="button" aria-pressed="false">编辑</button>
+          <button id="close-inspector" class="close-inspector" type="button" aria-label="关闭人物卡">×</button>
+        </div>
+      </div>
+
+      <div class="profile">
+        <div id="profile-avatar" class="profile-avatar" role="img" aria-label="人物头像"></div>
+        <div>
+          <h3 id="profile-name" class="profile-name">选择人物</h3>
+          <p id="profile-role" class="profile-role">从图谱中选择人物查看详情</p>
+        </div>
+      </div>
+
+      <div id="person-details" class="details-view">
+        <section class="info-section">
+          <h3>外观锚点</h3>
+          <ul id="anchor-list" class="info-list"></ul>
+        </section>
+
+        <section class="info-section">
+          <h3>人物备注</h3>
+          <ul id="notes-list" class="info-list"></ul>
+        </section>
+      </div>
+
+      <form id="person-form" class="editor" hidden>
+        <label class="field">
+          <span>姓名</span>
+          <input id="edit-name" name="name" maxlength="20" required autocomplete="off">
+        </label>
+
+        <label class="field">
+          <span>身份说明</span>
+          <input id="edit-role" name="role" maxlength="80" autocomplete="off">
+        </label>
+
+        <label class="field">
+          <span>独立 1:1 头像路径</span>
+          <input id="edit-avatar-src" name="avatarSrc" maxlength="240" autocomplete="off" placeholder="avatars/角色ID.png">
+          <small class="field-help">相对本 HTML 的方形 PNG；上半身完整、水平居中、四周留白。留空会回退人物图集。</small>
+        </label>
+
+        <label class="field">
+          <span>外观锚点</span>
+          <textarea id="edit-anchors" name="anchors" maxlength="300"></textarea>
+          <small class="field-help">每行一个特征；姓名、鼻型与朝向、发丝、黑块和鞋形尽量固定。</small>
+        </label>
+
+        <label class="field">
+          <span>人物备注</span>
+          <textarea id="edit-notes" name="notes" maxlength="400"></textarea>
+          <small class="field-help">每行一条长期有效的人物说明。</small>
+        </label>
+
+        <div class="form-actions">
+          <button class="action-button primary" type="submit">保存修改</button>
+          <button id="delete-node" class="action-button danger" type="button">删除人物</button>
+        </div>
+        <p id="save-status" class="save-status" aria-live="polite"></p>
+      </form>
+
+      <section class="info-section relationships">
+        <h3>关系</h3>
+        <ul id="relation-list" class="relation-list"></ul>
+        <form id="relation-form" class="relation-editor" hidden>
+          <label class="field">
+            <span>连接到</span>
+            <select id="relation-target" required></select>
+          </label>
+          <label class="field">
+            <span>关系类型</span>
+            <select id="relation-type">
+              <option value="friend">好友</option>
+              <option value="partner">伴侣</option>
+              <option value="family">家庭</option>
+              <option value="work">工作</option>
+              <option value="care">照顾</option>
+            </select>
+          </label>
+          <label class="field wide">
+            <span>连线标签</span>
+            <input id="relation-label" maxlength="12" placeholder="例如：同学" required autocomplete="off">
+          </label>
+          <button class="action-button" type="submit">新增关系</button>
+        </form>
+      </section>
+    </aside>
+  </main>
+
+  <script id="graph-data" type="application/json">
+    {
+  "status": "actual",
+  "atlas": {
+    "src": "character-lineup.svg",
+    "cols": 3,
+    "rows": 1
+  },
+  "nodes": [
+    {
+      "id": "paper-hao",
+      "name": "阿纸",
+      "role": "记录日常的人",
+      "col": 0,
+      "row": 0,
+      "x": -170,
+      "y": 20,
+      "anchors": [
+        "偏正半侧面与两只正圆豆豆眼",
+        "短发、开放线描鼻与低位小嘴",
+        "窄身板、首轮目标约头宽1/32的极细四肢与深色短裤",
+        "总把小事写进横线纸"
+      ],
+      "notes": [
+        "虚构公开示例角色"
+      ],
+      "avatarSrc": "avatars/paper-hao.svg"
+    },
+    {
+      "id": "paper-lin",
+      "name": "小林",
+      "role": "一起吃饭的朋友",
+      "col": 1,
+      "row": 0,
+      "x": 150,
+      "y": 20,
+      "anchors": [
+        "偏正半侧面与两只正圆豆豆眼",
+        "短发、圆眼镜与低位小嘴，镜框、镜桥和镜腿线宽与主体一致",
+        "窄身板、首轮目标约头宽1/32的极细四肢与浅色上衣",
+        "经常给日常补一句吐槽"
+      ],
+      "notes": [
+        "虚构公开示例角色"
+      ],
+      "avatarSrc": "avatars/paper-lin.svg"
+    },
+    {
+      "id": "paper-miao",
+      "name": "墨团",
+      "role": "总在旁边围观的猫",
+      "col": 2,
+      "row": 0,
+      "x": 0,
+      "y": -180,
+      "anchors": [
+        "猫咪偏正半侧面与双正圆黑点眼",
+        "两耳、单一小黑鼻与短尾巴",
+        "窄躯干、首轮目标约头宽1/32的极细四肢和略大爪掌",
+        "喜欢在桌边观察一切"
+      ],
+      "notes": [
+        "虚构公开示例角色"
+      ],
+      "avatarSrc": "avatars/paper-miao.svg",
+      "kind": "animal",
+      "species": "cat"
+    }
+  ],
+  "edges": [
+    {
+      "source": "paper-hao",
+      "target": "paper-lin",
+      "label": "朋友",
+      "type": "friend",
+      "curve": 0
+    },
+    {
+      "source": "paper-hao",
+      "target": "paper-miao",
+      "label": "照顾",
+      "type": "care",
+      "curve": -18
+    },
+    {
+      "source": "paper-lin",
+      "target": "paper-miao",
+      "label": "投喂",
+      "type": "care",
+      "curve": 18
+    }
+  ]
+}
+  </script>
+
+  <script>
+    (function () {
+      "use strict";
+
+      var graphData = JSON.parse(document.getElementById("graph-data").textContent);
+      var atlasCols = graphData.atlas.cols;
+      var atlasRows = graphData.atlas.rows;
+      var atlasSrc = graphData.atlas.src || "character-lineup.png";
+      var atlas = new Image();
+      atlas.src = atlasSrc;
+
+      var seedNodes = graphData.nodes;
+      var seedEdges = graphData.edges;
+      var initialPositionById = new Map(seedNodes.map(function (node) {
+        return [node.id, [node.x, node.y]];
+      }));
+
+      function datasetHash(value) {
+        var text = JSON.stringify(value);
+        var hash = 2166136261;
+        for (var index = 0; index < text.length; index += 1) {
+          hash ^= text.charCodeAt(index);
+          hash = Math.imul(hash, 16777619);
+        }
+        return (hash >>> 0).toString(36);
+      }
+
+      var STORAGE_KEY = "cartoon-diary-journal.character-graph.v3." + datasetHash(graphData);
+      var storedState = null;
+      try {
+        storedState = JSON.parse(window.localStorage.getItem(STORAGE_KEY));
+        if (!storedState || !Array.isArray(storedState.nodes) ||
+            !storedState.nodes.length || !Array.isArray(storedState.edges)) {
+          storedState = null;
+        }
+      } catch (error) {
+        storedState = null;
+      }
+
+      var nodes = storedState ? storedState.nodes : JSON.parse(JSON.stringify(seedNodes));
+      var edges = storedState ? storedState.edges : JSON.parse(JSON.stringify(seedEdges));
+      if (storedState) {
+        var seedNodeById = new Map(seedNodes.map(function (node) {
+          return [node.id, node];
+        }));
+        // Position edits may persist locally, but atlas coordinates are part of the
+        // current dataset and must always come from the current graph data.
+        nodes = nodes.map(function (node) {
+          var seed = seedNodeById.get(node.id);
+          if (!seed) {
+            return node;
+          }
+          ["col", "row", "avatarSrc", "avatarFocusX", "avatarFocusY"].forEach(function (key) {
+            if (Object.prototype.hasOwnProperty.call(seed, key)) {
+              node[key] = seed[key];
+            }
+          });
+          return node;
+        });
+      }
+      var nodeById = new Map();
+
+      function rebuildNodeIndex() {
+        nodeById = new Map(nodes.map(function (node) {
+          return [node.id, node];
+        }));
+        edges = edges.filter(function (edge) {
+          return nodeById.has(edge.source) && nodeById.has(edge.target);
+        });
+      }
+
+      rebuildNodeIndex();
+
+      var requestedCharacterId = null;
+      try {
+        requestedCharacterId = new URLSearchParams(window.location.search).get("character");
+      } catch (error) {
+        requestedCharacterId = null;
+      }
+
+      var canvas = document.getElementById("graph-canvas");
+      var pane = document.getElementById("graph-pane");
+      var ctx = canvas.getContext("2d");
+      var inspector = document.getElementById("inspector");
+      var searchInput = document.getElementById("search");
+      var relationFilter = document.getElementById("relation-filter");
+      var editToggle = document.getElementById("edit-toggle");
+      var addNodeButton = document.getElementById("add-node");
+      var autoLayoutButton = document.getElementById("auto-layout");
+      var undoLayoutButton = document.getElementById("undo-layout");
+      var redoLayoutButton = document.getElementById("redo-layout");
+      var graphHint = document.getElementById("graph-hint");
+      var personDetails = document.getElementById("person-details");
+      var anchorList = document.getElementById("anchor-list");
+      var notesList = document.getElementById("notes-list");
+      var personForm = document.getElementById("person-form");
+      var editName = document.getElementById("edit-name");
+      var editRole = document.getElementById("edit-role");
+      var editAvatarSrc = document.getElementById("edit-avatar-src");
+      var editAnchors = document.getElementById("edit-anchors");
+      var editNotes = document.getElementById("edit-notes");
+      var relationForm = document.getElementById("relation-form");
+      var relationTarget = document.getElementById("relation-target");
+      var relationType = document.getElementById("relation-type");
+      var relationLabel = document.getElementById("relation-label");
+      var edgeLabelEditor = document.getElementById("edge-label-editor");
+      var saveStatus = document.getElementById("save-status");
+      var dpr = Math.min(window.devicePixelRatio || 1, 2);
+      var reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+      var size = { width: 0, height: 0 };
+      var view = { x: 0, y: 0, scale: 1 };
+      var selectedId = nodeById.has(requestedCharacterId) ? requestedCharacterId : nodes[0].id;
+      var query = "";
+      var activeFilter = "all";
+      var editMode = false;
+      var gesture = null;
+      var statusTimer = null;
+      var edgeLabelEdit = null;
+      var layoutTargets = new Map();
+      var layoutFrame = null;
+      var layoutSavePending = false;
+      var layoutHistoryPending = null;
+      var positionHistory = [];
+      var positionFuture = [];
+      var positionTransitionFrame = null;
+      var smartLayoutFrame = null;
+      var smartLayoutToken = 0;
+      var avatarRenderToken = 0;
+      var avatarImageCache = new Map();
+
+      var relationDefaults = {
+        friend: "好友",
+        partner: "伴侣",
+        family: "家人",
+        work: "同事",
+        care: "照顾"
+      };
+
+      function showStatus(message) {
+        window.clearTimeout(statusTimer);
+        saveStatus.textContent = message;
+        statusTimer = window.setTimeout(function () {
+          saveStatus.textContent = "";
+        }, 2600);
+      }
+
+      function saveState(message) {
+        try {
+          window.localStorage.setItem(STORAGE_KEY, JSON.stringify({
+            nodes: nodes,
+            edges: edges
+          }));
+          if (message) {
+            showStatus(message);
+          }
+        } catch (error) {
+          showStatus("浏览器未允许本地保存，本次修改只在当前页面有效");
+        }
+      }
+
+      function relationCount(nodeId) {
+        return edges.filter(function (edge) {
+          return edge.source === nodeId || edge.target === nodeId;
+        }).length;
+      }
+
+      function edgeAllowed(edge) {
+        if (activeFilter === "all") {
+          return true;
+        }
+        if (activeFilter === "work") {
+          return edge.type === "work";
+        }
+        if (activeFilter === "family") {
+          return edge.type === "partner" || edge.type === "family" || edge.type === "care";
+        }
+        return edge.type === "partner" || edge.type === "friend" || edge.type === "family" || edge.type === "care";
+      }
+
+      function nodeMatches(node) {
+        if (!query) {
+          return true;
+        }
+        return node.name.indexOf(query) !== -1 || (node.role || "").indexOf(query) !== -1;
+      }
+
+      function edgeColor(edge, emphasized) {
+        if (emphasized) {
+          return "#3899ad";
+        }
+        if (edge.type === "family" || edge.type === "care") {
+          return "#171715";
+        }
+        return "#242421";
+      }
+
+      function resize() {
+        var rect = pane.getBoundingClientRect();
+        size.width = rect.width;
+        size.height = rect.height;
+        canvas.width = Math.max(1, Math.round(rect.width * dpr));
+        canvas.height = Math.max(1, Math.round(rect.height * dpr));
+        canvas.style.width = rect.width + "px";
+        canvas.style.height = rect.height + "px";
+        resetView(false);
+        draw();
+      }
+
+      function resetPositions() {
+        stopLayoutAnimation();
+        layoutTargets.clear();
+        layoutSavePending = false;
+        layoutHistoryPending = null;
+        nodes.forEach(function (node) {
+          var initial = initialPositionById.get(node.id);
+          if (initial) {
+            node.x = initial[0];
+            node.y = initial[1];
+          }
+        });
+      }
+
+      function resetView(restoreNodes) {
+        if (restoreNodes === true) {
+          resetPositions();
+        }
+        var fitX = Math.max(0.52, (size.width - 80) / 760);
+        var fitY = Math.max(0.52, (size.height - 190) / 650);
+        view.scale = Math.min(1.08, fitX, fitY);
+        view.x = size.width / 2;
+        view.y = size.height / 2 + 42;
+        draw();
+      }
+
+      function eventPoint(event) {
+        var rect = canvas.getBoundingClientRect();
+        return {
+          x: event.clientX - rect.left,
+          y: event.clientY - rect.top
+        };
+      }
+
+      function screenToWorld(point) {
+        return {
+          x: (point.x - view.x) / view.scale,
+          y: (point.y - view.y) / view.scale
+        };
+      }
+
+      function worldToScreen(point) {
+        return {
+          x: view.x + point.x * view.scale,
+          y: view.y + point.y * view.scale
+        };
+      }
+
+      function nodeAt(world) {
+        for (var index = nodes.length - 1; index >= 0; index -= 1) {
+          var node = nodes[index];
+          var dx = world.x - node.x;
+          var dy = world.y - node.y;
+          if (dx * dx + dy * dy <= 70 * 70) {
+            return node;
+          }
+        }
+        return null;
+      }
+
+      function connectionTargetAt(world, sourceId) {
+        for (var index = nodes.length - 1; index >= 0; index -= 1) {
+          var node = nodes[index];
+          if (node.id === sourceId) {
+            continue;
+          }
+          var dx = world.x - node.x;
+          var dy = world.y - node.y;
+          if (dx * dx + dy * dy <= 88 * 88) {
+            return node;
+          }
+        }
+        return null;
+      }
+
+      function nodeRadius(node) {
+        return selectedId === node.id ? 66 : 59;
+      }
+
+      function nodeLabelWidth(node) {
+        ctx.save();
+        ctx.font = '700 22px "Kaiti SC", "STKaiti", "KaiTi", cursive';
+        var width = ctx.measureText(node.name).width;
+        ctx.restore();
+        return width;
+      }
+
+      function nodeLayoutRadius(node) {
+        var halfWidth = Math.max(nodeRadius(node) + 10, nodeLabelWidth(node) / 2 + 12);
+        var halfHeight = nodeRadius(node) + 38;
+        return Math.sqrt(halfWidth * halfWidth + halfHeight * halfHeight);
+      }
+
+      function snapshotLayoutTargets() {
+        layoutTargets = new Map(nodes.map(function (node) {
+          return [node.id, { x: node.x, y: node.y }];
+        }));
+      }
+
+      function capturePositions() {
+        return new Map(nodes.map(function (node) {
+          return [node.id, { x: node.x, y: node.y }];
+        }));
+      }
+
+      function positionsChanged(snapshot) {
+        if (!snapshot || snapshot.size !== nodes.length) {
+          return true;
+        }
+        return nodes.some(function (node) {
+          var previous = snapshot.get(node.id);
+          return !previous || Math.abs(previous.x - node.x) > 0.5 || Math.abs(previous.y - node.y) > 0.5;
+        });
+      }
+
+      function applyPositions(snapshot) {
+        nodes.forEach(function (node) {
+          var position = snapshot.get(node.id);
+          if (position) {
+            node.x = position.x;
+            node.y = position.y;
+          }
+        });
+      }
+
+      function updateHistoryControls() {
+        var busy = smartLayoutFrame !== null || positionTransitionFrame !== null;
+        undoLayoutButton.disabled = busy || !positionHistory.length;
+        redoLayoutButton.disabled = busy || !positionFuture.length;
+      }
+
+      function recordPositionHistory(before) {
+        if (!before || !positionsChanged(before)) {
+          return;
+        }
+        positionHistory.push(before);
+        if (positionHistory.length > 40) {
+          positionHistory.shift();
+        }
+        positionFuture = [];
+        updateHistoryControls();
+      }
+
+      function stopLayoutAnimation() {
+        if (layoutFrame !== null) {
+          window.cancelAnimationFrame(layoutFrame);
+          layoutFrame = null;
+        }
+      }
+
+      function beginNodeLayout() {
+        stopLayoutAnimation();
+        snapshotLayoutTargets();
+        layoutSavePending = false;
+        layoutHistoryPending = null;
+      }
+
+      function separatePositionMap(positionMap, pinnedId, iterations) {
+        var gap = 18;
+        for (var pass = 0; pass < iterations; pass += 1) {
+          for (var firstIndex = 0; firstIndex < nodes.length; firstIndex += 1) {
+            for (var secondIndex = firstIndex + 1; secondIndex < nodes.length; secondIndex += 1) {
+              var first = nodes[firstIndex];
+              var second = nodes[secondIndex];
+              var firstPoint = positionMap.get(first.id);
+              var secondPoint = positionMap.get(second.id);
+              if (!firstPoint || !secondPoint) {
+                continue;
+              }
+              var dx = secondPoint.x - firstPoint.x;
+              var dy = secondPoint.y - firstPoint.y;
+              var distance = Math.sqrt(dx * dx + dy * dy);
+              var minimum = nodeLayoutRadius(first) + nodeLayoutRadius(second) + gap;
+              if (distance >= minimum) {
+                continue;
+              }
+              if (distance < 0.001) {
+                dx = (firstIndex + secondIndex) % 2 === 0 ? 1 : -1;
+                dy = firstIndex % 2 === 0 ? 0.35 : -0.35;
+                distance = Math.sqrt(dx * dx + dy * dy);
+              }
+              var overlap = minimum - distance;
+              var pushX = dx / distance * overlap;
+              var pushY = dy / distance * overlap;
+              if (first.id === pinnedId) {
+                secondPoint.x += pushX;
+                secondPoint.y += pushY;
+              } else if (second.id === pinnedId) {
+                firstPoint.x -= pushX;
+                firstPoint.y -= pushY;
+              } else {
+                firstPoint.x -= pushX * 0.5;
+                firstPoint.y -= pushY * 0.5;
+                secondPoint.x += pushX * 0.5;
+                secondPoint.y += pushY * 0.5;
+              }
+            }
+          }
+        }
+      }
+
+      function resolveLayoutTargets(pinnedId) {
+        if (!layoutTargets.size) {
+          snapshotLayoutTargets();
+        }
+        separatePositionMap(layoutTargets, pinnedId, 8);
+      }
+
+      function finishLayoutAnimation() {
+        layoutFrame = null;
+        if (layoutHistoryPending) {
+          recordPositionHistory(layoutHistoryPending);
+          layoutHistoryPending = null;
+        }
+        if (layoutSavePending) {
+          layoutSavePending = false;
+          saveState();
+        }
+      }
+
+      function stepLayoutAnimation() {
+        layoutFrame = null;
+        var draggedId = gesture && gesture.type === "node" ? gesture.node.id : null;
+        var moving = false;
+        nodes.forEach(function (node) {
+          if (node.id === draggedId) {
+            return;
+          }
+          var target = layoutTargets.get(node.id);
+          if (!target) {
+            return;
+          }
+          var dx = target.x - node.x;
+          var dy = target.y - node.y;
+          if (Math.abs(dx) > 0.05 || Math.abs(dy) > 0.05) {
+            var factor = reducedMotion ? 1 : 0.2;
+            node.x += dx * factor;
+            node.y += dy * factor;
+            moving = !reducedMotion;
+          } else {
+            node.x = target.x;
+            node.y = target.y;
+          }
+        });
+        draw();
+        if (moving) {
+          layoutFrame = window.requestAnimationFrame(stepLayoutAnimation);
+        } else {
+          finishLayoutAnimation();
+        }
+      }
+
+      function requestLayoutAnimation(saveAfter, historyBefore) {
+        if (saveAfter) {
+          layoutSavePending = true;
+        }
+        if (historyBefore) {
+          layoutHistoryPending = historyBefore;
+        }
+        if (layoutFrame === null) {
+          layoutFrame = window.requestAnimationFrame(stepLayoutAnimation);
+        }
+      }
+
+      function repelOverlappingNodes(draggedNode) {
+        if (!layoutTargets.size) {
+          snapshotLayoutTargets();
+        }
+        layoutTargets.set(draggedNode.id, { x: draggedNode.x, y: draggedNode.y });
+        resolveLayoutTargets(draggedNode.id);
+        requestLayoutAnimation(false);
+      }
+
+      function graphHintText() {
+        return editMode
+          ? "双击连线名称修改 · 拖动 + 控制点建连 · 拖出端点断开"
+          : "拖拽节点 · 滚轮缩放 · 空白处平移";
+      }
+
+      function buildAdjacency() {
+        var adjacency = new Map(nodes.map(function (node) {
+          return [node.id, []];
+        }));
+        edges.forEach(function (edge) {
+          if (!adjacency.has(edge.source) || !adjacency.has(edge.target)) {
+            return;
+          }
+          adjacency.get(edge.source).push(edge.target);
+          adjacency.get(edge.target).push(edge.source);
+        });
+        return adjacency;
+      }
+
+      function degreeOf(nodeId, adjacency) {
+        return (adjacency.get(nodeId) || []).length;
+      }
+
+      function chooseLayoutRoot(adjacency) {
+        var ordered = nodes.slice().sort(function (first, second) {
+          return degreeOf(second.id, adjacency) - degreeOf(first.id, adjacency) || first.name.localeCompare(second.name);
+        });
+        if (nodeById.has(selectedId) && degreeOf(selectedId, adjacency) === degreeOf(ordered[0].id, adjacency)) {
+          return selectedId;
+        }
+        return ordered[0].id;
+      }
+
+      function componentFrom(startId, adjacency, seen) {
+        var queue = [startId];
+        var component = [];
+        seen.add(startId);
+        while (queue.length) {
+          var nodeId = queue.shift();
+          component.push(nodeId);
+          (adjacency.get(nodeId) || []).forEach(function (nextId) {
+            if (!seen.has(nextId)) {
+              seen.add(nextId);
+              queue.push(nextId);
+            }
+          });
+        }
+        return component;
+      }
+
+      function isForest(adjacency) {
+        var seen = new Set();
+        var hasCycle = false;
+        function visit(nodeId, parentId) {
+          seen.add(nodeId);
+          (adjacency.get(nodeId) || []).forEach(function (nextId) {
+            if (nextId === parentId) {
+              return;
+            }
+            if (seen.has(nextId)) {
+              hasCycle = true;
+              return;
+            }
+            visit(nextId, nodeId);
+          });
+        }
+        nodes.forEach(function (node) {
+          if (!seen.has(node.id)) {
+            visit(node.id, null);
+          }
+        });
+        return !hasCycle;
+      }
+
+      function sortByImportance(ids, adjacency) {
+        return ids.slice().sort(function (firstId, secondId) {
+          var degreeDifference = degreeOf(secondId, adjacency) - degreeOf(firstId, adjacency);
+          if (degreeDifference) {
+            return degreeDifference;
+          }
+          return nodeById.get(firstId).name.localeCompare(nodeById.get(secondId).name);
+        });
+      }
+
+      function buildHierarchicalPositions(adjacency, rootId) {
+        var seen = new Set();
+        var roots = [rootId];
+        componentFrom(rootId, adjacency, seen);
+        nodes.forEach(function (node) {
+          if (!seen.has(node.id)) {
+            roots.push(node.id);
+            componentFrom(node.id, adjacency, seen);
+          }
+        });
+        var target = new Map();
+        var rightEdge = 0;
+        roots.forEach(function (componentRoot, componentIndex) {
+          var queue = [{ id: componentRoot, level: 0 }];
+          var visited = new Set([componentRoot]);
+          var levels = [];
+          while (queue.length) {
+            var item = queue.shift();
+            if (!levels[item.level]) {
+              levels[item.level] = [];
+            }
+            levels[item.level].push(item.id);
+            sortByImportance(adjacency.get(item.id) || [], adjacency).forEach(function (nextId) {
+              if (!visited.has(nextId)) {
+                visited.add(nextId);
+                queue.push({ id: nextId, level: item.level + 1 });
+              }
+            });
+          }
+          var widest = Math.max.apply(null, levels.map(function (level) {
+            return level.length;
+          }));
+          var halfWidth = Math.max(0, (widest - 1) * 140);
+          var offsetX = componentIndex === 0 ? 0 : rightEdge + halfWidth + 340;
+          levels.forEach(function (level, levelIndex) {
+            var ordered = sortByImportance(level, adjacency);
+            ordered.forEach(function (nodeId, index) {
+              target.set(nodeId, {
+                x: offsetX + (index - (ordered.length - 1) / 2) * 280,
+                y: levelIndex * 290
+              });
+            });
+          });
+          rightEdge = Math.max(rightEdge, offsetX + halfWidth);
+        });
+        separatePositionMap(target, rootId, 14);
+        return target;
+      }
+
+      function buildForcePositions(rootId) {
+        var target = new Map();
+        var others = nodes.filter(function (node) {
+          return node.id !== rootId;
+        });
+        var radius = Math.max(300, Math.sqrt(nodes.length) * 150);
+        target.set(rootId, { x: 0, y: 0 });
+        others.forEach(function (node, index) {
+          var angle = -Math.PI / 2 + Math.PI * 2 * index / Math.max(1, others.length);
+          target.set(node.id, {
+            x: Math.cos(angle) * radius,
+            y: Math.sin(angle) * radius
+          });
+        });
+        return target;
+      }
+
+      function buildTrianglePositions(rootId, adjacency) {
+        var target = new Map();
+        var baseNodes = sortByImportance(nodes.filter(function (node) {
+          return node.id !== rootId;
+        }).map(function (node) {
+          return node.id;
+        }), adjacency);
+        var halfBase = 310;
+        var halfHeight = Math.round(halfBase * Math.sqrt(3) / 2);
+        target.set(rootId, { x: 0, y: -halfHeight });
+        target.set(baseNodes[0], { x: -halfBase, y: halfHeight });
+        target.set(baseNodes[1], { x: halfBase, y: halfHeight });
+        return target;
+      }
+
+      function runForceStep(positions, adjacency, rootId, progress) {
+        var displacement = new Map(nodes.map(function (node) {
+          return [node.id, { x: 0, y: 0 }];
+        }));
+        var idealDistance = Math.max(250, Math.sqrt(nodes.length) * 145);
+        for (var firstIndex = 0; firstIndex < nodes.length; firstIndex += 1) {
+          for (var secondIndex = firstIndex + 1; secondIndex < nodes.length; secondIndex += 1) {
+            var first = nodes[firstIndex];
+            var second = nodes[secondIndex];
+            var firstPoint = positions.get(first.id);
+            var secondPoint = positions.get(second.id);
+            var dx = secondPoint.x - firstPoint.x;
+            var dy = secondPoint.y - firstPoint.y;
+            var distance = Math.max(1, Math.sqrt(dx * dx + dy * dy));
+            if (distance === 1) {
+              dx = firstIndex % 2 ? -1 : 1;
+              dy = secondIndex % 2 ? -0.4 : 0.4;
+              distance = Math.sqrt(dx * dx + dy * dy);
+            }
+            var repulsion = idealDistance * idealDistance / (distance * distance);
+            var minimum = nodeLayoutRadius(first) + nodeLayoutRadius(second) + 18;
+            if (distance < minimum) {
+              repulsion += (minimum - distance) * 0.9;
+            }
+            var pushX = dx / distance * repulsion;
+            var pushY = dy / distance * repulsion;
+            displacement.get(first.id).x -= pushX;
+            displacement.get(first.id).y -= pushY;
+            displacement.get(second.id).x += pushX;
+            displacement.get(second.id).y += pushY;
+          }
+        }
+        edges.forEach(function (edge) {
+          var source = positions.get(edge.source);
+          var target = positions.get(edge.target);
+          if (!source || !target) {
+            return;
+          }
+          var dx = target.x - source.x;
+          var dy = target.y - source.y;
+          var distance = Math.max(1, Math.sqrt(dx * dx + dy * dy));
+          var attraction = distance * distance / idealDistance * 0.028;
+          var pullX = dx / distance * attraction;
+          var pullY = dy / distance * attraction;
+          displacement.get(edge.source).x += pullX;
+          displacement.get(edge.source).y += pullY;
+          displacement.get(edge.target).x -= pullX;
+          displacement.get(edge.target).y -= pullY;
+        });
+        var temperature = Math.max(3, 30 * (1 - progress));
+        nodes.forEach(function (node) {
+          if (node.id === rootId) {
+            return;
+          }
+          var delta = displacement.get(node.id);
+          var distance = Math.sqrt(delta.x * delta.x + delta.y * delta.y);
+          if (distance > temperature) {
+            delta.x = delta.x / distance * temperature;
+            delta.y = delta.y / distance * temperature;
+          }
+          positions.get(node.id).x += delta.x;
+          positions.get(node.id).y += delta.y;
+        });
+      }
+
+      function now() {
+        return window.performance && window.performance.now ? window.performance.now() : Date.now();
+      }
+
+      function fitViewToPositions(positions) {
+        if (!size.width || !size.height || !positions.size) {
+          return;
+        }
+        var bounds = { left: Infinity, right: -Infinity, top: Infinity, bottom: -Infinity };
+        nodes.forEach(function (node) {
+          var point = positions.get(node.id);
+          if (!point) {
+            return;
+          }
+          var radius = nodeLayoutRadius(node) + 26;
+          bounds.left = Math.min(bounds.left, point.x - radius);
+          bounds.right = Math.max(bounds.right, point.x + radius);
+          bounds.top = Math.min(bounds.top, point.y - radius);
+          bounds.bottom = Math.max(bounds.bottom, point.y + radius);
+        });
+        var width = Math.max(1, bounds.right - bounds.left);
+        var height = Math.max(1, bounds.bottom - bounds.top);
+        view.scale = Math.min(1.08, Math.max(0.38, Math.min((size.width - 100) / width, (size.height - 180) / height)));
+        view.x = size.width / 2 - (bounds.left + bounds.right) / 2 * view.scale;
+        view.y = size.height / 2 + 42 - (bounds.top + bounds.bottom) / 2 * view.scale;
+      }
+
+      function finishPositionTransition(before, message) {
+        positionTransitionFrame = null;
+        if (before) {
+          recordPositionHistory(before);
+        }
+        saveState(message);
+        autoLayoutButton.disabled = false;
+        autoLayoutButton.removeAttribute("aria-busy");
+        graphHint.textContent = graphHintText();
+        updateHistoryControls();
+        draw();
+      }
+
+      function animateToPositions(target, duration, before, message) {
+        var start = capturePositions();
+        var startedAt = null;
+        fitViewToPositions(target);
+        autoLayoutButton.disabled = true;
+        updateHistoryControls();
+        function frame(timestamp) {
+          if (startedAt === null) {
+            startedAt = timestamp;
+          }
+          var progress = reducedMotion ? 1 : Math.min(1, (timestamp - startedAt) / duration);
+          var eased = 1 - Math.pow(1 - progress, 3);
+          nodes.forEach(function (node) {
+            var from = start.get(node.id);
+            var to = target.get(node.id);
+            if (from && to) {
+              node.x = from.x + (to.x - from.x) * eased;
+              node.y = from.y + (to.y - from.y) * eased;
+            }
+          });
+          draw();
+          if (progress < 1) {
+            positionTransitionFrame = window.requestAnimationFrame(frame);
+          } else {
+            applyPositions(target);
+            finishPositionTransition(before, message);
+          }
+        }
+        positionTransitionFrame = window.requestAnimationFrame(frame);
+        updateHistoryControls();
+      }
+
+      function finishSmartLayout(target, rootId, before, mode) {
+        smartLayoutFrame = null;
+        separatePositionMap(target, rootId, 14);
+        var message = mode === "triangle"
+          ? "已使用等腰三角形完成编排"
+          : mode === "hierarchical"
+            ? "已使用层次布局完成编排"
+            : "已使用力导向布局完成编排";
+        animateToPositions(target, 420, before, message);
+      }
+
+      function runForceLayout(target, adjacency, rootId, before, token) {
+        var iteration = 0;
+        var total = nodes.length > 50 ? 110 : 170;
+        function frame() {
+          if (token !== smartLayoutToken) {
+            return;
+          }
+          var frameStart = now();
+          var frameBudget = nodes.length > 50 ? 7 : 10;
+          while (iteration < total && now() - frameStart < frameBudget) {
+            runForceStep(target, adjacency, rootId, iteration / total);
+            iteration += 1;
+          }
+          if (iteration < total) {
+            smartLayoutFrame = window.requestAnimationFrame(frame);
+          } else {
+            finishSmartLayout(target, rootId, before, "force");
+          }
+        }
+        smartLayoutFrame = window.requestAnimationFrame(frame);
+        updateHistoryControls();
+      }
+
+      function cancelSmartLayout() {
+        smartLayoutToken += 1;
+        if (smartLayoutFrame !== null) {
+          window.cancelAnimationFrame(smartLayoutFrame);
+          smartLayoutFrame = null;
+        }
+      }
+
+      function startSmartLayout() {
+        if (nodes.length < 2 || smartLayoutFrame !== null || positionTransitionFrame !== null) {
+          return;
+        }
+        cancelEdgeLabelEditing();
+        stopLayoutAnimation();
+        var before = capturePositions();
+        var adjacency = buildAdjacency();
+        var rootId = chooseLayoutRoot(adjacency);
+        selectNode(nodeById.get(rootId), false, false);
+        graphHint.textContent = "正在智能编排…";
+        autoLayoutButton.disabled = true;
+        autoLayoutButton.setAttribute("aria-busy", "true");
+        var token = smartLayoutToken + 1;
+        smartLayoutToken = token;
+        if (nodes.length === 3) {
+          finishSmartLayout(buildTrianglePositions(rootId, adjacency), rootId, before, "triangle");
+        } else if (isForest(adjacency)) {
+          finishSmartLayout(buildHierarchicalPositions(adjacency, rootId), rootId, before, "hierarchical");
+        } else {
+          runForceLayout(buildForcePositions(rootId), adjacency, rootId, before, token);
+        }
+      }
+
+      function restorePositionHistory(direction) {
+        if (smartLayoutFrame !== null || positionTransitionFrame !== null) {
+          return;
+        }
+        var target = direction === "undo" ? positionHistory.pop() : positionFuture.pop();
+        if (!target) {
+          return;
+        }
+        var current = capturePositions();
+        if (direction === "undo") {
+          positionFuture.push(current);
+        } else {
+          positionHistory.push(current);
+        }
+        updateHistoryControls();
+        animateToPositions(target, 360, null, direction === "undo" ? "已撤销位置调整" : "已重做位置调整");
+      }
+
+      function connectionPort(node) {
+        return {
+          x: node.x + 82,
+          y: node.y
+        };
+      }
+
+      function connectionPortAt(world) {
+        for (var index = nodes.length - 1; index >= 0; index -= 1) {
+          var node = nodes[index];
+          var port = connectionPort(node);
+          var dx = world.x - port.x;
+          var dy = world.y - port.y;
+          if (dx * dx + dy * dy <= 13 * 13) {
+            return node;
+          }
+        }
+        return null;
+      }
+
+      function edgeGeometry(edge) {
+        var source = nodeById.get(edge.source);
+        var target = nodeById.get(edge.target);
+        if (!source || !target) {
+          return null;
+        }
+        var dx = target.x - source.x;
+        var dy = target.y - source.y;
+        var length = Math.max(1, Math.sqrt(dx * dx + dy * dy));
+        var unitX = dx / length;
+        var unitY = dy / length;
+        var normalX = -unitY;
+        var normalY = unitX;
+        var start = {
+          x: source.x + unitX * (nodeRadius(source) + 8),
+          y: source.y + unitY * (nodeRadius(source) + 8)
+        };
+        var end = {
+          x: target.x - unitX * (nodeRadius(target) + 8),
+          y: target.y - unitY * (nodeRadius(target) + 8)
+        };
+        return {
+          source: source,
+          target: target,
+          start: start,
+          end: end,
+          control: {
+            x: (start.x + end.x) / 2 + normalX * edge.curve,
+            y: (start.y + end.y) / 2 + normalY * edge.curve
+          }
+        };
+      }
+
+      function edgeEndpointAt(world) {
+        for (var index = edges.length - 1; index >= 0; index -= 1) {
+          var edge = edges[index];
+          if (!edgeAllowed(edge)) {
+            continue;
+          }
+          var geometry = edgeGeometry(edge);
+          if (!geometry) {
+            continue;
+          }
+          var startDx = world.x - geometry.start.x;
+          var startDy = world.y - geometry.start.y;
+          if (startDx * startDx + startDy * startDy <= 12 * 12) {
+            return {
+              edgeIndex: index,
+              endpoint: "source",
+              node: geometry.source,
+              start: geometry.start
+            };
+          }
+          var endDx = world.x - geometry.end.x;
+          var endDy = world.y - geometry.end.y;
+          if (endDx * endDx + endDy * endDy <= 12 * 12) {
+            return {
+              edgeIndex: index,
+              endpoint: "target",
+              node: geometry.target,
+              start: geometry.end
+            };
+          }
+        }
+        return null;
+      }
+
+      function applyWorldTransform() {
+        ctx.setTransform(
+          dpr * view.scale,
+          0,
+          0,
+          dpr * view.scale,
+          dpr * view.x,
+          dpr * view.y
+        );
+      }
+
+      function quadraticPoint(a, control, b, t) {
+        var inverse = 1 - t;
+        return {
+          x: inverse * inverse * a.x + 2 * inverse * t * control.x + t * t * b.x,
+          y: inverse * inverse * a.y + 2 * inverse * t * control.y + t * t * b.y
+        };
+      }
+
+      function edgeLabelLayout(edge) {
+        var geometry = edgeGeometry(edge);
+        if (!geometry) {
+          return null;
+        }
+        var point = quadraticPoint(geometry.start, geometry.control, geometry.end, 0.5);
+        ctx.save();
+        ctx.font = '700 16px "Kaiti SC", "STKaiti", "KaiTi", cursive';
+        var width = ctx.measureText(edge.label).width + 18;
+        ctx.restore();
+        return {
+          point: point,
+          width: width,
+          height: 28
+        };
+      }
+
+      function edgeLabelAt(world) {
+        var padding = 6 / Math.max(0.38, view.scale);
+        for (var index = edges.length - 1; index >= 0; index -= 1) {
+          if (!edgeAllowed(edges[index])) {
+            continue;
+          }
+          var layout = edgeLabelLayout(edges[index]);
+          if (layout &&
+              Math.abs(world.x - layout.point.x) <= layout.width / 2 + padding &&
+              Math.abs(world.y - layout.point.y) <= layout.height / 2 + padding) {
+            return index;
+          }
+        }
+        return -1;
+      }
+
+      function positionEdgeLabelEditor() {
+        if (!edgeLabelEdit || edgeLabelEditor.hidden) {
+          return;
+        }
+        var edge = edges[edgeLabelEdit.edgeIndex];
+        var layout = edge && edgeLabelLayout(edge);
+        if (!layout) {
+          edgeLabelEdit = null;
+          edgeLabelEditor.hidden = true;
+          return;
+        }
+        var screen = worldToScreen(layout.point);
+        ctx.save();
+        ctx.font = '700 16px "Kaiti SC", "STKaiti", "KaiTi", cursive';
+        var draftWidth = ctx.measureText(edgeLabelEditor.value || edge.label).width + 28;
+        ctx.restore();
+        edgeLabelEditor.style.left = screen.x + "px";
+        edgeLabelEditor.style.top = screen.y + "px";
+        edgeLabelEditor.style.width = Math.max(68, Math.max(layout.width, draftWidth) * view.scale + 18) + "px";
+        edgeLabelEditor.style.fontSize = Math.max(13, Math.min(18, 16 * view.scale)) + "px";
+      }
+
+      function cancelEdgeLabelEditing() {
+        if (!edgeLabelEdit) {
+          return;
+        }
+        edgeLabelEdit = null;
+        edgeLabelEditor.hidden = true;
+        draw();
+      }
+
+      function startEdgeLabelEditing(edgeIndex) {
+        var edge = edges[edgeIndex];
+        if (!editMode || !edge) {
+          return;
+        }
+        edgeLabelEdit = { edgeIndex: edgeIndex };
+        edgeLabelEditor.value = edge.label;
+        edgeLabelEditor.hidden = false;
+        positionEdgeLabelEditor();
+        edgeLabelEditor.focus();
+        edgeLabelEditor.select();
+        draw();
+      }
+
+      function commitEdgeLabelEditing() {
+        if (!edgeLabelEdit) {
+          return;
+        }
+        var edge = edges[edgeLabelEdit.edgeIndex];
+        var value = edgeLabelEditor.value.trim();
+        if (!edge || !value) {
+          showStatus("关系名称不能为空");
+          edgeLabelEditor.focus();
+          return;
+        }
+        edge.label = value;
+        edgeLabelEdit = null;
+        edgeLabelEditor.hidden = true;
+        saveState("关系名称已保存");
+        selectNode(nodeById.get(selectedId), false, false);
+      }
+
+      function drawEdge(edge, edgeIndex) {
+        if (!edgeAllowed(edge)) {
+          return;
+        }
+        var geometry = edgeGeometry(edge);
+        if (!geometry) {
+          return;
+        }
+        var source = geometry.source;
+        var target = geometry.target;
+        var emphasized = selectedId === source.id || selectedId === target.id;
+        var faded = query && !nodeMatches(source) && !nodeMatches(target);
+
+        ctx.save();
+        ctx.globalAlpha = faded ? 0.1 : emphasized ? 1 : 0.62;
+        ctx.strokeStyle = edgeColor(edge, emphasized);
+        ctx.lineWidth = emphasized ? 2.3 : 1.7;
+        ctx.setLineDash(edge.type === "care" ? [7, 6] : []);
+        ctx.beginPath();
+        ctx.moveTo(geometry.start.x, geometry.start.y);
+        ctx.quadraticCurveTo(
+          geometry.control.x,
+          geometry.control.y,
+          geometry.end.x,
+          geometry.end.y
+        );
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        var labelLayout = edgeLabelLayout(edge);
+        var labelPoint = labelLayout.point;
+        ctx.font = '700 16px "Kaiti SC", "STKaiti", "KaiTi", cursive';
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        var labelWidth = labelLayout.width;
+        ctx.fillStyle = "#ffffff";
+        var editingThisLabel = edgeLabelEdit && edgeLabelEdit.edgeIndex === edgeIndex;
+        ctx.strokeStyle = editingThisLabel || emphasized ? "#3899ad" : "rgba(23,23,21,0.52)";
+        ctx.lineWidth = editingThisLabel ? 2 : 1.2;
+        roundRect(ctx, labelPoint.x - labelWidth / 2, labelPoint.y - 14, labelWidth, 28, 9);
+        ctx.fill();
+        ctx.stroke();
+        ctx.fillStyle = "#171715";
+        ctx.fillText(edge.label, labelPoint.x, labelPoint.y + 1);
+        ctx.restore();
+      }
+
+      function drawEndpoint(point, emphasized) {
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(point.x, point.y, 7, 0, Math.PI * 2);
+        ctx.fillStyle = "#ffffff";
+        ctx.fill();
+        ctx.strokeStyle = emphasized ? "#3899ad" : "#171715";
+        ctx.lineWidth = emphasized ? 2.4 : 1.8;
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(point.x, point.y, 2.2, 0, Math.PI * 2);
+        ctx.fillStyle = emphasized ? "#3899ad" : "#171715";
+        ctx.fill();
+        ctx.restore();
+      }
+
+      function drawEdgeHandles(edge) {
+        if (!editMode || !edgeAllowed(edge)) {
+          return;
+        }
+        var geometry = edgeGeometry(edge);
+        if (!geometry) {
+          return;
+        }
+        var emphasized = selectedId === geometry.source.id || selectedId === geometry.target.id;
+        drawEndpoint(geometry.start, emphasized);
+        drawEndpoint(geometry.end, emphasized);
+      }
+
+      function drawConnectionPort(node) {
+        if (!editMode || (query && !nodeMatches(node))) {
+          return;
+        }
+        var port = connectionPort(node);
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(port.x, port.y, 9, 0, Math.PI * 2);
+        ctx.fillStyle = selectedId === node.id ? "#3899ad" : "#ffffff";
+        ctx.fill();
+        ctx.strokeStyle = "#3899ad";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(port.x - 4, port.y);
+        ctx.lineTo(port.x + 4, port.y);
+        ctx.moveTo(port.x, port.y - 4);
+        ctx.lineTo(port.x, port.y + 4);
+        ctx.strokeStyle = selectedId === node.id ? "#ffffff" : "#3899ad";
+        ctx.lineWidth = 1.7;
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      function snapPointForTarget(start, target) {
+        var dx = target.x - start.x;
+        var dy = target.y - start.y;
+        var length = Math.max(1, Math.sqrt(dx * dx + dy * dy));
+        return {
+          x: target.x - dx / length * (nodeRadius(target) + 8),
+          y: target.y - dy / length * (nodeRadius(target) + 8)
+        };
+      }
+
+      function drawPreviewLine(start, end, color) {
+        var control = {
+          x: (start.x + end.x) / 2,
+          y: (start.y + end.y) / 2 - Math.min(48, Math.abs(end.x - start.x) * 0.12)
+        };
+        ctx.save();
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 2.6;
+        ctx.setLineDash([8, 6]);
+        ctx.beginPath();
+        ctx.moveTo(start.x, start.y);
+        ctx.quadraticCurveTo(control.x, control.y, end.x, end.y);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.beginPath();
+        ctx.arc(end.x, end.y, 8, 0, Math.PI * 2);
+        ctx.fillStyle = "#ffffff";
+        ctx.fill();
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 2.2;
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      function drawGesturePreview() {
+        if (!editMode || !gesture) {
+          return;
+        }
+        if (gesture.type === "connect") {
+          var targetPoint = gesture.target
+            ? snapPointForTarget(gesture.start, gesture.target)
+            : gesture.current;
+          drawPreviewLine(gesture.start, targetPoint, "#3899ad");
+        } else if (gesture.type === "detach") {
+          var edge = edges[gesture.edgeIndex];
+          var geometry = edge && edgeGeometry(edge);
+          if (!geometry) {
+            return;
+          }
+          var fixed = gesture.endpoint === "source" ? geometry.end : geometry.start;
+          drawPreviewLine(fixed, gesture.current, "#c4493d");
+        }
+      }
+
+      function roundRect(context, x, y, width, height, radius) {
+        var r = Math.min(radius, width / 2, height / 2);
+        context.beginPath();
+        context.moveTo(x + r, y);
+        context.arcTo(x + width, y, x + width, y + height, r);
+        context.arcTo(x + width, y + height, x, y + height, r);
+        context.arcTo(x, y + height, x, y, r);
+        context.arcTo(x, y, x + width, y, r);
+        context.closePath();
+      }
+
+      function isAnimalNode(node) {
+        var identity = [node.kind, node.type, node.species, node.role]
+          .concat(node.anchors || [])
+          .join(" ");
+        return node.kind === "animal" || /宠物|动物|猫|狗|兔|鸟|鱼|龟|仓鼠|豚鼠|鹦鹉|马/.test(identity);
+      }
+
+      function clampUnit(value, fallback) {
+        var number = typeof value === "number" && isFinite(value) ? value : fallback;
+        return Math.max(0, Math.min(1, number));
+      }
+
+      function atlasCropRect(node) {
+        var cellWidth = atlas.naturalWidth ? atlas.naturalWidth / atlasCols : 0;
+        var cellHeight = atlas.naturalHeight ? atlas.naturalHeight / atlasRows : 0;
+        var side = Math.min(cellWidth, cellHeight);
+        var cellLeft = node.col * cellWidth;
+        var cellTop = node.row * cellHeight;
+        var focusX = clampUnit(node.avatarFocusX, 0.5);
+        var focusY = clampUnit(node.avatarFocusY, isAnimalNode(node) ? 0.64 : 0.36);
+        var desiredSx = cellLeft + focusX * cellWidth - side / 2;
+        var desiredSy = cellTop + focusY * cellHeight - side / 2;
+        var maxCellSx = cellLeft + Math.max(0, cellWidth - side);
+        var maxCellSy = cellTop + Math.max(0, cellHeight - side);
+        return {
+          // Keep every crop inside its own atlas cell so selecting one node can never
+          // leak pixels from a neighbouring character.
+          sx: Math.max(cellLeft, Math.min(maxCellSx, desiredSx)),
+          sy: Math.max(cellTop, Math.min(maxCellSy, desiredSy)),
+          side: side
+        };
+      }
+
+      function hasAtlasCell(node) {
+        return Number.isInteger(node.col) && Number.isInteger(node.row) &&
+          node.col >= 0 && node.col < atlasCols && node.row >= 0 && node.row < atlasRows;
+      }
+
+      function isSafeLocalAvatarPath(value) {
+        if (typeof value !== "string" || !value.trim()) {
+          return false;
+        }
+        var normalized = value.trim().replace(/\\/g, "/");
+        try {
+          normalized = decodeURIComponent(normalized);
+        } catch (error) {
+          return false;
+        }
+        return !/^[A-Za-z][A-Za-z0-9+.-]*:/.test(normalized) &&
+          !normalized.startsWith("/") &&
+          normalized.split("/").every(function (part) { return part !== ".."; });
+      }
+
+      function directAvatarSource(node) {
+        if (!node || !isSafeLocalAvatarPath(node.avatarSrc)) {
+          return null;
+        }
+        try {
+          return new URL(node.avatarSrc.trim(), document.baseURI).href;
+        } catch (error) {
+          return node.avatarSrc.trim();
+        }
+      }
+
+      function avatarImageRecord(node) {
+        var source = directAvatarSource(node);
+        if (!source) {
+          return null;
+        }
+        var record = avatarImageCache.get(source);
+        if (record) {
+          return record;
+        }
+        var image = new Image();
+        record = {
+          source: source,
+          image: image,
+          ready: false,
+          failed: false
+        };
+        image.onload = function () {
+          record.ready = true;
+          record.failed = false;
+          draw();
+          if (selectedId && nodeById.has(selectedId)) {
+            renderProfileAvatar(nodeById.get(selectedId));
+          }
+        };
+        image.onerror = function () {
+          record.failed = true;
+          draw();
+          if (selectedId && nodeById.has(selectedId)) {
+            renderProfileAvatar(nodeById.get(selectedId));
+          }
+        };
+        image.src = source;
+        avatarImageCache.set(source, record);
+        return record;
+      }
+
+      function drawDirectAvatar(node, radius) {
+        var record = avatarImageRecord(node);
+        if (!record || record.failed || !record.ready ||
+            !record.image.naturalWidth || !record.image.naturalHeight) {
+          return false;
+        }
+        var sourceSide = Math.min(record.image.naturalWidth, record.image.naturalHeight);
+        var sourceX = (record.image.naturalWidth - sourceSide) / 2;
+        var sourceY = (record.image.naturalHeight - sourceSide) / 2;
+        try {
+          ctx.drawImage(
+            record.image,
+            sourceX,
+            sourceY,
+            sourceSide,
+            sourceSide,
+            node.x - radius,
+            node.y - radius,
+            radius * 2,
+            radius * 2
+          );
+        } catch (error) {
+          return false;
+        }
+        return true;
+      }
+
+      function setAtlasFallback(avatar, node) {
+        if (!atlas.naturalWidth || !atlas.naturalHeight) {
+          return false;
+        }
+        var crop = atlasCropRect(node);
+        if (!crop.side) {
+          return false;
+        }
+        // The fallback uses the exact same source rectangle as the canvas path. This
+        // keeps local file:// previews correct even when canvas export is unavailable.
+        var xRange = Math.max(1, atlas.naturalWidth - crop.side);
+        var yRange = Math.max(1, atlas.naturalHeight - crop.side);
+        avatar.style.backgroundImage = 'url("' + atlasSrc + '")';
+        avatar.style.backgroundSize = (atlas.naturalWidth / crop.side * 100) + "% auto";
+        avatar.style.backgroundPosition =
+          (crop.sx / xRange * 100) + "% " + (crop.sy / yRange * 100) + "%";
+        return true;
+      }
+
+      function profileAvatarDataUrl(node) {
+        if (!atlas.complete || !atlas.naturalWidth || !atlas.naturalHeight) {
+          return null;
+        }
+        var crop = atlasCropRect(node);
+        if (!crop.side) {
+          return null;
+        }
+        var tile = document.createElement("canvas");
+        tile.width = 512;
+        tile.height = 512;
+        var tileContext = tile.getContext("2d");
+        tileContext.fillStyle = "#ffffff";
+        tileContext.fillRect(0, 0, tile.width, tile.height);
+        try {
+          tileContext.drawImage(
+            atlas,
+            crop.sx,
+            crop.sy,
+            crop.side,
+            crop.side,
+            0,
+            0,
+            tile.width,
+            tile.height
+          );
+          return tile.toDataURL("image/png");
+        } catch (error) {
+          return null;
+        }
+      }
+
+      function renderProfileAvatar(node) {
+        var avatar = document.getElementById("profile-avatar");
+        var token = ++avatarRenderToken;
+        avatar.textContent = "";
+        avatar.style.backgroundImage = "none";
+        avatar.style.backgroundSize = "auto";
+        avatar.style.backgroundPosition = "center";
+        var directRecord = avatarImageRecord(node);
+        if (directRecord && !directRecord.failed) {
+          avatar.textContent = "";
+          avatar.style.backgroundImage = "url(" + JSON.stringify(directRecord.source) + ")";
+          avatar.style.backgroundSize = "contain";
+          avatar.style.backgroundPosition = "center";
+          return;
+        }
+        if (!hasAtlasCell(node)) {
+          avatar.textContent = node.name.slice(0, 1);
+          return;
+        }
+        avatar.textContent = node.name.slice(0, 1);
+        if (!atlas.complete || !atlas.naturalWidth || !atlas.naturalHeight) {
+          return;
+        }
+        var avatarDataUrl = profileAvatarDataUrl(node);
+        if (token !== avatarRenderToken) {
+          return;
+        }
+        if (avatarDataUrl) {
+          avatar.textContent = "";
+          avatar.style.backgroundImage = 'url("' + avatarDataUrl + '")';
+          avatar.style.backgroundSize = "cover";
+          avatar.style.backgroundPosition = "center";
+          return;
+        }
+        if (setAtlasFallback(avatar, node)) {
+          avatar.textContent = "";
+        }
+      }
+
+      function drawNode(node) {
+        var radius = nodeRadius(node);
+        var faded = query && !nodeMatches(node);
+        var hasAtlasCell = Number.isInteger(node.col) && Number.isInteger(node.row) &&
+          node.col >= 0 && node.col < atlasCols && node.row >= 0 && node.row < atlasRows;
+
+        ctx.save();
+        ctx.globalAlpha = faded ? 0.16 : 1;
+
+        ctx.beginPath();
+        ctx.arc(node.x, node.y, radius + 5, 0, Math.PI * 2);
+        ctx.fillStyle = "#ffffff";
+        ctx.fill();
+
+        if (selectedId === node.id) {
+          ctx.strokeStyle = "#3899ad";
+          ctx.lineWidth = 3;
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.arc(node.x, node.y, radius + 10, 0.1, Math.PI * 1.92);
+          ctx.strokeStyle = "rgba(124,207,223,0.7)";
+          ctx.lineWidth = 1.5;
+          ctx.stroke();
+        } else {
+          ctx.strokeStyle = "#171715";
+          ctx.lineWidth = 2;
+          ctx.stroke();
+        }
+
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(node.x, node.y, radius - 2, 0, Math.PI * 2);
+        ctx.clip();
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(node.x - radius, node.y - radius, radius * 2, radius * 2);
+
+        var drewDirectAvatar = drawDirectAvatar(node, radius - 2);
+        if (!drewDirectAvatar) {
+          if (hasAtlasCell && atlas.complete && atlas.naturalWidth) {
+            var crop = atlasCropRect(node);
+            ctx.drawImage(
+              atlas,
+              crop.sx,
+              crop.sy,
+              crop.side,
+              crop.side,
+              node.x - radius,
+              node.y - radius,
+              radius * 2,
+              radius * 2
+            );
+          } else {
+            ctx.fillStyle = "#171715";
+            ctx.font = '700 30px "Kaiti SC", "STKaiti", "KaiTi", cursive';
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillText(node.name.slice(0, 1), node.x, node.y);
+          }
+        }
+        ctx.restore();
+
+        ctx.fillStyle = "#171715";
+        ctx.font = '700 22px "Kaiti SC", "STKaiti", "KaiTi", cursive';
+        ctx.textAlign = "center";
+        ctx.textBaseline = "top";
+        ctx.fillText(node.name, node.x, node.y + radius + 10);
+
+        var badgeX = node.x + radius * 0.72;
+        var badgeY = node.y + radius * 0.72;
+        ctx.beginPath();
+        ctx.arc(badgeX, badgeY, 13, 0, Math.PI * 2);
+        ctx.fillStyle = "#171715";
+        ctx.fill();
+        ctx.fillStyle = "#ffffff";
+        ctx.font = '700 12px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(String(relationCount(node.id)), badgeX, badgeY + 0.5);
+        ctx.restore();
+      }
+
+      function draw() {
+        if (!size.width || !size.height) {
+          return;
+        }
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        applyWorldTransform();
+        edges.forEach(drawEdge);
+        nodes.forEach(drawNode);
+        edges.forEach(drawEdgeHandles);
+        nodes.forEach(drawConnectionPort);
+        drawGesturePreview();
+        positionEdgeLabelEditor();
+      }
+
+      function relationsFor(nodeId) {
+        return edges.map(function (edge, edgeIndex) {
+          if (edge.source !== nodeId && edge.target !== nodeId) {
+            return null;
+          }
+          var targetId = edge.source === nodeId ? edge.target : edge.source;
+          var targetNode = nodeById.get(targetId);
+          if (!targetNode) {
+            return null;
+          }
+          return {
+            edgeIndex: edgeIndex,
+            label: edge.label,
+            target: targetNode.name,
+            targetId: targetId,
+            type: edge.type
+          };
+        }).filter(Boolean);
+      }
+
+      function linesFrom(value) {
+        return value.split(/\r?\n/).map(function (item) {
+          return item.trim();
+        }).filter(Boolean);
+      }
+
+      function renderTextList(element, items, emptyText) {
+        element.textContent = "";
+        if (!items || !items.length) {
+          var empty = document.createElement("li");
+          empty.className = "empty-note";
+          empty.textContent = emptyText;
+          element.appendChild(empty);
+          return;
+        }
+        items.forEach(function (item) {
+          var li = document.createElement("li");
+          li.textContent = item;
+          element.appendChild(li);
+        });
+      }
+
+      function fillRelationshipTargets(node) {
+        relationTarget.textContent = "";
+        nodes.forEach(function (candidate) {
+          if (candidate.id === node.id) {
+            return;
+          }
+          var option = document.createElement("option");
+          option.value = candidate.id;
+          option.textContent = candidate.name;
+          relationTarget.appendChild(option);
+        });
+        relationForm.querySelector('button[type="submit"]').disabled = nodes.length < 2;
+      }
+
+      function removeRelation(edgeIndex, message) {
+        if (!editMode || !edges[edgeIndex]) {
+          return;
+        }
+        cancelEdgeLabelEditing();
+        edges.splice(edgeIndex, 1);
+        saveState(message || "关系已删除");
+        selectNode(nodeById.get(selectedId), false, false);
+      }
+
+      function addRelation(sourceId, targetId, label, type, message) {
+        if (!editMode || !sourceId || !targetId || sourceId === targetId) {
+          return false;
+        }
+        var duplicate = edges.some(function (edge) {
+          return (edge.source === sourceId && edge.target === targetId) ||
+            (edge.source === targetId && edge.target === sourceId);
+        });
+        if (duplicate) {
+          showStatus("两个人物之间已有关系，请先断开原关系");
+          return false;
+        }
+        edges.push({
+          source: sourceId,
+          target: targetId,
+          label: label || relationDefaults[type] || "关系",
+          type: type || "friend",
+          curve: ((edges.length % 5) - 2) * 12
+        });
+        saveState(message || "关系已新增");
+        selectNode(nodeById.get(sourceId), false, false);
+        return true;
+      }
+
+      function selectNode(node, center, openMobile) {
+        if (!node) {
+          return;
+        }
+        selectedId = node.id;
+        document.getElementById("profile-name").textContent = node.name;
+        document.getElementById("profile-role").textContent = node.role;
+        editName.value = node.name;
+        editRole.value = node.role || "";
+        editAvatarSrc.value = node.avatarSrc || "";
+        editAnchors.value = (node.anchors || []).join("\n");
+        editNotes.value = (node.notes || []).join("\n");
+        renderTextList(anchorList, node.anchors || [], "暂无外观锚点");
+        renderTextList(notesList, node.notes || [], "暂无人物备注");
+        fillRelationshipTargets(node);
+
+        var avatar = document.getElementById("profile-avatar");
+        renderProfileAvatar(node);
+        avatar.setAttribute("aria-label", node.name + "头像");
+
+        var relationList = document.getElementById("relation-list");
+        relationList.textContent = "";
+        var nodeRelations = relationsFor(node.id);
+        if (!nodeRelations.length) {
+          var empty = document.createElement("li");
+          empty.className = "empty-note";
+          empty.textContent = editMode ? "还没有关系，可在下方新增。" : "暂无关系。";
+          relationList.appendChild(empty);
+        }
+        nodeRelations.forEach(function (relation) {
+          var li = document.createElement("li");
+          var copy = document.createElement("span");
+          copy.className = "relation-copy";
+          var label = document.createElement("span");
+          label.className = "relation-label";
+          var dot = document.createElement("span");
+          dot.className = "relation-dot";
+          if (relation.type === "family" || relation.type === "care") {
+            dot.style.background = "#171715";
+          }
+          label.appendChild(dot);
+          label.appendChild(document.createTextNode(relation.label));
+          var target = document.createElement("span");
+          target.className = "relation-target";
+          target.textContent = relation.target;
+          copy.appendChild(label);
+          copy.appendChild(target);
+          li.appendChild(copy);
+          if (editMode) {
+            var remove = document.createElement("button");
+            remove.className = "relation-remove";
+            remove.type = "button";
+            remove.textContent = "×";
+            remove.setAttribute("aria-label", "删除与" + relation.target + "的" + relation.label + "关系");
+            remove.addEventListener("click", function () {
+              removeRelation(relation.edgeIndex);
+            });
+            li.appendChild(remove);
+          }
+          relationList.appendChild(li);
+        });
+
+        if (center) {
+          view.x = size.width / 2 - node.x * view.scale;
+          view.y = size.height / 2 - node.y * view.scale + 30;
+        }
+        if (openMobile && window.matchMedia("(max-width: 900px)").matches) {
+          inspector.classList.add("open");
+        }
+        draw();
+      }
+
+      function setEditMode(active) {
+        cancelEdgeLabelEditing();
+        editMode = active === true;
+        editToggle.setAttribute("aria-pressed", String(editMode));
+        editToggle.textContent = editMode ? "退出编辑" : "编辑";
+        personDetails.hidden = editMode;
+        personForm.hidden = !editMode;
+        relationForm.hidden = !editMode;
+        addNodeButton.hidden = !editMode;
+        graphHint.textContent = graphHintText();
+        gesture = null;
+        canvas.classList.remove("dragging", "connecting", "detaching", "label-hover");
+        selectNode(nodeById.get(selectedId) || nodes[0], false, false);
+      }
+
+      function addNode() {
+        if (!editMode) {
+          return;
+        }
+        var center = screenToWorld({ x: size.width / 2, y: size.height / 2 });
+        var node = {
+          id: "person-" + Date.now().toString(36),
+          name: "新人物",
+          role: "点击右侧修改人物信息",
+          col: -1,
+          row: -1,
+          x: center.x,
+          y: center.y,
+          anchors: ["实际头型", "实际单鼻型与朝向", "实际双眼与低位嘴", "实际发丝、双线四肢与鞋形"],
+          notes: []
+        };
+        nodes.push(node);
+        rebuildNodeIndex();
+        saveState("新人物已加入图谱");
+        selectNode(node, false, true);
+        inspector.classList.add("open");
+        editName.focus();
+        editName.select();
+      }
+
+      function deleteSelectedNode() {
+        if (!editMode) {
+          return;
+        }
+        var node = nodeById.get(selectedId);
+        if (!node) {
+          return;
+        }
+        if (nodes.length === 1) {
+          showStatus("至少保留一个人物");
+          return;
+        }
+        if (!window.confirm("删除“" + node.name + "”及其全部关系？")) {
+          return;
+        }
+        cancelEdgeLabelEditing();
+        stopLayoutAnimation();
+        layoutTargets.clear();
+        layoutSavePending = false;
+        nodes = nodes.filter(function (item) {
+          return item.id !== node.id;
+        });
+        edges = edges.filter(function (edge) {
+          return edge.source !== node.id && edge.target !== node.id;
+        });
+        rebuildNodeIndex();
+        selectedId = nodes[0].id;
+        saveState("人物及关联关系已删除");
+        selectNode(nodes[0], true, false);
+      }
+
+      canvas.addEventListener("pointerdown", function (event) {
+        if (event.button !== undefined && event.button !== 0) {
+          return;
+        }
+        if (smartLayoutFrame !== null || positionTransitionFrame !== null) {
+          return;
+        }
+        cancelEdgeLabelEditing();
+        var point = eventPoint(event);
+        var world = screenToWorld(point);
+        var hit = nodeAt(world);
+        var endpointHit = editMode ? edgeEndpointAt(world) : null;
+        var portHit = editMode ? connectionPortAt(world) : null;
+        canvas.setPointerCapture(event.pointerId);
+
+        if (endpointHit) {
+          selectNode(endpointHit.node, false, true);
+          var geometry = edgeGeometry(edges[endpointHit.edgeIndex]);
+          var start = endpointHit.endpoint === "source" ? geometry.start : geometry.end;
+          gesture = {
+            type: "detach",
+            edgeIndex: endpointHit.edgeIndex,
+            endpoint: endpointHit.endpoint,
+            node: endpointHit.node,
+            start: start,
+            current: start,
+            moved: false
+          };
+          canvas.classList.add("detaching");
+        } else if (portHit) {
+          selectNode(portHit, false, true);
+          var port = connectionPort(portHit);
+          gesture = {
+            type: "connect",
+            source: portHit,
+            start: port,
+            current: port,
+            target: null
+          };
+          canvas.classList.add("connecting");
+        } else if (hit) {
+          selectNode(hit, false, true);
+          beginNodeLayout();
+          gesture = {
+            type: "node",
+            node: hit,
+            offsetX: world.x - hit.x,
+            offsetY: world.y - hit.y,
+            positionBefore: capturePositions()
+          };
+          canvas.classList.add("dragging");
+        } else {
+          gesture = {
+            type: "pan",
+            startX: point.x,
+            startY: point.y,
+            viewX: view.x,
+            viewY: view.y
+          };
+          canvas.classList.add("dragging");
+        }
+      });
+
+      canvas.addEventListener("pointermove", function (event) {
+        var point = eventPoint(event);
+        if (!gesture) {
+          var hoverWorld = screenToWorld(point);
+          canvas.classList.toggle("label-hover", editMode && edgeLabelAt(hoverWorld) !== -1);
+          return;
+        }
+        canvas.classList.remove("label-hover");
+        if (gesture.type === "node") {
+          var world = screenToWorld(point);
+          gesture.node.x = world.x - gesture.offsetX;
+          gesture.node.y = world.y - gesture.offsetY;
+          repelOverlappingNodes(gesture.node);
+        } else if (gesture.type === "pan") {
+          view.x = gesture.viewX + point.x - gesture.startX;
+          view.y = gesture.viewY + point.y - gesture.startY;
+        } else if (gesture.type === "connect") {
+          var connectWorld = screenToWorld(point);
+          gesture.current = connectWorld;
+          gesture.target = connectionTargetAt(connectWorld, gesture.source.id);
+        } else if (gesture.type === "detach") {
+          var detachWorld = screenToWorld(point);
+          var detachDx = detachWorld.x - gesture.start.x;
+          var detachDy = detachWorld.y - gesture.start.y;
+          gesture.current = detachWorld;
+          gesture.moved = detachDx * detachDx + detachDy * detachDy >= 18 * 18;
+        }
+        draw();
+      });
+
+      function endGesture(event, cancelled) {
+        var finished = gesture;
+        if (gesture && canvas.hasPointerCapture(event.pointerId)) {
+          canvas.releasePointerCapture(event.pointerId);
+        }
+        gesture = null;
+        canvas.classList.remove("dragging", "connecting", "detaching");
+        if (!finished || cancelled) {
+          draw();
+          return;
+        }
+        if (finished.type === "node") {
+          requestLayoutAnimation(true, finished.positionBefore);
+        } else if (finished.type === "connect") {
+          if (!finished.target) {
+            showStatus("未建立关系：请将控制点拖到另一个节点");
+          } else {
+            var chosenType = relationType.value || "friend";
+            var chosenLabel = relationLabel.value.trim() || relationDefaults[chosenType] || "关系";
+            if (addRelation(
+              finished.source.id,
+              finished.target.id,
+              chosenLabel,
+              chosenType,
+              "已通过拖拽建立关系"
+            )) {
+              relationLabel.value = "";
+            }
+          }
+        } else if (finished.type === "detach" && finished.moved) {
+          var radialDx = finished.current.x - finished.node.x;
+          var radialDy = finished.current.y - finished.node.y;
+          var radialDistance = Math.sqrt(radialDx * radialDx + radialDy * radialDy);
+          if (radialDistance >= nodeRadius(finished.node) + 10) {
+            removeRelation(finished.edgeIndex, "已通过拖拽断开关系");
+          }
+        }
+        draw();
+      }
+
+      canvas.addEventListener("pointerup", function (event) {
+        endGesture(event, false);
+      });
+      canvas.addEventListener("pointercancel", function (event) {
+        endGesture(event, true);
+      });
+
+      canvas.addEventListener("dblclick", function (event) {
+        if (!editMode) {
+          return;
+        }
+        var edgeIndex = edgeLabelAt(screenToWorld(eventPoint(event)));
+        if (edgeIndex === -1) {
+          return;
+        }
+        event.preventDefault();
+        startEdgeLabelEditing(edgeIndex);
+      });
+
+      canvas.addEventListener("wheel", function (event) {
+        event.preventDefault();
+        var point = eventPoint(event);
+        var before = screenToWorld(point);
+        var factor = Math.exp(-event.deltaY * 0.0015);
+        view.scale = Math.min(2.2, Math.max(0.38, view.scale * factor));
+        view.x = point.x - before.x * view.scale;
+        view.y = point.y - before.y * view.scale;
+        draw();
+      }, { passive: false });
+
+      canvas.addEventListener("keydown", function (event) {
+        var handled = true;
+        if (event.key === "ArrowLeft") {
+          view.x += 28;
+        } else if (event.key === "ArrowRight") {
+          view.x -= 28;
+        } else if (event.key === "ArrowUp") {
+          view.y += 28;
+        } else if (event.key === "ArrowDown") {
+          view.y -= 28;
+        } else if (event.key === "+" || event.key === "=") {
+          view.scale = Math.min(2.2, view.scale * 1.12);
+        } else if (event.key === "-") {
+          view.scale = Math.max(0.38, view.scale / 1.12);
+        } else if (event.key === "0") {
+          resetView(false);
+        } else if (event.key === "Delete" || event.key === "Backspace") {
+          deleteSelectedNode();
+        } else {
+          handled = false;
+        }
+        if (handled) {
+          event.preventDefault();
+          draw();
+        }
+      });
+
+      searchInput.addEventListener("input", function () {
+        query = searchInput.value.trim();
+        var match = nodes.find(nodeMatches);
+        if (query && match) {
+          selectNode(match, true, true);
+        } else {
+          draw();
+        }
+      });
+
+      relationFilter.addEventListener("change", function () {
+        activeFilter = relationFilter.value;
+        draw();
+      });
+
+      personForm.addEventListener("submit", function (event) {
+        event.preventDefault();
+        if (!editMode) {
+          return;
+        }
+        var node = nodeById.get(selectedId);
+        var name = editName.value.trim();
+        if (!node || !name) {
+          showStatus("姓名不能为空");
+          editName.focus();
+          return;
+        }
+        node.name = name;
+        node.role = editRole.value.trim();
+        var avatarSrc = editAvatarSrc.value.trim();
+        if (avatarSrc && !isSafeLocalAvatarPath(avatarSrc)) {
+          showStatus("头像路径只能使用当前图谱目录下的相对本地文件");
+          editAvatarSrc.focus();
+          return;
+        }
+        if (avatarSrc) {
+          node.avatarSrc = avatarSrc;
+        } else {
+          delete node.avatarSrc;
+        }
+        node.anchors = linesFrom(editAnchors.value);
+        node.notes = linesFrom(editNotes.value);
+        saveState("人物信息已保存");
+        selectNode(node, false, false);
+      });
+
+      relationForm.addEventListener("submit", function (event) {
+        event.preventDefault();
+        if (!editMode) {
+          return;
+        }
+        var targetId = relationTarget.value;
+        var label = relationLabel.value.trim();
+        if (!targetId || !label || targetId === selectedId) {
+          showStatus("请选择另一个人物并填写关系标签");
+          return;
+        }
+        if (addRelation(selectedId, targetId, label, relationType.value, "关系已新增")) {
+          relationLabel.value = "";
+        }
+      });
+
+      edgeLabelEditor.addEventListener("keydown", function (event) {
+        if (event.isComposing) {
+          return;
+        }
+        if (event.key === "Enter") {
+          event.preventDefault();
+          event.stopPropagation();
+          commitEdgeLabelEditing();
+        } else if (event.key === "Escape") {
+          event.preventDefault();
+          event.stopPropagation();
+          cancelEdgeLabelEditing();
+          canvas.focus();
+        }
+      });
+
+      edgeLabelEditor.addEventListener("input", positionEdgeLabelEditor);
+
+      edgeLabelEditor.addEventListener("blur", function () {
+        cancelEdgeLabelEditing();
+      });
+
+      addNodeButton.addEventListener("click", addNode);
+      autoLayoutButton.addEventListener("click", startSmartLayout);
+      undoLayoutButton.addEventListener("click", function () {
+        restorePositionHistory("undo");
+      });
+      redoLayoutButton.addEventListener("click", function () {
+        restorePositionHistory("redo");
+      });
+      document.getElementById("delete-node").addEventListener("click", deleteSelectedNode);
+      editToggle.addEventListener("click", function () {
+        setEditMode(!editMode);
+      });
+
+      document.getElementById("reset").addEventListener("click", function () {
+        query = "";
+        activeFilter = "all";
+        searchInput.value = "";
+        relationFilter.value = "all";
+        selectNode(nodeById.get(selectedId) || nodes[0], false, false);
+        resetView(false);
+      });
+
+      document.getElementById("show-inspector").addEventListener("click", function () {
+        inspector.classList.add("open");
+      });
+
+      document.getElementById("close-inspector").addEventListener("click", function () {
+        inspector.classList.remove("open");
+      });
+
+      atlas.addEventListener("load", function () {
+        draw();
+        if (selectedId && nodeById.has(selectedId)) {
+          renderProfileAvatar(nodeById.get(selectedId));
+        }
+      });
+      window.addEventListener("resize", resize);
+      if (!nodeById.has(selectedId)) {
+        selectedId = nodes[0].id;
+      }
+      updateHistoryControls();
+      setEditMode(false);
+      resize();
+      if (requestedCharacterId && nodeById.has(requestedCharacterId)) {
+        selectNode(nodeById.get(requestedCharacterId), true, true);
+      }
+    }());
+  </script>
+</body>
+</html>
