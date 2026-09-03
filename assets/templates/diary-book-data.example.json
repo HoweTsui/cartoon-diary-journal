@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "book": {
+    "id": "life-2026",
+    "title": "2026 生活日记",
+    "subtitle": "一些普通但值得记住的日子",
+    "coverSrc": "assets/cover-fallback.svg",
+    "coverImageSrc": "assets/cover-assets/cover-main-3x4.png",
+    "coverImageAlt": "原创封面主视觉",
+    "coverImagePosition": "50% 50%",
+    "coverEyebrow": "OFFLINE DIARY",
+    "coverTitle": "纸上小日子",
+    "coverSubtitle": "一些普通但值得记住的日子",
+    "coverTheme": "brick",
+    "graphHref": "character-graph.html"
+  },
+  "periods": [
+    {
+      "id": "late-summer",
+      "title": "夏末篇",
+      "startDate": "2026-08-01",
+      "endDate": "2026-08-31",
+      "summary": "下雨、晚饭和慢慢变好的日常",
+      "coverSrc": "assets/periods/late-summer.png"
+    }
+  ],
+  "entries": [
+    {
+      "id": "2026-08-28",
+      "date": "2026-08-28",
+      "periodId": "late-summer",
+      "title": "背单词、双周会和三杯鸡",
+      "posterSrc": "assets/entries/2026-08-28.png",
+      "summary": "一天里的几个小转折。",
+      "characterIds": ["aha", "ayan"],
+      "tags": ["工作", "晚饭"]
+    }
+  ]
+}

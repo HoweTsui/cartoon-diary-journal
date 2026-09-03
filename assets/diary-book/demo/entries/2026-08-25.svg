@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1600" viewBox="0 0 1200 1600">
+  <rect width="1200" height="1600" fill="#fffef8"/>
+  <g stroke="#d8eaf2" stroke-width="4">
+    <path d="M0 88h1200M0 168h1200M0 248h1200M0 328h1200M0 408h1200M0 488h1200M0 568h1200M0 648h1200M0 728h1200M0 808h1200M0 888h1200M0 968h1200M0 1048h1200M0 1128h1200M0 1208h1200M0 1288h1200M0 1368h1200M0 1448h1200M0 1528h1200"/>
+  </g>
+  <g fill="#171716" font-family="PingFang SC, Hiragino Sans GB, sans-serif" text-anchor="middle">
+    <text x="600" y="82" font-size="42">2026.08.25　周二</text>
+    <text x="600" y="158" font-family="STKaiti, Kaiti SC, serif" font-size="70" font-weight="700">新的一页先留白</text>
+  </g>
+  <g fill="none" stroke="#171716" stroke-width="8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M112 490h725M162 490v98m590-98v98"/>
+    <path d="M300 402c4-62 55-100 116-94 64 6 95 55 86 115-8 52-50 83-104 80-61-3-102-42-98-101z"/>
+    <path d="M304 400c7-48 36-80 76-92l-30 34 43-16-10 31 47-14-10 35 38-8"/>
+    <circle cx="372" cy="438" r="8" fill="#171716"/><circle cx="422" cy="438" r="8" fill="#171716"/>
+    <path d="M360 462c-20 0-28 10-28 20 0 11 12 17 31 16"/><path d="M384 506h30"/>
+    <path d="M369 572v70m58-70v70M337 642h126v112H337z" fill="#171716"/>
+    <path d="M359 754v112m82-112v112M346 870c28-15 74-15 102 0"/>
+    <path d="M330 864c20-14 70-14 94 0l-8 24h-96zM425 864c20-14 70-14 94 0l-8 24h-96z" fill="#171716"/>
+    <path d="M605 412c19-59 80-86 137-60 48 22 65 81 43 130-23 51-79 68-129 46-42-19-65-71-51-116z"/>
+    <path d="M606 415c17-43 55-64 93-65l-23 26 39-6-24 27 42 8-30 22"/>
+    <circle cx="667" cy="441" r="8" fill="#171716"/><circle cx="716" cy="441" r="8" fill="#171716"/>
+    <path d="M653 465c-18 0-26 11-24 20 2 11 13 16 30 14"/><path d="M679 505h29"/>
+    <path d="M662 567v70m60-70v70M631 637h122v116H631z"/>
+    <path d="M654 753v112m77-112v112M638 867c31-14 78-14 108 0"/>
+    <path d="M627 862c20-14 69-14 94 0l-8 25h-96zM726 862c20-14 69-14 94 0l-8 25h-96z" fill="#171716"/>
+  </g>
+  <g fill="#171716" font-family="STKaiti, Kaiti SC, serif">
+    <text x="920" y="520" font-size="36">慢慢开始</text>
+    <text x="150" y="1010" font-size="36">猫先占座</text>
+  </g>
+  <g fill="none" stroke="#171716" stroke-width="8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M164 1250h860"/>
+    <path d="M408 1132c2-43 42-80 88-80s86 37 88 80c2 42-33 70-88 70s-90-28-88-70z"/>
+    <path d="M454 1056l42-43 43 43"/>
+    <circle cx="470" cy="1126" r="8" fill="#171716"/><circle cx="522" cy="1126" r="8" fill="#171716"/>
+    <path d="M478 1150c-15 0-22 8-22 17 0 10 10 15 24 14"/><path d="M494 1178h28"/>
+    <path d="M451 1200l-49 50m151-50 49 50"/>
+    <path d="M720 1144c7-36 39-58 75-49 35 9 52 43 39 78-15 37-52 49-84 30-24-14-36-37-30-59z"/>
+    <path d="M721 1142l25-36 20 28 30-27 17 37"/>
+    <circle cx="759" cy="1150" r="7" fill="#171716"/><circle cx="797" cy="1150" r="7" fill="#171716"/>
+    <path d="M778 1168l-13 9 13 8" fill="#171716"/>
+    <path d="M747 1210l-30 40m80-40 31 40m-101-7c-9 13-7 24 5 29m74-29c10 13 8 24-4 29"/>
+  </g>
+  <g fill="#171716" font-family="STKaiti, Kaiti SC, serif" text-anchor="middle">
+    <text x="600" y="1450" font-size="38">把今天的轻松留到下一次</text>
+    <text x="600" y="1560" font-size="36">这一页，先不急着写满。</text>
+  </g>
+</svg>

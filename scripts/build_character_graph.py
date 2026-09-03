@@ -8,11 +8,12 @@ import json
 import re
 import sys
 from pathlib import Path
+from urllib.parse import unquote
 
 
 SKILL_ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_TEMPLATE = (
-    SKILL_ROOT / "assets" / "character-library" / "character-graph.html"
+    SKILL_ROOT / "assets" / "style-reference" / "character-graph-demo.html"
 )
 GRAPH_DATA_PATTERN = re.compile(
     r'(<script\s+id="graph-data"\s+type="application/json">\s*)'
@@ -48,6 +49,20 @@ def require_text(value: object, path: str, maximum: int = 120) -> str:
     return result
 
 
+def require_asset_path(value: object, path: str) -> str:
+    result = require_text(value, path, maximum=240)
+    normalized = result.replace("\\", "/")
+    decoded = unquote(normalized)
+    if (
+        "\x00" in decoded
+        or re.match(r"^[A-Za-z][A-Za-z0-9+.-]*:", decoded)
+        or decoded.startswith("/")
+        or any(part == ".." for part in decoded.split("/"))
+    ):
+        raise ValueError(f"{path} must be a relative local asset path")
+    return result
+
+
 def require_string_list(value: object, path: str, minimum: int = 0) -> list[str]:
     if not isinstance(value, list) or len(value) < minimum:
         raise ValueError(f"{path} must contain at least {minimum} items")
@@ -70,9 +85,7 @@ def normalize_data(data: dict) -> dict:
     atlas = data.get("atlas")
     if not isinstance(atlas, dict):
         raise ValueError("atlas must be an object")
-    atlas_src = require_text(atlas.get("src"), "atlas.src")
-    if "://" in atlas_src or atlas_src.startswith(("/", "..")):
-        raise ValueError("atlas.src must be a relative local asset path")
+    atlas_src = require_asset_path(atlas.get("src"), "atlas.src")
     cols = atlas.get("cols")
     rows = atlas.get("rows")
     if not isinstance(cols, int) or cols < 1 or not isinstance(rows, int) or rows < 1:
@@ -82,6 +95,7 @@ def normalize_data(data: dict) -> dict:
     if not isinstance(raw_nodes, list) or not raw_nodes:
         raise ValueError("nodes must contain at least one actual character")
     nodes: list[dict] = []
+    avatar_sources: list[str] = []
     ids: set[str] = set()
     for index, raw in enumerate(raw_nodes):
         if not isinstance(raw, dict):
@@ -119,6 +133,12 @@ def normalize_data(data: dict) -> dict:
             ),
             "notes": require_string_list(raw.get("notes", []), f"nodes[{index}].notes"),
         }
+        if "avatarSrc" in raw:
+            avatar_src = require_asset_path(
+                raw["avatarSrc"], f"nodes[{index}].avatarSrc"
+            )
+            node["avatarSrc"] = avatar_src
+            avatar_sources.append(avatar_src)
         for optional_key in ("kind", "species"):
             if optional_key in raw:
                 node[optional_key] = require_text(
@@ -139,6 +159,13 @@ def normalize_data(data: dict) -> dict:
                 )
             node["avatarFocusY"] = focus_y
         nodes.append(node)
+
+    if avatar_sources and len(avatar_sources) != len(nodes):
+        raise ValueError(
+            "avatarSrc must be provided for every node when independent avatars are used"
+        )
+    if len(set(avatar_sources)) != len(avatar_sources):
+        raise ValueError("nodes.avatarSrc must point to a unique image for each character")
 
     raw_edges = data.get("edges")
     if not isinstance(raw_edges, list):

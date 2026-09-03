@@ -1,0 +1,85 @@
+{
+  "atlas": {
+    "src": "character-lineup.svg",
+    "cols": 3,
+    "rows": 1
+  },
+  "nodes": [
+    {
+      "id": "paper-hao",
+      "name": "阿纸",
+      "role": "记录日常的人",
+      "col": 0,
+      "row": 0,
+      "avatarSrc": "avatars/paper-hao.svg",
+      "x": -170,
+      "y": 20,
+      "anchors": [
+        "偏正半侧面与两只正圆豆豆眼",
+        "短发、开放线描鼻与低位小嘴",
+        "窄身板、首轮目标约头宽1/32的极细四肢与深色短裤",
+        "总把小事写进横线纸"
+      ],
+      "notes": ["虚构公开示例角色"]
+    },
+    {
+      "id": "paper-lin",
+      "name": "小林",
+      "role": "一起吃饭的朋友",
+      "col": 1,
+      "row": 0,
+      "avatarSrc": "avatars/paper-lin.svg",
+      "x": 150,
+      "y": 20,
+      "anchors": [
+        "偏正半侧面与两只正圆豆豆眼",
+        "短发、圆眼镜与低位小嘴，镜框、镜桥和镜腿线宽与主体一致",
+        "窄身板、首轮目标约头宽1/32的极细四肢与浅色上衣",
+        "经常给日常补一句吐槽"
+      ],
+      "notes": ["虚构公开示例角色"]
+    },
+    {
+      "id": "paper-miao",
+      "name": "墨团",
+      "role": "总在旁边围观的猫",
+      "kind": "animal",
+      "species": "cat",
+      "col": 2,
+      "row": 0,
+      "avatarSrc": "avatars/paper-miao.svg",
+      "x": 0,
+      "y": -180,
+      "anchors": [
+        "猫咪偏正半侧面与双正圆黑点眼",
+        "两耳、单一小黑鼻与短尾巴",
+        "窄躯干、首轮目标约头宽1/32的极细四肢和略大爪掌",
+        "喜欢在桌边观察一切"
+      ],
+      "notes": ["虚构公开示例角色"]
+    }
+  ],
+  "edges": [
+    {
+      "source": "paper-hao",
+      "target": "paper-lin",
+      "label": "朋友",
+      "type": "friend",
+      "curve": 0
+    },
+    {
+      "source": "paper-hao",
+      "target": "paper-miao",
+      "label": "照顾",
+      "type": "care",
+      "curve": -18
+    },
+    {
+      "source": "paper-lin",
+      "target": "paper-miao",
+      "label": "投喂",
+      "type": "care",
+      "curve": 18
+    }
+  ]
+}

@@ -860,6 +860,12 @@
         </label>
 
         <label class="field">
+          <span>独立 1:1 头像路径</span>
+          <input id="edit-avatar-src" name="avatarSrc" maxlength="240" autocomplete="off" placeholder="avatars/角色ID.png">
+          <small class="field-help">相对本 HTML 的方形 PNG；上半身完整、水平居中、四周留白。留空会回退人物图集。</small>
+        </label>
+
+        <label class="field">
           <span>外观锚点</span>
           <textarea id="edit-anchors" name="anchors" maxlength="300"></textarea>
           <small class="field-help">每行一个特征；姓名、鼻型与朝向、发丝、黑块和鞋形尽量固定。</small>
@@ -926,7 +932,7 @@
       "anchors": [
         "25-35度偏正半侧面、双正圆豆豆眼略高且外侧眼留白",
         "四束稀疏翘发、后脑小块黑发与圆角头部",
-        "窄身板、极细双线四肢与扁平鞋",
+        "窄身板、首轮目标约头宽1/32且统一目标粗细的极细双线四肢（不含手掌不超过头宽约1/24）与扁平鞋",
         "前外侧短弧后到鼻根约1.5个眼点高度空白断口、低位嘴和横向上方开口的线描半椭圆鼻"
       ],
       "notes": [
@@ -946,7 +952,7 @@
       "anchors": [
         "25-35度偏正半侧面、双正圆豆豆眼略高且外侧眼留白",
         "耳上短波浪发、单枚发夹与圆角头部",
-        "窄身板、极细双线四肢与扁平鞋",
+        "窄身板、首轮目标约头宽1/32且统一目标粗细的极细双线四肢（不含手掌不超过头宽约1/24）与扁平鞋；可见眼镜线宽与主体一致",
         "前外侧短弧后到鼻根约1.5个眼点高度空白断口、低位嘴和横向上方开口的线描半椭圆鼻"
       ],
       "notes": [
@@ -966,7 +972,7 @@
       "anchors": [
         "25-35度物种半侧面、大头窄身和黑色远耳耳尖",
         "双眼下方中央的小黑色猫鼻",
-        "极细四肢、略大爪掌和黑色尾尖",
+        "首轮目标约头宽1/32且统一目标粗细的极细四肢（不含爪掌不超过头宽约1/24）、略大爪掌和黑色尾尖",
         "无写实毛发和眼睛高光"
       ],
       "notes": [
@@ -1056,7 +1062,7 @@
           if (!seed) {
             return node;
           }
-          ["col", "row", "avatarFocusX", "avatarFocusY"].forEach(function (key) {
+          ["col", "row", "avatarSrc", "avatarFocusX", "avatarFocusY"].forEach(function (key) {
             if (Object.prototype.hasOwnProperty.call(seed, key)) {
               node[key] = seed[key];
             }
@@ -1077,6 +1083,13 @@
 
       rebuildNodeIndex();
 
+      var requestedCharacterId = null;
+      try {
+        requestedCharacterId = new URLSearchParams(window.location.search).get("character");
+      } catch (error) {
+        requestedCharacterId = null;
+      }
+
       var canvas = document.getElementById("graph-canvas");
       var pane = document.getElementById("graph-pane");
       var ctx = canvas.getContext("2d");
@@ -1095,6 +1108,7 @@
       var personForm = document.getElementById("person-form");
       var editName = document.getElementById("edit-name");
       var editRole = document.getElementById("edit-role");
+      var editAvatarSrc = document.getElementById("edit-avatar-src");
       var editAnchors = document.getElementById("edit-anchors");
       var editNotes = document.getElementById("edit-notes");
       var relationForm = document.getElementById("relation-form");
@@ -1108,7 +1122,7 @@
 
       var size = { width: 0, height: 0 };
       var view = { x: 0, y: 0, scale: 1 };
-      var selectedId = nodes[0].id;
+      var selectedId = nodeById.has(requestedCharacterId) ? requestedCharacterId : nodes[0].id;
       var query = "";
       var activeFilter = "all";
       var editMode = false;
@@ -1125,6 +1139,7 @@
       var smartLayoutFrame = null;
       var smartLayoutToken = 0;
       var avatarRenderToken = 0;
+      var avatarImageCache = new Map();
 
       var relationDefaults = {
         friend: "好友",
@@ -2269,6 +2284,95 @@
           node.col >= 0 && node.col < atlasCols && node.row >= 0 && node.row < atlasRows;
       }
 
+      function isSafeLocalAvatarPath(value) {
+        if (typeof value !== "string" || !value.trim()) {
+          return false;
+        }
+        var normalized = value.trim().replace(/\\/g, "/");
+        try {
+          normalized = decodeURIComponent(normalized);
+        } catch (error) {
+          return false;
+        }
+        return !/^[A-Za-z][A-Za-z0-9+.-]*:/.test(normalized) &&
+          !normalized.startsWith("/") &&
+          normalized.split("/").every(function (part) { return part !== ".."; });
+      }
+
+      function directAvatarSource(node) {
+        if (!node || !isSafeLocalAvatarPath(node.avatarSrc)) {
+          return null;
+        }
+        try {
+          return new URL(node.avatarSrc.trim(), document.baseURI).href;
+        } catch (error) {
+          return node.avatarSrc.trim();
+        }
+      }
+
+      function avatarImageRecord(node) {
+        var source = directAvatarSource(node);
+        if (!source) {
+          return null;
+        }
+        var record = avatarImageCache.get(source);
+        if (record) {
+          return record;
+        }
+        var image = new Image();
+        record = {
+          source: source,
+          image: image,
+          ready: false,
+          failed: false
+        };
+        image.onload = function () {
+          record.ready = true;
+          record.failed = false;
+          draw();
+          if (selectedId && nodeById.has(selectedId)) {
+            renderProfileAvatar(nodeById.get(selectedId));
+          }
+        };
+        image.onerror = function () {
+          record.failed = true;
+          draw();
+          if (selectedId && nodeById.has(selectedId)) {
+            renderProfileAvatar(nodeById.get(selectedId));
+          }
+        };
+        image.src = source;
+        avatarImageCache.set(source, record);
+        return record;
+      }
+
+      function drawDirectAvatar(node, radius) {
+        var record = avatarImageRecord(node);
+        if (!record || record.failed || !record.ready ||
+            !record.image.naturalWidth || !record.image.naturalHeight) {
+          return false;
+        }
+        var sourceSide = Math.min(record.image.naturalWidth, record.image.naturalHeight);
+        var sourceX = (record.image.naturalWidth - sourceSide) / 2;
+        var sourceY = (record.image.naturalHeight - sourceSide) / 2;
+        try {
+          ctx.drawImage(
+            record.image,
+            sourceX,
+            sourceY,
+            sourceSide,
+            sourceSide,
+            node.x - radius,
+            node.y - radius,
+            radius * 2,
+            radius * 2
+          );
+        } catch (error) {
+          return false;
+        }
+        return true;
+      }
+
       function setAtlasFallback(avatar, node) {
         if (!atlas.naturalWidth || !atlas.naturalHeight) {
           return false;
@@ -2327,6 +2431,14 @@
         avatar.style.backgroundImage = "none";
         avatar.style.backgroundSize = "auto";
         avatar.style.backgroundPosition = "center";
+        var directRecord = avatarImageRecord(node);
+        if (directRecord && !directRecord.failed) {
+          avatar.textContent = "";
+          avatar.style.backgroundImage = "url(" + JSON.stringify(directRecord.source) + ")";
+          avatar.style.backgroundSize = "contain";
+          avatar.style.backgroundPosition = "center";
+          return;
+        }
         if (!hasAtlasCell(node)) {
           avatar.textContent = node.name.slice(0, 1);
           return;
@@ -2387,25 +2499,28 @@
         ctx.fillStyle = "#ffffff";
         ctx.fillRect(node.x - radius, node.y - radius, radius * 2, radius * 2);
 
-        if (hasAtlasCell && atlas.complete && atlas.naturalWidth) {
-          var crop = atlasCropRect(node);
-          ctx.drawImage(
-            atlas,
-            crop.sx,
-            crop.sy,
-            crop.side,
-            crop.side,
-            node.x - radius,
-            node.y - radius,
-            radius * 2,
-            radius * 2
-          );
-        } else {
-          ctx.fillStyle = "#171715";
-          ctx.font = '700 30px "Kaiti SC", "STKaiti", "KaiTi", cursive';
-          ctx.textAlign = "center";
-          ctx.textBaseline = "middle";
-          ctx.fillText(node.name.slice(0, 1), node.x, node.y);
+        var drewDirectAvatar = drawDirectAvatar(node, radius - 2);
+        if (!drewDirectAvatar) {
+          if (hasAtlasCell && atlas.complete && atlas.naturalWidth) {
+            var crop = atlasCropRect(node);
+            ctx.drawImage(
+              atlas,
+              crop.sx,
+              crop.sy,
+              crop.side,
+              crop.side,
+              node.x - radius,
+              node.y - radius,
+              radius * 2,
+              radius * 2
+            );
+          } else {
+            ctx.fillStyle = "#171715";
+            ctx.font = '700 30px "Kaiti SC", "STKaiti", "KaiTi", cursive';
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillText(node.name.slice(0, 1), node.x, node.y);
+          }
         }
         ctx.restore();
 
@@ -2543,6 +2658,7 @@
         document.getElementById("profile-role").textContent = node.role;
         editName.value = node.name;
         editRole.value = node.role || "";
+        editAvatarSrc.value = node.avatarSrc || "";
         editAnchors.value = (node.anchors || []).join("\n");
         editNotes.value = (node.notes || []).join("\n");
         renderTextList(anchorList, node.anchors || [], "暂无外观锚点");
@@ -2895,6 +3011,17 @@
         }
         node.name = name;
         node.role = editRole.value.trim();
+        var avatarSrc = editAvatarSrc.value.trim();
+        if (avatarSrc && !isSafeLocalAvatarPath(avatarSrc)) {
+          showStatus("头像路径只能使用当前图谱目录下的相对本地文件");
+          editAvatarSrc.focus();
+          return;
+        }
+        if (avatarSrc) {
+          node.avatarSrc = avatarSrc;
+        } else {
+          delete node.avatarSrc;
+        }
         node.anchors = linesFrom(editAnchors.value);
         node.notes = linesFrom(editNotes.value);
         saveState("人物信息已保存");
@@ -2982,6 +3109,9 @@
       updateHistoryControls();
       setEditMode(false);
       resize();
+      if (requestedCharacterId && nodeById.has(requestedCharacterId)) {
+        selectNode(nodeById.get(requestedCharacterId), true, true);
+      }
     }());
   </script>
 </body>
