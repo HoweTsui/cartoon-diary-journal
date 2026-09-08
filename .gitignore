@@ -14,3 +14,10 @@ task-output/
 diary-book-data.local.json
 *.jpg
 *.jpeg
+
+# Local development caches; packaged reader runtime is retained.
+node_modules/
+__pycache__/
+.npm-cache/
+test-results/
+playwright-report/

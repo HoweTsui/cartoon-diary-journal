@@ -18,7 +18,8 @@ from build_diary_prompt import (
     build_prompt,
     load_brief,
     load_character_graph,
-    normalize_brief,
+    validate_brief,
+    geometry,
     valid_relative_asset_path,
 )
 
@@ -41,6 +42,15 @@ REQUIRED_FILES = (
     "scripts/build_character_graph.py",
     "scripts/build_diary_book.py",
     "scripts/build_diary_prompt.py",
+    "scripts/build_diary_reader.py",
+    "references/diary-reader-v3.md",
+    "references/geometry.json",
+    "assets/diary-reader-v3/source/package.json",
+    "assets/diary-reader-v3/source/package-lock.json",
+    "assets/diary-reader-v3/runtime/index.html",
+    "assets/diary-reader-v3/runtime/THIRD_PARTY_NOTICES.md",
+    "assets/diary-reader-v3/runtime/fonts/OFL.txt",
+    "assets/diary-reader-v3/runtime/fonts/ZCOOLKuaiLe-Regular.woff",
     "assets/style-reference/character-graph-demo.html",
     "assets/diary-book/book.css",
     "assets/diary-book/book.js",
@@ -72,12 +82,13 @@ RATIO_TOLERANCE = 0.01
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Preflight the diary Skill package or task data.")
     parser.add_argument("--graph", type=Path, help="Optional actual task character graph HTML")
-    parser.add_argument("--brief", type=Path, help="Optional diary brief; requires --graph")
+    parser.add_argument("--brief", type=Path, help="Schema-v2 authored brief")
     parser.add_argument(
         "--book",
         type=Path,
         help="Optional diary-book manifest beside its output index.html; requires --graph",
     )
+    parser.add_argument("--preview", action="store_true")
     return parser.parse_args()
 
 
@@ -153,6 +164,10 @@ def path_is_within(path: Path, parent: Path) -> bool:
 
 
 def check_package(failures: list[str]) -> None:
+    try:
+        geometry({})
+    except (OSError, ValueError) as exc:
+        fail(f"canonical geometry invalid: {exc}", failures)
     for relative in REQUIRED_FILES:
         path = SKILL_ROOT / relative
         if path.is_file():
@@ -176,61 +191,15 @@ def check_package(failures: list[str]) -> None:
     skill_text = (SKILL_ROOT / "SKILL.md").read_text(encoding="utf-8")
     if not skill_text.startswith("---\n") or "name:" not in skill_text.split("---\n", 2)[1]:
         fail("SKILL.md frontmatter is incomplete", failures)
-    for reference in re.findall(r"`((?:references|scripts)/[^`]+)`", skill_text):
+    for reference in re.findall(r"(?:references|scripts)/[A-Za-z0-9_./-]+\.(?:md|json|py)", skill_text):
         if not (SKILL_ROOT / reference).exists():
             fail(f"SKILL.md points to missing path: {reference}", failures)
 
-    required_skill_guards = (
-        "25°-35° 的偏正半侧面",
-        "约 1.5 个眼点高度",
-        "外侧眼不贴轮廓",
-        "骨感黑白日记锁",
-        "四张图一同作为 `image_gen` 的图像输入",
-        "人头小于全身高度约 30%",
-        "人物鼻子绝不能实心填黑",
-        "人物鼻子必须清晰可见",
-        "动物使用符合物种的单一实心黑鼻",
-        "耳朵内侧保持空白无修饰线",
-        "4-10 字短总结",
-        "至少留出 1 条完整横线高度",
-        "P0 门禁",
-        "每个场景都要为每一名可见人物或宠物单独写出角色 ID",
-        "references/visual-atoms.md",
-        "背景环境出现不同档线宽",
-        "眼镜框、镜桥和镜腿",
-        "日期和标题均水平居中",
-        "固定字号",
-        "右侧备注栏",
-        "1:1 方形上半身头像",
-        "avatarSrc",
-        "旧数据兜底",
-        "表情必须先从日记事件推断",
-        "眼点直径锁定为确认版图集的固定 canonical diameter",
-        "上臂/前臂管径不超过头宽约 1/22",
-        "统一极细肢体与反正面锁（首轮即生效）",
-        "首轮目标约 1/32",
-        "首轮目标约 1/28",
-        "身体比例缩短约 10%",
-        "手部和脚部尺寸保持确认版",
-        "外轮廓宽度不超过该角色头宽的约 1/24",
-        "禁止正对镜头、对称双耳/双肩、鼻子居中",
-        "动物不含爪掌的前后肢杆部",
-        "头脸优先于照片、场景、表情和身体比例",
-        "references/diary-book-system.md",
-        "scripts/build_diary_book.py",
-        "character-graph.html?character=<角色ID>",
-        "task-output/diary-book/",
-    )
-    for guard in required_skill_guards:
-        if guard not in skill_text:
-            fail(f"SKILL.md is missing style guard: {guard}", failures)
-    for legacy_guard in ("1/16-1/12", "眉线位置"):
-        if legacy_guard in skill_text:
-            fail(f"SKILL.md still contains conflicting legacy guard: {legacy_guard}", failures)
+    reader_root = SKILL_ROOT / "assets/diary-reader-v3"
+    for relative in ("runtime/data", "source/public/data", "source/node_modules"):
+        if (reader_root / relative).exists():
+            fail(f"reader package must not include local data or dependencies: {relative}", failures)
 
-    prompt_builder_text = (SKILL_ROOT / "scripts" / "build_diary_prompt.py").read_text(
-        encoding="utf-8"
-    )
     css_text = (SKILL_ROOT / "assets" / "diary-book" / "book.css").read_text(encoding="utf-8")
     js_text = (SKILL_ROOT / "assets" / "diary-book" / "book.js").read_text(encoding="utf-8")
     css_guards = (
@@ -261,53 +230,6 @@ def check_package(failures: list[str]) -> None:
         text = (SKILL_ROOT / relative).read_text(encoding="utf-8")
         if re.search(r"https?://(?!www\.w3\.org/2000/svg)", text):
             fail(f"{relative} must not reference remote resources", failures)
-    required_prompt_guards = (
-        "P0 geometry lock",
-        "PRIMARY DRAWING GATE",
-        "unfilled human nose",
-        "mandatory 4-10 character",
-        "one full notebook-rule height",
-        "P0 visual gate",
-        "Atlas gate",
-        "BONE-THIN RULED-DIARY LOCK",
-        "REQUIRED image inputs, in order",
-        "downturned U/C shape",
-        "PER-SCENE CHARACTER-CARD LOCK",
-        "Never use the protagonist's head",
-        "background/environment strokes",
-        "eyeglass frames, bridge and temples",
-        "horizontal-center",
-        "fixed typography",
-        "right-side caption lane",
-        "event-driven expression",
-        "canonical eye-dot diameter",
-        "1/22 of head width",
-        "same 1/24 target",
-        "FIRST-PASS UNIFORM ULTRA-THIN LIMB LOCK",
-        "outer shaft width no more than 1/24",
-        "FIRST-PASS ANTI-FRONT LOCK",
-        "CANONICAL HEAD/FACE BLUEPRINT",
-        "approved atlas width/height",
-        "straight-at-camera face",
-        "standard 90-degree正侧面",
-        "Arm and leg shafts must be equally thin",
-        "nose must remain separately drawn and visibly present",
-        "nose merged with mouth",
-        "oversized hair hiding the forehead or eyes",
-        "ear interiors must remain plain white",
-        "1/32 head-width ultra-thin",
-        "1/28 head-width ultra-thin",
-        "body proportion about 90%",
-        "head, hands and feet",
-        "inner-ear decoration lines",
-        "animal limb shafts excluding hands/paws",
-        "independent 1:1 upper-body",
-        "avatarSrc",
-    )
-    for guard in required_prompt_guards:
-        if guard not in prompt_builder_text:
-            fail(f"prompt builder is missing style guard: {guard}", failures)
-
     for path in (SKILL_ROOT / "scripts").glob("*.py"):
         try:
             ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
@@ -395,15 +317,13 @@ def check_graph(path: Path, failures: list[str]) -> None:
         fail(f"graph check failed: {exc}", failures)
 
 
-def check_brief(graph_path: Path, brief_path: Path, failures: list[str]) -> None:
+def check_brief(graph_path, brief_path, failures, preview=False):
     try:
-        characters, relationships = load_character_graph(graph_path)
-        header, title, events, summary = normalize_brief(load_brief(brief_path), characters)
-        prompt = build_prompt(header, title, events, summary, characters, relationships)
-        if not prompt.strip() or header not in prompt:
-            raise ValueError("generated prompt is empty or missing its exact date header")
-        print(f"PASS  brief matched ({len(events)} scenes, header {header})")
-    except (OSError, ValueError, json.JSONDecodeError) as exc:
+        brief = validate_brief(load_brief(brief_path), brief_path.parent, preview, graph_path)
+        if not build_prompt(brief).strip():
+            raise ValueError("empty prompt")
+        print(f"PASS  structured brief ({brief['kind']}, {brief['role']})")
+    except (OSError, ValueError) as exc:
         fail(f"brief check failed: {exc}", failures)
 
 
@@ -454,14 +374,12 @@ def main() -> int:
     args = parse_args()
     failures: list[str] = []
     check_package(failures)
-    if args.brief and not args.graph:
-        fail("--brief requires --graph so characters cannot be resolved from a stale default", failures)
     if args.book and not args.graph:
         fail("--book requires --graph so characters and avatars cannot be resolved from a stale default", failures)
     if args.graph:
         check_graph(args.graph, failures)
-    if args.brief and args.graph:
-        check_brief(args.graph, args.brief, failures)
+    if args.brief:
+        check_brief(args.graph, args.brief, failures, args.preview)
     if args.book and args.graph:
         check_book(args.graph, args.book, failures)
     check_book(

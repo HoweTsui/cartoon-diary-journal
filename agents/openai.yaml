@@ -1,4 +1,4 @@
 interface:
-  display_name: "小屁孩日记风格 Skill"
-  short_description: "生成角色一致的原创黑白日记页，并可汇编为离线可翻页日记本"
-  default_prompt: "Use $cartoon-diary-journal to 先检索本次任务人物关系图，再将今天的经历整理为一页带日期和周几的原创极简黑白日记页；缺失角色先补图入库。"
+  display_name: "原创黑白日记 Skill"
+  short_description: "生成角色卡、表情预览与日记海报，并汇编为可编辑封面的手写3D日记本"
+  default_prompt: "Use $cartoon-diary-journal to 保留完整日记原文，语义编写1–4个选景与短文案；新身份先生成未批准预览，正式生图核验用户身份版本审批。"
