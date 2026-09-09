@@ -19,6 +19,10 @@ UV_CACHE_DIR="${TMPDIR:-/tmp}/cartoon-diary-uv-cache" uv run --no-project --with
 
 ## GitHub 发布
 
+每次版本推送后，向用户简述版本号、主要变化、是否影响使用方式，并附版本链接；不要只报告“已推送”。逐版记录保留在 CHANGELOG.md，README 展示最近版本摘要。
+
+精简 Skill 入口时，不应删除 README 的封面、演示图和安装使用说明。发布前检查图片与链接，并实际查看新增或修改的图片；历史示例应明确标注，不能作为当前角色验收依据。
+
 不要把私人图谱、真人照片、任务 HTML 或本地生成物提交到公开仓库。发布前检查：
 
 ```bash
