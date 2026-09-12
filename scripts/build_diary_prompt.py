@@ -11,7 +11,6 @@ from pathlib import Path
 from urllib.parse import unquote
 SKILL_ROOT = Path(__file__).resolve().parents[1]
 GRAPH_DATA_PATTERN = re.compile(r'<script\s+id="graph-data"\s+type="application/json">\s*(.*?)\s*</script>', re.DOTALL)
-DATE_PATTERN = re.compile(r"\b20\d{2}[./-]\d{1,2}[./-]\d{1,2}\b")
 PLACEHOLDER_MARKERS = ("actual-person-", "实际人物", "实际关系", "占位")
 def require_text(data: dict, key: str, maximum: int) -> str:
     value = data.get(key)
@@ -70,8 +69,6 @@ def load_character_graph(path: Path) -> tuple[dict[str, dict], list[dict]]:
     match = GRAPH_DATA_PATTERN.search(html)
     if not match:
         raise ValueError("character graph has no graph-data block")
-    if DATE_PATTERN.search(html):
-        raise ValueError("global character graph must not contain date-like text")
     try:
         graph_data = json.loads(match.group(1))
     except json.JSONDecodeError as exc:
@@ -203,9 +200,10 @@ def validate_brief(data, base, preview=False, graph=None):
         raise ValueError("unconfirmed identity blocked in production; use --preview for requested drafts")
     if kind == "onboarding" and not preview:
         raise ValueError("onboarding requires --preview")
+    graph_characters = load_character_graph(graph)[0] if graph else {}
     chars = data.get("characters")
     if chars is None and graph:
-        chars = list(load_character_graph(graph)[0].values())
+        chars = list(graph_characters.values())
     if not isinstance(chars, list) or not chars:
         raise ValueError("characters must be a non-empty list")
     ids = set()
@@ -220,6 +218,8 @@ def validate_brief(data, base, preview=False, graph=None):
         anchors = c.get("anchors")
         if not isinstance(anchors, list) or not 2 <= len(anchors) <= 12 or any(not isinstance(a, str) or not a.strip() or len(a) > 160 for a in anchors):
             raise ValueError("character anchors require 2-12 short observable identity features")
+        if not preview and graph_characters.get(cid, {}).get("profile", {}).get("approval") == "draft":
+            raise ValueError(f"character {cid} is still a draft in the character graph")
     if not isinstance(data.get("protagonistId"), str) or data["protagonistId"] not in ids:
         raise ValueError("protagonistId must identify an explicit character")
     refs = data.get("references")
@@ -258,8 +258,8 @@ def validate_brief(data, base, preview=False, graph=None):
         date = dt.date.fromisoformat(require_text(data, "date", 10))
         result["header"] = date.strftime("%Y.%m.%d") + " " + ("周一", "周二", "周三", "周四", "周五", "周六", "周日")[date.weekday()]
     events = data.get("events")
-    if not isinstance(events, list) or not 1 <= len(events) <= 4:
-        raise ValueError("events must contain 1-4 explicitly selected scenes")
+    if not isinstance(events, list) or not 1 <= len(events) <= 5:
+        raise ValueError("events must contain 1-5 explicitly selected scenes")
     selected = []
     for event in events:
         if not isinstance(event, dict):

@@ -13,7 +13,7 @@ Agent 负责理解事实、选景、编写短文本与表情；脚本仅验证�
 confirmed 还需 approvedVersion=version、approvedBy=user。仅用户明确批准该版本后记录；预览不能自动改状态。
 参考 role：identity-source、identity-draft、identity-approved、style、layout、scene。onboarding 必须 identity-source 且 --preview；expression/diary 预览需要 identity-draft 或 identity-approved，正式必须 identity-approved。style/layout/scene 按任务需要选用，无四图固定门槛；声明后均须存在并作为生图输入。仅支持PNG/JPEG/GIF/WebP，禁止远程、绝对、父目录或逃逸符号链接路径。源图的旧几何不具优先权。
 
-expression 和 diary 还必填 sourceText、title（1–12字符）、events（1–4个）。diary 另需真实 ISO date（YYYY-MM-DD）。
+expression 和 diary 还必填 sourceText、title（1–12字符）、events（1–5个）。diary 另需真实 ISO date（YYYY-MM-DD）。每天只产出一张海报；5个场景也在同一张3:4画面内按时间顺序编排。
 每个 event：
 ```json
 {"scene":"明确动作与可见事实","caption":"四到十字备注","characters":["角色ID"],"emotion":"surprise","intensity":"medium","eye_state":"wide_round","eyebrows":"none","bubble":"可选","must_keep":["关键事实"],"flexible":["可简化背景"]}

@@ -1,4 +1,4 @@
-import{b as Nr,r as sl,o as oc,c as lc}from"./reader-CEAiWRbj.js";/* empty css              *//**
+import{b as Nr,r as sl,o as oc,c as lc}from"./reader-CDAGVLLX.js";/* empty css              *//**
  * @license
  * Copyright 2010-2026 Three.js Authors
  * SPDX-License-Identifier: MIT

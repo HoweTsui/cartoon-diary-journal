@@ -51,6 +51,25 @@ class ReaderExportTest(unittest.TestCase):
             if name.endswith(".svg"):
                 self.assertEqual((self.output / "data" / name).read_bytes(), value)
 
+    def test_missing_dates_become_date_only_blank_entries(self):
+        self.data["entries"].append({"id": "three", "date": "2026-08-19", "title": "第三天",
+                                     "periodId": "week", "posterSrc": "poster.svg", "characterIds": []})
+        result = reader.export_reader(self.write_index(), self.output)
+        manifest = json.loads((self.output / "data/manifest.json").read_text())
+        self.assertEqual(result["blankDays"], 1)
+        self.assertEqual([entry["date"] for entry in manifest["entries"]],
+                         ["2026-08-17", "2026-08-18", "2026-08-19"])
+        blank = manifest["entries"][1]
+        self.assertEqual(blank["id"], "blank-2026-08-18")
+        self.assertTrue(blank["isBlank"])
+        self.assertEqual(blank["posterSrc"], "")
+
+    def test_duplicate_date_is_rejected(self):
+        self.data["entries"].append({"id": "duplicate", "date": "2026-08-17", "title": "第二篇",
+                                     "periodId": "week", "posterSrc": "poster.svg", "characterIds": []})
+        with self.assertRaisesRegex(ValueError, "one diary"):
+            reader.export_reader(self.write_index(), self.output)
+
     def test_missing_file_leaves_no_export(self):
         self.data["entries"][0]["posterSrc"] = "missing.png"
         with self.assertRaisesRegex(ValueError, "Missing asset"):
@@ -107,11 +126,13 @@ class ReaderExportTest(unittest.TestCase):
             self.skipTest("Optional source book is not present in this checkout")
         original = reader.read_manifest(index)
         result = reader.export_reader(index, self.output)
-        self.assertEqual(result["entries"], expected)
         exported = json.loads((self.output / "data/manifest.json").read_text())
+        actual_entries = [entry for entry in exported["entries"] if not entry.get("isBlank")]
+        self.assertEqual(len(actual_entries), expected)
         self.assertEqual([e["id"] for e in original["entries"]],
-                         [e["id"] for e in exported["entries"]])
-        for before, after in zip(original["entries"], exported["entries"]):
+                         [e["id"] for e in actual_entries])
+        self.assertEqual(result["entries"], expected + result["blankDays"])
+        for before, after in zip(original["entries"], actual_entries):
             self.assertEqual((index.parent / unquote(before["posterSrc"])).read_bytes(),
                              (self.output / "data" / unquote(after["posterSrc"])).read_bytes())
 

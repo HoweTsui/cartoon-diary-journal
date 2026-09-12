@@ -23,6 +23,7 @@ GRAPH_DATA_PATTERN = re.compile(
 )
 ALLOWED_TYPES = {"friend", "partner", "family", "work", "care"}
 PLACEHOLDER_MARKERS = ("actual-person-", "实际人物", "实际关系", "占位")
+PROFILE_APPROVALS = {"draft", "approved"}
 
 
 def parse_args() -> argparse.Namespace:
@@ -67,6 +68,27 @@ def require_string_list(value: object, path: str, minimum: int = 0) -> list[str]
     if not isinstance(value, list) or len(value) < minimum:
         raise ValueError(f"{path} must contain at least {minimum} items")
     return [require_text(item, f"{path}[{index}]") for index, item in enumerate(value)]
+
+
+def normalize_profile(value: object, path: str) -> dict:
+    if not isinstance(value, dict):
+        raise ValueError(f"{path} must be an object")
+    unknown = set(value) - {"approval", "appearance", "standardCardSrc", "firstAppearance"}
+    if unknown:
+        raise ValueError(f"{path} contains unknown fields: {', '.join(sorted(unknown))}")
+    approval = value.get("approval", "draft")
+    if approval not in PROFILE_APPROVALS:
+        raise ValueError(f"{path}.approval must be draft or approved")
+    profile = {
+        "approval": approval,
+        "appearance": require_string_list(value.get("appearance", []), f"{path}.appearance"),
+        "firstAppearance": require_text(value.get("firstAppearance", ""), f"{path}.firstAppearance", 120),
+    }
+    if "standardCardSrc" in value and value["standardCardSrc"]:
+        profile["standardCardSrc"] = require_asset_path(
+            value["standardCardSrc"], f"{path}.standardCardSrc"
+        )
+    return profile
 
 
 def load_data(path: Path) -> dict:
@@ -158,6 +180,8 @@ def normalize_data(data: dict) -> dict:
                     f"nodes[{index}].avatarFocusY must be a number between 0 and 1"
                 )
             node["avatarFocusY"] = focus_y
+        if "profile" in raw:
+            node["profile"] = normalize_profile(raw["profile"], f"nodes[{index}].profile")
         nodes.append(node)
 
     if avatar_sources and len(avatar_sources) != len(nodes):

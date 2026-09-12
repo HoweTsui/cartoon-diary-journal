@@ -1,6 +1,6 @@
 # 验收清单
 
-- 原文完整保留在sourceText，未进入渲染文本；Agent已语义编写标题、短备注、表情与1–4选景。
+- 原文完整保留在sourceText，未进入渲染文本；Agent已语义编写标题、短备注、表情与1–5选景，并且每天只输出一张海报。
 - protagonistId和全部场景角色ID精确对应本次角色。
 - draft只能--preview；confirmed记录用户审批与匹配版本，正式引用identity-approved。
 - 声明图片全部存在并实际附给生图；新角色onboarding不要求旧角色卡合格。

@@ -15,8 +15,18 @@ function page(title, subtitle, lines, number) {
   x.fillStyle="#77756f";x.font="25px "+handFont;x.fillText(number,88,1110);
   return c.toDataURL();
 }
+function blankDatePage(date, number) {
+  const c=paperCanvas(), x=c.getContext("2d");
+  x.fillStyle="#77756f";x.font="27px "+handFont;x.fillText(date,88,128);
+  x.fillStyle="#171715";x.font="42px "+handFont;x.fillText("留白日",88,244);
+  x.fillStyle="#7ccfdf";x.fillRect(88,270,100,8);
+  x.fillStyle="#77756f";x.font="27px "+handFont;x.fillText("这一天，先留给空白。",88,360);
+  x.fillStyle="#77756f";x.font="25px "+handFont;x.fillText(number,88,1110);
+  return c.toDataURL();
+}
+function emptyPaper() { return paperCanvas().toDataURL(); }
 const entryPages=[];
-data.entries.forEach((e,i)=>{const period=data.periods.find(p=>p.id===e.periodId);entryPages.push(page(e.title,e.date+"  /  "+(period?.title||""),[e.summary||"",e.content||e.body||"",(e.characterIds||[]).map(id=>data.characters?.find(c=>c.id===id)?.name||id).join(" · ")],String(i+1).padStart(2,"0")),"data/"+e.posterSrc);});
+data.entries.forEach((e,i)=>{const number=String(i+1).padStart(2,"0");if(e.isBlank){entryPages.push(blankDatePage(e.date,number),emptyPaper());return;}const period=data.periods.find(p=>p.id===e.periodId);entryPages.push(page(e.title,e.date+"  /  "+(period?.title||""),[e.summary||"",e.content||e.body||"",(e.characterIds||[]).map(id=>data.characters?.find(c=>c.id)?.name||id).join(" · ")],number),"data/"+e.posterSrc);});
 export const books=[{id:data.book.id,title:data.book.title,mark:"",ratio:3/4,pages:[]}];
 export async function rebuildCover(value) {
   const settings=value||defaultCover;

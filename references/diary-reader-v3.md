@@ -9,7 +9,7 @@ python3 -m http.server 8000 --bind 127.0.0.1 --directory task-output/reader-v3-d
 
 打开 http://127.0.0.1:8000/ 。必须通过 HTTP 访问，不能直接用 file:// 打开。输出目录必须是 task-output 下的新目录；已有目录直接拒绝，换一个新名字即可。
 
-v3 使用真正 Three.js / Quick FlipBook、手写字体、可替换花瓣裁剪封面、独立书名、日期/时期/人物检索、稳定 #entry 链接、阅读进度和原图放大。手机保留完整双页 spread，阅读海报细字请点“放大原图”。旧 build_diary_book.py 和 legacy runtime 不变，可继续独立使用；这个导入命令不会替换旧命令。
+v3 使用真正 Three.js / Quick FlipBook、手写字体、可替换花瓣裁剪封面、独立书名、日期/时期/人物检索、稳定 #entry 链接、阅读进度和原图放大。导出时会按最早至最晚的日记日期自动插入“留白日”：留白页只展示日期和纸张，不伪造日记或海报；同一天输入两篇日记会直接拒绝。手机在窄屏使用放大的可读书页构图，桌面仍保留完整 3D 翻页；阅读海报细字请点“放大原图”。旧 build_diary_book.py 和 legacy runtime 不变，可继续独立使用；这个导入命令不会替换旧命令。
 
 ## 数据与发布边界
 

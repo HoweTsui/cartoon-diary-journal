@@ -76,7 +76,9 @@ class BriefTests(unittest.TestCase):
                 self.data = original
     def test_scene_count(self):
         self.data["events"] *= 5
-        with self.assertRaisesRegex(ValueError, "1-4"):
+        self.assertEqual(len(self.valid()["events"]), 5)
+        self.data["events"].append(copy.deepcopy(self.data["events"][0]))
+        with self.assertRaisesRegex(ValueError, "1-5"):
             self.valid()
     def test_identity_and_species(self):
         self.data["protagonistId"] = "absent"

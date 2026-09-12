@@ -81,10 +81,14 @@ def read_manifest(index):
             if identity in ids[name]:
                 raise ValueError(f"Duplicate {name} id: {identity}")
             ids[name].add(identity)
+    entry_dates = set()
     for entry in data["entries"]:
         for key in ("title", "date", "posterSrc"):
             required_text(entry.get(key), f"entry.{key}")
-        date.fromisoformat(entry["date"])
+        entry_date = date.fromisoformat(entry["date"])
+        if entry_date in entry_dates:
+            raise ValueError(f"Only one diary is allowed per date: {entry['date']}")
+        entry_dates.add(entry_date)
         if entry.get("periodId") not in ids["periods"]:
             raise ValueError(f"Unknown period for entry {entry['id']}")
         entry.setdefault("characterIds", [])
@@ -93,6 +97,32 @@ def read_manifest(index):
         ):
             raise ValueError(f"Unknown character for entry {entry['id']}")
     return data
+
+
+def insert_blank_dates(data):
+    """Return chronological entries with date-only placeholders for missing days."""
+    result = copy.deepcopy(data)
+    entries_by_date = {date.fromisoformat(entry["date"]): entry for entry in result["entries"]}
+    first, last = min(entries_by_date), max(entries_by_date)
+    entries = []
+    current = first
+    while current <= last:
+        entry = entries_by_date.get(current)
+        if entry is None:
+            entry = {
+                "id": f"blank-{current.isoformat()}",
+                "date": current.isoformat(),
+                "title": "留白日",
+                "summary": "",
+                "periodId": "",
+                "posterSrc": "",
+                "characterIds": [],
+                "isBlank": True,
+            }
+        entries.append(entry)
+        current = date.fromordinal(current.toordinal() + 1)
+    result["entries"] = entries
+    return result
 
 
 def local_asset(root, value):
@@ -147,7 +177,7 @@ def export_reader(index, output_dir):
         raise ValueError("Output already exists; choose a new directory")
     if inside(output, root) or inside(root, output):
         raise ValueError("Output must be separate from the source directory")
-    data, assets = collect_assets(read_manifest(index), root)
+    data, assets = collect_assets(insert_blank_dates(read_manifest(index)), root)
     if not (RUNTIME / "index.html").is_file():
         raise ValueError("Bundled runtime missing; rebuild source first")
     if (RUNTIME / "data").exists():
@@ -173,7 +203,12 @@ def export_reader(index, output_dir):
         except Exception:
             shutil.rmtree(output)
             raise
-    return {"output": str(output), "entries": len(data["entries"]), "assets": len(assets)}
+    return {
+        "output": str(output),
+        "entries": len(data["entries"]),
+        "blankDays": sum(1 for entry in data["entries"] if entry.get("isBlank")),
+        "assets": len(assets),
+    }
 
 
 def main():
