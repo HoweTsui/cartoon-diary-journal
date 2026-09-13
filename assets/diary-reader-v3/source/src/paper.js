@@ -1,5 +1,5 @@
-export const handFont = '"DiaryHand"';
-export const fontReady = document.fonts.load('32px DiaryHand', '纸上小日子快乐日记').then(faces => {
+export const handFont = '"Yozai"';
+export const fontReady = document.fonts.load('32px Yozai', '纸上小日子快乐日记').then(faces => {
   if (!faces.length) throw new Error("手写字体未加载，请刷新重试");
   return document.fonts.ready;
 });
@@ -48,8 +48,6 @@ export async function coverCanvas(title, source) {
   ctx.fillStyle = "#171715";
   ctx.font = '27px ' + handFont;
   ctx.fillText("我的日记本", 450, 155);
-  ctx.strokeStyle = "#7ccfdf"; ctx.lineWidth = 18;
-  ctx.beginPath(); ctx.moveTo(180, 301); ctx.quadraticCurveTo(450, 289, 720, 300); ctx.stroke();
   let size = 76;
   do { ctx.font = size + "px " + handFont; size -= 2; } while (ctx.measureText(title).width > 735 && size > 28);
   ctx.fillText(title, 450, 290);
@@ -63,6 +61,6 @@ export async function coverCanvas(title, source) {
   ctx.font = '30px ' + handFont;
   ctx.fillStyle = "#171715"; ctx.fillText("把日常，慢慢翻开。", 450, 975);
   ctx.font = '23px ' + handFont;
-  ctx.fillStyle = "#77756f"; ctx.fillText("一页一页，收藏小小的快乐", 450, 1040);
+  ctx.fillStyle = "#171715"; ctx.fillText("一页一页，收藏小小的快乐", 450, 1040);
   return canvas;
 }

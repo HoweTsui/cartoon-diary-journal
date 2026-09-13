@@ -1,11 +1,12 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1600" viewBox="0 0 1200 1600">
+  <style>-face{font-family:Yozai;src:url("../runtime/fonts/Yozai-Regular.ttf") format("truetype")}</style>
   <rect width="1200" height="1600" fill="#fffef8"/>
   <g stroke="#d8eaf2" stroke-width="4">
     <path d="M0 88h1200M0 168h1200M0 248h1200M0 328h1200M0 408h1200M0 488h1200M0 568h1200M0 648h1200M0 728h1200M0 808h1200M0 888h1200M0 968h1200M0 1048h1200M0 1128h1200M0 1208h1200M0 1288h1200M0 1368h1200M0 1448h1200M0 1528h1200"/>
   </g>
-  <g fill="#171716" font-family="PingFang SC, Hiragino Sans GB, sans-serif" text-anchor="middle">
+  <g fill="#171716" font-family="Yozai, sans-serif" text-anchor="middle">
     <text x="600" y="82" font-size="42">2026.08.25　周二</text>
-    <text x="600" y="158" font-family="STKaiti, Kaiti SC, serif" font-size="70" font-weight="700">新的一页先留白</text>
+    <text x="600" y="158" font-family="Yozai, sans-serif" font-size="70" font-weight="700">新的一页先留白</text>
   </g>
   <g fill="none" stroke="#171716" stroke-width="8" stroke-linecap="round" stroke-linejoin="round">
     <path d="M112 490h725M162 490v98m590-98v98"/>
@@ -24,7 +25,7 @@
     <path d="M654 753v112m77-112v112M638 867c31-14 78-14 108 0"/>
     <path d="M627 862c20-14 69-14 94 0l-8 25h-96zM726 862c20-14 69-14 94 0l-8 25h-96z" fill="#171716"/>
   </g>
-  <g fill="#171716" font-family="STKaiti, Kaiti SC, serif">
+  <g fill="#171716" font-family="Yozai, sans-serif">
     <text x="920" y="520" font-size="36">慢慢开始</text>
     <text x="150" y="1010" font-size="36">猫先占座</text>
   </g>
@@ -41,7 +42,7 @@
     <path d="M778 1168l-13 9 13 8" fill="#171716"/>
     <path d="M747 1210l-30 40m80-40 31 40m-101-7c-9 13-7 24 5 29m74-29c10 13 8 24-4 29"/>
   </g>
-  <g fill="#171716" font-family="STKaiti, Kaiti SC, serif" text-anchor="middle">
+  <g fill="#171716" font-family="Yozai, sans-serif" text-anchor="middle">
     <text x="600" y="1450" font-size="38">把今天的轻松留到下一次</text>
     <text x="600" y="1560" font-size="36">这一页，先不急着写满。</text>
   </g>

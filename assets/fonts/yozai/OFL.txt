@@ -1,8 +1,9 @@
-Copyright 2018 The ZCOOL KuaiLe Project Authors (https://github.com/googlefonts/zcool-kuaile)
+Copyright 2020, 2024 LXGW (https://github.com/lxgw/yozai-font)
+Copyright (c) 2021-03-07, Y.Oz (Y.OzVox) (http://yozvox.web.fc2.com), words containing "Y.Oz" or "YOz" are reserved as font names.
 
 This Font Software is licensed under the SIL Open Font License, Version 1.1.
 This license is copied below, and is also available with a FAQ at:
-https://openfontlicense.org
+http://scripts.sil.org/OFL
 
 
 -----------------------------------------------------------

@@ -44,7 +44,8 @@ class ReaderExportTest(unittest.TestCase):
         result = reader.export_reader(index, self.output)
         self.assertEqual(result["entries"], 1)
         self.assertEqual(result["assets"], 3)
-        self.assertTrue((self.output / "fonts/ZCOOLKuaiLe-Regular.woff").is_file())
+        self.assertTrue((self.output / "fonts/Yozai-Regular.ttf").is_file())
+        self.assertTrue((self.output / "fonts/Yozai-Medium.ttf").is_file())
         self.assertTrue((self.output / "THIRD_PARTY_NOTICES.md").is_file())
         for name, value in before.items():
             self.assertEqual((self.source / name).read_bytes(), value)
@@ -149,6 +150,14 @@ class ReaderExportTest(unittest.TestCase):
                 continue
             self.assertNotIn(path.name, {"node_modules", "review", "manifest.json"})
         self.assertTrue((reader.RUNTIME / "index.html").is_file())
+
+    def test_static_reader_fallback_remains_available_without_webgl(self):
+        bootstrap = (PACKAGE / "source/src/bootstrap.js").read_text(encoding="utf-8")
+        reader_source = (PACKAGE / "source/src/reader.js").read_text(encoding="utf-8")
+        styles = (PACKAGE / "source/src/style.css").read_text(encoding="utf-8")
+        self.assertIn("enableStaticReader", bootstrap)
+        self.assertIn("static-reader", reader_source)
+        self.assertIn("static-reader", styles)
 
 
 if __name__ == "__main__":

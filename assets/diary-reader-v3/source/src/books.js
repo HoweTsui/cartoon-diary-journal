@@ -7,21 +7,16 @@ export let customCover = await readCover(data.book.id).catch(()=>null);
 await fontReady;
 function page(title, subtitle, lines, number) {
   const c=paperCanvas(), x=c.getContext("2d");
-  x.fillStyle="#77756f";x.font="27px "+handFont;x.fillText(subtitle,88,128);
+  x.fillStyle="#171715";x.font="27px "+handFont;x.fillText(subtitle,88,128);
   x.fillStyle="#171715";x.font="46px "+handFont;x.fillText(title,88,244);
-  x.fillStyle="#7ccfdf";x.fillRect(88,270,100,8);
   x.fillStyle="#171715";x.font="30px "+handFont;let y=360;
   for(const line of lines){let row="";for(const ch of line){if(x.measureText(row+ch).width>700){x.fillText(row,88,y);y+=58;row="";}row+=ch;}x.fillText(row,88,y);y+=58;}
-  x.fillStyle="#77756f";x.font="25px "+handFont;x.fillText(number,88,1110);
+  x.fillStyle="#171715";x.font="25px "+handFont;x.fillText(number,88,1110);
   return c.toDataURL();
 }
 function blankDatePage(date, number) {
   const c=paperCanvas(), x=c.getContext("2d");
-  x.fillStyle="#77756f";x.font="27px "+handFont;x.fillText(date,88,128);
-  x.fillStyle="#171715";x.font="42px "+handFont;x.fillText("留白日",88,244);
-  x.fillStyle="#7ccfdf";x.fillRect(88,270,100,8);
-  x.fillStyle="#77756f";x.font="27px "+handFont;x.fillText("这一天，先留给空白。",88,360);
-  x.fillStyle="#77756f";x.font="25px "+handFont;x.fillText(number,88,1110);
+  x.fillStyle="#171715";x.textAlign="center";x.font="34px "+handFont;x.fillText(date,450,132);
   return c.toDataURL();
 }
 function emptyPaper() { return paperCanvas().toDataURL(); }

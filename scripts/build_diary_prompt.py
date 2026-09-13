@@ -3,6 +3,7 @@
 from __future__ import annotations
 import argparse
 import datetime as dt
+import hashlib
 import json
 import math
 import re
@@ -12,6 +13,14 @@ from urllib.parse import unquote
 SKILL_ROOT = Path(__file__).resolve().parents[1]
 GRAPH_DATA_PATTERN = re.compile(r'<script\s+id="graph-data"\s+type="application/json">\s*(.*?)\s*</script>', re.DOTALL)
 PLACEHOLDER_MARKERS = ("actual-person-", "实际人物", "实际关系", "占位")
+
+
+def is_within(path: Path, root: Path) -> bool:
+    try:
+        path.relative_to(root)
+        return True
+    except ValueError:
+        return False
 def require_text(data: dict, key: str, maximum: int) -> str:
     value = data.get(key)
     if not isinstance(value, str) or not value.strip():
@@ -158,6 +167,77 @@ def load_character_graph(path: Path) -> tuple[dict[str, dict], list[dict]]:
 
 EYES = {"neutral_dot", "closed_arc", "half_lid", "wide_round", "crossed"}
 ROLES = {"identity-source", "identity-draft", "identity-approved", "style", "layout", "scene"}
+REFERENCE_MANIFEST = SKILL_ROOT / "assets" / "style-reference" / "reference-manifest.json"
+
+
+def image_signature(path: Path, label: str) -> None:
+    with path.open("rb") as handle:
+        signature = handle.read(16)
+    if not (
+        signature.startswith(b"\x89PNG\r\n\x1a\n")
+        or signature.startswith(b"\xff\xd8\xff")
+        or signature.startswith((b"GIF87a", b"GIF89a"))
+        or (signature.startswith(b"RIFF") and signature[8:12] == b"WEBP")
+    ):
+        raise ValueError("reference must be PNG/JPEG/GIF/WebP: " + label)
+
+
+def bundled_references(kind: str) -> list[dict]:
+    """Return, and integrity-check, the immutable visual reference pack."""
+    try:
+        data = json.loads(REFERENCE_MANIFEST.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise ValueError(f"bundled reference manifest is unreadable: {exc}") from exc
+    if data.get("schemaVersion") != 1 or not isinstance(data.get("references"), list):
+        raise ValueError("bundled reference manifest has an invalid schema")
+    result = []
+    for item in data["references"]:
+        if not isinstance(item, dict) or kind not in item.get("appliesTo", []):
+            continue
+        relative = valid_relative_asset_path(item.get("path"), "bundled reference.path")
+        full = (SKILL_ROOT / relative).resolve()
+        if not full.is_file() or not is_within(full, SKILL_ROOT.resolve()):
+            raise ValueError("bundled reference is missing: " + relative)
+        expected = item.get("sha256")
+        actual = hashlib.sha256(full.read_bytes()).hexdigest()
+        if not isinstance(expected, str) or actual != expected:
+            raise ValueError("bundled reference checksum does not match: " + relative)
+        image_signature(full, relative)
+        role = item.get("role")
+        if role not in {"style", "layout"}:
+            raise ValueError("bundled reference has an invalid role: " + relative)
+        result.append({"path": str(full), "role": role, "id": item.get("id"), "origin": "bundled"})
+    if not result or (kind == "diary" and "layout" not in {item["role"] for item in result}):
+        raise ValueError("bundled reference manifest lacks required references for " + kind)
+    return result
+
+
+def validate_photo_archive(data: dict, base: Path, user_photo_paths: set[str]) -> None:
+    if not user_photo_paths:
+        return
+    archive = data.get("photoArchive")
+    if not isinstance(archive, dict):
+        raise ValueError("user-photo references require photoArchive.manifest")
+    manifest_path = valid_relative_asset_path(archive.get("manifest"), "photoArchive.manifest")
+    full = (base / manifest_path).resolve()
+    if not full.is_file() or not is_within(full, base.resolve()):
+        raise ValueError("photo archive manifest is missing: " + manifest_path)
+    try:
+        manifest = json.loads(full.read_text(encoding="utf-8"))
+    except json.JSONDecodeError as exc:
+        raise ValueError(f"invalid photo archive manifest at line {exc.lineno}") from exc
+    photos = manifest.get("photos") if isinstance(manifest, dict) else None
+    if not isinstance(manifest, dict) or manifest.get("schemaVersion") != 1 or not isinstance(photos, list):
+        raise ValueError("photo archive manifest has an invalid schema")
+    manifest_parent = Path(manifest_path).parent
+    compressed = {
+        (manifest_parent / item.get("compressedPath")).as_posix()
+        for item in photos
+        if isinstance(item, dict) and isinstance(item.get("compressedPath"), str)
+    }
+    missing = sorted(user_photo_paths - compressed)
+    if missing:
+        raise ValueError("user-photo reference is not the archived compressed copy: " + ", ".join(missing))
 def geometry(data):
     canonical = json.loads((SKILL_ROOT / "references/geometry.json").read_text(encoding="utf-8"))
     value = json.loads(json.dumps(canonical))
@@ -225,7 +305,7 @@ def validate_brief(data, base, preview=False, graph=None):
     refs = data.get("references")
     if not isinstance(refs, list) or not refs:
         raise ValueError("references must be a non-empty list")
-    resolved, roles = [], set()
+    resolved, roles, user_photo_paths = [], set(), set()
     for ref in refs:
         if not isinstance(ref, dict) or not isinstance(ref.get("role"), str) or ref["role"] not in ROLES:
             raise ValueError("invalid reference role")
@@ -237,16 +317,19 @@ def validate_brief(data, base, preview=False, graph=None):
             raise ValueError("reference escapes brief directory")
         if not full.is_file():
             raise ValueError("reference missing: " + path)
-        with full.open("rb") as f:
-            signature = f.read(16)
-        if not (signature.startswith(b"\x89PNG\r\n\x1a\n") or signature.startswith(b"\xff\xd8\xff") or signature.startswith((b"GIF87a", b"GIF89a")) or (signature.startswith(b"RIFF") and signature[8:12] == b"WEBP")):
-            raise ValueError("reference must be PNG/JPEG/GIF/WebP: " + path)
+        image_signature(full, path)
+        origin = ref.get("origin", "task-asset")
+        if origin not in {"task-asset", "user-photo"}:
+            raise ValueError("reference.origin must be task-asset or user-photo")
+        if origin == "user-photo":
+            user_photo_paths.add(path)
         roles.add(ref["role"])
-        resolved.append({"path": str(full), "role": ref["role"]})
+        resolved.append({"path": str(full), "role": ref["role"], "origin": origin})
+    validate_photo_archive(data, base, user_photo_paths)
     needed = {"identity-source"} if kind == "onboarding" else ({"identity-approved"} if not preview else {"identity-draft", "identity-approved"})
     if not roles.intersection(needed):
         raise ValueError("missing identity reference role: " + "/".join(sorted(needed)))
-    result = {"kind": kind, "role": "draft-preview" if preview else "production", "identity": identity, "protagonistId": data["protagonistId"], "characters": chars, "references": resolved, "geometry": geometry(data)}
+    result = {"kind": kind, "role": "draft-preview" if preview else "production", "identity": identity, "protagonistId": data["protagonistId"], "characters": chars, "references": resolved + bundled_references(kind), "geometry": geometry(data)}
     if kind == "onboarding":
         return result
     if not isinstance(data.get("sourceText"), str) or not data["sourceText"].strip():
@@ -309,8 +392,18 @@ def build_prompt(brief):
     render = {k: v for k, v in brief.items() if k != "sourceText"}
     rules = (SKILL_ROOT / "references/style-system.md").read_text(encoding="utf-8")
     purpose = "Create one full-body character lineup. Correct old geometry while preserving broad identity features. No preexisting approved atlas required. Use neutral_dot and no eyebrows." if brief["kind"] == "onboarding" else ("Create an expression/action test sheet from selected scenes." if brief["kind"] == "expression" else "Create one complete 3:4 diary poster from selected scenes.")
+    bundled = [item for item in brief["references"] if item.get("origin") == "bundled"]
+    fixed_pack = "\n".join(f"- {item.get('id')}: {item['path']} ({item['role']})" for item in bundled)
+    text_plan = "" if brief["kind"] != "diary" else (
+        "Before drawing, reserve the header and right caption lane defined in "
+        "assets/templates/diary-poster-text-layout.json. No objects in those zones; horizontal paper rules must continue through the caption lane. No vertical divider. "
+        "Generate the illustration with no letters, numbers, captions, dates, or title. "
+        "A local post-process applies the Yozai text layer after image approval."
+    )
     return "\n".join([purpose, "Draft preview is not identity approval; never label it confirmed.", rules,
-        "Reference roles: identity-source supplies broad features only; identity-draft is provisional; identity-approved locks identity; style/layout supply their named role only; scene supplies facts. Attach all listed images.",
+        "Reference roles: identity-source supplies broad features only; identity-draft is provisional; identity-approved locks identity; style/layout supply their named role only; scene supplies facts. Attach every listed image, including the mandatory fixed pack below.",
+        "Mandatory bundled reference pack (all must be attached):", fixed_pack,
+        text_plan,
         "Only header/title/caption/bubble/summary are renderable text; onboarding may label character names. All other metadata and scene descriptions are drawing instructions, never printed. No additional text.",
         "Use each character's own species dimensions and anchors. Per-character expressions override event expression for that character; event expression applies only to characters without an override. Never spread one person's emotion to a pet with its own override. Selected eye_state overrides neutral expression only: open eye dots remain circular, lids only occlude them, closed eyes remain arcs. Temporary eyebrows require an explicitly authored strong exaggerated expression. Preserve identity, nose, upper contour gap and proportions; mouth length/shape follows the authored emotion at its low rear-side position.",
         json.dumps(render, ensure_ascii=False, indent=2)])

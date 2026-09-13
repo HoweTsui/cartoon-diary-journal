@@ -9,7 +9,7 @@ python3 -m http.server 8000 --bind 127.0.0.1 --directory task-output/reader-v3-d
 
 打开 http://127.0.0.1:8000/ 。必须通过 HTTP 访问，不能直接用 file:// 打开。输出目录必须是 task-output 下的新目录；已有目录直接拒绝，换一个新名字即可。
 
-v3 使用真正 Three.js / Quick FlipBook、手写字体、可替换花瓣裁剪封面、独立书名、日期/时期/人物检索、稳定 #entry 链接、阅读进度和原图放大。导出时会按最早至最晚的日记日期自动插入“留白日”：留白页只展示日期和纸张，不伪造日记或海报；同一天输入两篇日记会直接拒绝。手机在窄屏使用放大的可读书页构图，桌面仍保留完整 3D 翻页；阅读海报细字请点“放大原图”。旧 build_diary_book.py 和 legacy runtime 不变，可继续独立使用；这个导入命令不会替换旧命令。
+v3 使用真正 Three.js / Quick FlipBook、随包悠哉字体、可替换花瓣裁剪封面、独立书名、日期/时期/人物检索、稳定 #entry 链接、阅读进度和原图放大。导出时会按最早至最晚的日记日期自动插入留白页：留白页只展示日期和纸张，不伪造日记或海报；同一天输入两篇日记会直接拒绝。手机在窄屏使用放大的可读书页构图，桌面仍保留完整 3D 翻页；阅读海报细字请点“放大原图”。保留正常抗锯齿与最高1.5×设备像素比，曲线与小字不能出现明显锯齿；3D只允许干净、轻微的中性灰投影。旧 build_diary_book.py 和 legacy runtime 不变，可继续独立使用；这个导入命令不会替换旧命令。
 
 ## 数据与发布边界
 
@@ -19,7 +19,7 @@ graphHref 等非图片字段保留为旧数据元信息，但 v3 不提供旧图
 
 assets/diary-reader-v3/source 是可发布源码；runtime 是可直接导出的编译代码、字体和许可。两者均不包含 diary data、测试图片、node_modules 或审阅图。任何 task-output 导出均为本地内容，不要提交到发布仓库。
 
-封面上传仅保存在当前浏览器 IndexedDB，与 HTTP origin/端口绑定；它不会修改导出文件或上传图片。字体为本地 ZCOOL KuaiLe WOFF，SIL OFL 1.1；Three.js、Quick FlipBook、模板许可见 runtime/THIRD_PARTY_NOTICES.md。three.modifiers 未提供独立 LICENSE 的上游声明限制也保留在该文件。
+封面上传仅保存在当前浏览器 IndexedDB，与 HTTP origin/端口绑定；它不会修改导出文件或上传图片。字体为本地悠哉/Yozai TrueType（含OFL 1.1许可）；Three.js、Quick FlipBook、模板许可见 runtime/THIRD_PARTY_NOTICES.md。three.modifiers 未提供独立 LICENSE 的上游声明限制也保留在该文件。
 
 ## 从纯源码重建
 

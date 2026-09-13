@@ -8,6 +8,7 @@ import unittest
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "scripts"))
 from build_diary_prompt import SKILL_ROOT, build_prompt, geometry, validate_brief
+from build_diary_text_layer import build as build_text_layer
 from build_diary_book import load_manifest, normalize_manifest
 
 class BriefTests(unittest.TestCase):
@@ -34,6 +35,42 @@ class BriefTests(unittest.TestCase):
         before = copy.deepcopy(self.data)
         self.assertEqual(self.valid()["role"], "draft-preview")
         self.assertEqual(self.data, before)
+    def test_fixed_reference_pack_is_auto_attached(self):
+        value = self.valid()
+        bundled = [item for item in value["references"] if item.get("origin") == "bundled"]
+        self.assertEqual(len(bundled), 4)
+        self.assertEqual({item["role"] for item in bundled}, {"style", "layout"})
+        prompt = build_prompt(value)
+        self.assertIn("Mandatory bundled reference pack", prompt)
+        self.assertIn("approved-diary-layout-3x4.png", prompt)
+    def test_user_photo_requires_archived_compressed_copy(self):
+        self.data["references"][0]["origin"] = "user-photo"
+        with self.assertRaisesRegex(ValueError, "photoArchive"):
+            self.valid()
+        archive = self.base / "archive"
+        archive.mkdir()
+        self.data["references"][0]["path"] = "archive/reference/identity.jpg"
+        reference = archive / "reference"
+        reference.mkdir()
+        (reference / "identity.jpg").write_bytes((SKILL_ROOT / "assets/style-reference/character-lineup-demo.png").read_bytes())
+        (archive / "archive-manifest.json").write_text(json.dumps({"schemaVersion": 1, "photos": [{"compressedPath": "reference/identity.jpg"}]}), encoding="utf-8")
+        self.data["photoArchive"] = {"manifest": "archive/archive-manifest.json"}
+        self.assertEqual(self.valid()["references"][0]["origin"], "user-photo")
+    def test_text_layer_uses_local_yozai_and_reserves_caption_lane(self):
+        output = self.base / "poster-layer"
+        (self.base / "brief.json").write_text(json.dumps(self.data, ensure_ascii=False), encoding="utf-8")
+        anchors = self.base / "anchors.json"
+        anchors.write_text(json.dumps({"sceneCenters": [.5]}))
+        with self.assertRaisesRegex(ValueError, "--anchors"):
+            build_text_layer(self.base / "brief.json", self.base / "identity.png", output, True)
+        self.assertFalse(output.exists())
+        result = build_text_layer(self.base / "brief.json", self.base / "identity.png", output, True, anchors)
+        content = result.read_text(encoding="utf-8")
+        self.assertIn('font-family:Yozai', content)
+        self.assertIn('id="captions"', content)
+        self.assertIn('top:50.00%', content)
+        self.assertNotIn('border-left', content)
+        self.assertTrue((output / "fonts/Yozai-Regular.ttf").is_file())
     def test_confirmed_version_required(self):
         self.data["identity"] = {"status": "confirmed", "version": "v2", "approvedVersion": "v1", "approvedBy": "user"}
         with self.assertRaisesRegex(ValueError, "approvedVersion"):

@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "id": "approved-reference-pack-2026-09",
+  "description": "Every generated character card, expression sheet, and diary poster attaches these approved non-private visual references. They define style and layout only, never a user's identity.",
+  "references": [
+    {
+      "id": "human-geometry-v11",
+      "path": "assets/style-reference/approved-human-geometry-v11.png",
+      "role": "style",
+      "appliesTo": ["onboarding", "expression", "diary"],
+      "sha256": "cdec45282466cce8bdb8725182d2dc3f52366a7d5853c09bbde3650808527439"
+    },
+    {
+      "id": "human-expressions-v5",
+      "path": "assets/style-reference/approved-human-expressions-v5.png",
+      "role": "style",
+      "appliesTo": ["onboarding", "expression", "diary"],
+      "sha256": "ed5298df21d3fc8ea516881dbe4890edf5fbc7fe81964aaf319f0e6da851fa88"
+    },
+    {
+      "id": "pet-expressions-v5",
+      "path": "assets/style-reference/approved-pet-expressions-v5.png",
+      "role": "style",
+      "appliesTo": ["onboarding", "expression", "diary"],
+      "sha256": "40e0b6090f2cb0f1842a84522641ece2846d28a15475d8cc0d1e2da93a00918e"
+    },
+    {
+      "id": "diary-layout-3x4",
+      "path": "assets/style-reference/approved-diary-layout-3x4.png",
+      "role": "layout",
+      "appliesTo": ["diary"],
+      "sha256": "040339693fee482160c25af83ca24e7ecf26183679e2f6f5ddd61591fc36839e"
+    }
+  ]
+}

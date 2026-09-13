@@ -5,19 +5,36 @@ const $=s=>document.querySelector(s);
 const key="diary-reader-v3:"+data.book.id;
 let saved="";try{saved=localStorage.getItem(key)||"";}catch{}
 let spread=spreadFromHash(location.hash,data.entries)??spreadFromHash(saved,data.entries)??0;
+let staticReader=false;
+let staticPage=null;
 export const requestedSpread=()=>spread;
 let navigating=false;
 export function onSpread(value){
  if(navigating && value!==spread)return;
  navigating=false;spread=value;
  const e=data.entries[value-1],p=data.periods.find(p=>p.id===e?.periodId);
- $("#entry-title").textContent=e?(e.isBlank?"留白日":e.title):data.book.title;
- $("#period-label").textContent=e?(e.isBlank?e.date+" / 留白日":e.date+" / "+(p?.title||"")):value===0?data.entries.filter(e=>!e.isBlank).length+" 篇日记 · "+data.periods.length+" 个时期":"这一册，已读完";
+ $("#entry-title").textContent=e?(e.isBlank?e.date:e.title):data.book.title;
+ $("#period-label").textContent=e?(e.isBlank?e.date:e.date+" / "+(p?.title||"")):value===0?data.entries.filter(e=>!e.isBlank).length+" 篇日记 · "+data.periods.length+" 个时期":"这一册，已读完";
  const hash=e?entryHash(e.id):value===0?"#cover":"#back";
  history.replaceState(null,"",hash);try{localStorage.setItem(key,hash);}catch{}
  $("#entry-characters").replaceChildren();
  for(const id of e?.characterIds||[]){const c=data.characters.find(c=>c.id===id);if(!c)continue;const a=document.createElement("a");a.href="#character="+encodeURIComponent(id);a.textContent=c.name;a.onclick=ev=>{ev.preventDefault();$("#character-filter").value=id;renderResults();$("#contents").showModal();};$("#entry-characters").append(a);}
  $("#enlarge").disabled=value>data.entries.length||Boolean(e?.isBlank);
+ renderStaticPage(e,value);
+}
+function renderStaticPage(entry,value){
+ if(!staticReader||!staticPage)return;
+ staticPage.replaceChildren();
+ if(entry?.isBlank){const date=document.createElement("p");date.className="static-blank-date";date.textContent=entry.date;staticPage.append(date);return;}
+ const image=document.createElement("img");image.className="static-poster";
+ if(entry){image.src=asset(entry.posterSrc);image.alt=entry.title;}
+ else {image.src=value===0?books[0].pages[0]:books[0].pages.at(-1);image.alt=value===0?data.book.title:"日记本封底";}
+ staticPage.append(image);
+}
+export function enableStaticReader(){
+ staticReader=true;$("#book-scene").hidden=true;
+ staticPage=document.createElement("article");staticPage.id="static-reader";staticPage.setAttribute("aria-label","平面日记页");$(".stage").append(staticPage);
+ renderStaticPage(data.entries[spread-1],spread);
 }
 function go(value){spread=value;navigating=true;window.dispatchEvent(new Event("reader:goto"));onSpread(value);}
 window.addEventListener("hashchange",()=>{const v=spreadFromHash(location.hash,data.entries);if(v!==null)go(v);else if(location.hash.startsWith("#character=")){const id=decodeURIComponent(location.hash.slice(11));$("#character-filter").value=id;renderResults();if(!$("#contents").open)$("#contents").showModal();}});
@@ -25,7 +42,7 @@ for(const [selector,items,label] of [["#period-filter",data.periods,"所有时�
 function renderResults(){
  const entries=filterEntries(data,{query:$("#search").value,period:$("#period-filter").value,character:$("#character-filter").value,date:$("#date-filter").value});
  $("#results").replaceChildren();
- for(const e of entries){const a=document.createElement("a");a.href=entryHash(e.id);const date=document.createElement("small");date.textContent=e.date;const title=document.createElement("strong");title.textContent=e.isBlank?"留白日":e.title;const summary=document.createElement("span");summary.textContent=e.isBlank?"这一天没有收录日记。":e.summary;a.append(date,title,summary);a.onclick=ev=>{ev.preventDefault();$("#contents").close();go(data.entries.indexOf(e)+1);};$("#results").append(a);}
+ for(const e of entries){const a=document.createElement("a");a.href=entryHash(e.id);const date=document.createElement("small");date.textContent=e.date;const title=document.createElement("strong");title.textContent=e.isBlank?e.date:e.title;const summary=document.createElement("span");summary.textContent=e.isBlank?"":e.summary;a.append(date,title,summary);a.onclick=ev=>{ev.preventDefault();$("#contents").close();go(data.entries.indexOf(e)+1);};$("#results").append(a);}
  $("#result-count").textContent=entries.length?entries.length+" 篇日记":"没有匹配的日记，试试其他日期或关键词。";
 }
 for(const id of ["#search","#period-filter","#character-filter","#date-filter"])$(id).addEventListener("input",renderResults);

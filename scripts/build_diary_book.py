@@ -24,6 +24,9 @@ RUNTIME_FILES = (
     (RUNTIME_ROOT / "NOTICE.md", "runtime/NOTICE.md"),
     (RUNTIME_ROOT / "vendor" / "page-flip.browser.js", "runtime/page-flip.browser.js"),
     (RUNTIME_ROOT / "vendor" / "STPAGEFLIP-LICENSE", "runtime/STPAGEFLIP-LICENSE"),
+    (SKILL_ROOT / "assets" / "fonts" / "yozai" / "Yozai-Regular.ttf", "runtime/fonts/Yozai-Regular.ttf"),
+    (SKILL_ROOT / "assets" / "fonts" / "yozai" / "Yozai-Medium.ttf", "runtime/fonts/Yozai-Medium.ttf"),
+    (SKILL_ROOT / "assets" / "fonts" / "yozai" / "OFL.txt", "runtime/fonts/OFL.txt"),
 )
 ID_PATTERN = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$")
 COVER_THEMES = {
