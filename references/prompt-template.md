@@ -1,5 +1,17 @@
 # Schema v2 与 CLI
 
+## 强制固定参考与照片归档
+
+`assets/style-reference/reference-manifest.json` 是内置参考包，脚本会按 `kind` 自动加入：onboarding/expression/diary 均附人物几何、人类表情、动物表情；diary 额外附3:4无人物横线模板。调用生图工具时必须实际附上输出 references 中所有 `origin=bundled` 图片，不能仅在提示词里提及，不能用用户照片或旧成果替换它们。
+
+用户照片先执行：
+```bash
+python3 scripts/archive_diary_photos.py <photo...> --date 2026-09-13 --character-id <id> --output-dir task-output/2026-09-13/photo-archive
+```
+脚本保留 `original/` 原件，创建 `reference/` 长边2048px、JPEG质量85压缩件和 `archive-manifest.json`。brief 中照片引用使用 `origin: "user-photo"`，`path` 只能是该清单记录的 `compressedPath`；并增加 `photoArchive: {"manifest":"photo-archive/archive-manifest.json"}`。非用户照片可省略 origin，默认 `task-asset`。
+
+日记海报先按 `assets/templates/diary-poster-text-layout.json` 预留顶部与右侧，不画人物道具，但横线贯穿右侧。检查生成图后逐场记录整页归一化高度，例如 `{"sceneCenters":[0.3,0.7]}`，通过 `scripts/build_diary_text_layer.py --anchors anchors.json` 生成悠哉透明文字层。锚点数量与场景数一致、逐图检查，不从小栏坐标或固定等距位置推断。导出PNG前检查图文对应与留白；不要让图像模型画汉字、日期、标题或备注。
+
 Agent 负责理解事实、选景、编写短文本与表情；脚本仅验证和编排。原始用户日记逐字保存在 brief.sourceText（保留换行与空格，无长度上限），不传入生图提示词。不要修改原始日记文件；brief 是其独立工作副本。
 
 公共必填：
@@ -8,12 +20,12 @@ Agent 负责理解事实、选景、编写短文本与表情；脚本仅验证�
 - protagonistId: characters 中精确 ID
 - identity: {status: draft | confirmed, version: 非空字符串}
 - characters: [{id, name, species: human | cat | dog, anchors: 2–12个可观察身份特征}]
-- references: [{path: 相对 brief 所在目录的本地图片, role}]
+- references: [{path: 相对 brief 所在目录的本地图片, role, origin?: task-asset | user-photo}]
 
 confirmed 还需 approvedVersion=version、approvedBy=user。仅用户明确批准该版本后记录；预览不能自动改状态。
-参考 role：identity-source、identity-draft、identity-approved、style、layout、scene。onboarding 必须 identity-source 且 --preview；expression/diary 预览需要 identity-draft 或 identity-approved，正式必须 identity-approved。style/layout/scene 按任务需要选用，无四图固定门槛；声明后均须存在并作为生图输入。仅支持PNG/JPEG/GIF/WebP，禁止远程、绝对、父目录或逃逸符号链接路径。源图的旧几何不具优先权。
+参考 role：identity-source、identity-draft、identity-approved、style、layout、scene。onboarding 必须 identity-source 且 --preview；expression/diary 预览需要 identity-draft 或 identity-approved，正式必须 identity-approved。用户提供的 references 是身份与事实来源；内置 style/layout 由脚本强制注入，无四图字段冗余写法。所有声明和注入图片都须实际作为生图输入。仅支持PNG/JPEG/GIF/WebP，禁止远程、绝对、父目录或逃逸符号链接路径。源图的旧几何不具优先权。
 
-expression 和 diary 还必填 sourceText、title（1–12字符）、events（1–4个）。diary 另需真实 ISO date（YYYY-MM-DD）。
+expression 和 diary 还必填 sourceText、title（1–12字符）、events（1–5个）。diary 另需真实 ISO date（YYYY-MM-DD）。每天只产出一张海报；5个场景也在同一张3:4画面内按时间顺序编排。
 每个 event：
 ```json
 {"scene":"明确动作与可见事实","caption":"四到十字备注","characters":["角色ID"],"emotion":"surprise","intensity":"medium","eye_state":"wide_round","eyebrows":"none","bubble":"可选","must_keep":["关键事实"],"flexible":["可简化背景"]}

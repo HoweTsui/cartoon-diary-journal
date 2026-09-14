@@ -21,6 +21,14 @@
         "肢体与身体尺寸使用references/geometry.json中该物种的canonical目标；动作不改变杆宽和段长，保留衣物与鞋爪轮廓"
       ],
       "notes": []
+      ,
+      "profile": {
+        "approval": "draft",
+        "appearance": [
+          "填写已确认的发型、衣着和固定配饰"
+        ],
+        "firstAppearance": "填写首次出现的日记"
+      }
     },
     {
       "id": "actual-person-02",

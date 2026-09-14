@@ -42,6 +42,9 @@ REQUIRED_FILES = (
     "scripts/build_character_graph.py",
     "scripts/build_diary_book.py",
     "scripts/build_diary_prompt.py",
+    "scripts/archive_diary_photos.py",
+    "scripts/build_diary_text_layer.py",
+    "scripts/check_poster_ink.py",
     "scripts/build_diary_reader.py",
     "references/diary-reader-v3.md",
     "references/geometry.json",
@@ -49,8 +52,12 @@ REQUIRED_FILES = (
     "assets/diary-reader-v3/source/package-lock.json",
     "assets/diary-reader-v3/runtime/index.html",
     "assets/diary-reader-v3/runtime/THIRD_PARTY_NOTICES.md",
-    "assets/diary-reader-v3/runtime/fonts/OFL.txt",
-    "assets/diary-reader-v3/runtime/fonts/ZCOOLKuaiLe-Regular.woff",
+    "assets/diary-reader-v3/runtime/fonts/Yozai-OFL.txt",
+    "assets/diary-reader-v3/runtime/fonts/Yozai-Regular.ttf",
+    "assets/diary-reader-v3/runtime/fonts/Yozai-Medium.ttf",
+    "assets/fonts/yozai/Yozai-Regular.ttf",
+    "assets/fonts/yozai/Yozai-Medium.ttf",
+    "assets/fonts/yozai/OFL.txt",
     "assets/style-reference/character-graph-demo.html",
     "assets/diary-book/book.css",
     "assets/diary-book/book.js",
@@ -72,6 +79,12 @@ REQUIRED_FILES = (
     "assets/style-reference/face-geometry-closeup.png",
     "assets/style-reference/diary-layout-only.png",
     "assets/style-reference/diary-style-anchor-3x4.png",
+    "assets/style-reference/reference-manifest.json",
+    "assets/style-reference/approved-human-geometry-v11.png",
+    "assets/style-reference/approved-human-expressions-v5.png",
+    "assets/style-reference/approved-pet-expressions-v5.png",
+    "assets/style-reference/approved-diary-layout-3x4.png",
+    "assets/templates/diary-poster-text-layout.json",
 )
 PLACEHOLDER_NAMES = ("林芽", "江屿", "桃子", "阿岚", "林杏", "灰豆", "actual-person-")
 DATE_PATTERN = re.compile(r"\b20\d{2}[./-]\d{1,2}[./-]\d{1,2}\b")
@@ -180,6 +193,7 @@ def check_package(failures: list[str]) -> None:
         "assets/diary-book/demo/cover-assets/cover-main-3x4.png",
         "assets/style-reference/diary-layout-only.png",
         "assets/style-reference/diary-style-anchor-3x4.png",
+        "assets/style-reference/approved-diary-layout-3x4.png",
     ):
         path = SKILL_ROOT / relative
         dimensions = image_dimensions(path)
@@ -194,6 +208,18 @@ def check_package(failures: list[str]) -> None:
     for reference in re.findall(r"(?:references|scripts)/[A-Za-z0-9_./-]+\.(?:md|json|py)", skill_text):
         if not (SKILL_ROOT / reference).exists():
             fail(f"SKILL.md points to missing path: {reference}", failures)
+
+    try:
+        reference_manifest = json.loads((SKILL_ROOT / "assets/style-reference/reference-manifest.json").read_text(encoding="utf-8"))
+        if reference_manifest.get("schemaVersion") != 1 or len(reference_manifest.get("references", [])) < 4:
+            raise ValueError("expected four approved references")
+        for item in reference_manifest["references"]:
+            relative = valid_relative_asset_path(item.get("path"), "reference manifest path")
+            if not (SKILL_ROOT / relative).is_file():
+                raise ValueError("missing " + relative)
+        print("PASS  approved fixed reference pack")
+    except (OSError, ValueError, json.JSONDecodeError) as exc:
+        fail(f"fixed reference pack invalid: {exc}", failures)
 
     reader_root = SKILL_ROOT / "assets/diary-reader-v3"
     for relative in ("runtime/data", "source/public/data", "source/node_modules"):
@@ -217,6 +243,12 @@ def check_package(failures: list[str]) -> None:
             fail(f"book.js is missing cover behavior: {guard}", failures)
     if "background-color: var(--ink)" in css_text:
         fail("book.css must not use the ink color as the cover background", failures)
+    for font_guard in ('font-family: "Yozai"', 'url("fonts/Yozai-Regular.ttf")'):
+        if font_guard not in css_text:
+            fail(f"book.css is missing bundled Yozai guard: {font_guard}", failures)
+    graph_text = (SKILL_ROOT / "assets/style-reference/character-graph-demo.html").read_text(encoding="utf-8")
+    if 'font-family: "Yozai"' not in graph_text or 'url("fonts/Yozai-Regular.ttf")' not in graph_text:
+        fail("character graph template must use bundled Yozai", failures)
     public_demo_css = SKILL_ROOT / "assets" / "diary-book" / "demo" / "runtime" / "book.css"
     if public_demo_css.is_file() and "aspect-ratio: 3 / 4" not in public_demo_css.read_text(encoding="utf-8"):
         fail("public Demo runtime CSS is stale and lacks the 3:4 page ratio", failures)

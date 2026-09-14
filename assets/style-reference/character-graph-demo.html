@@ -5,19 +5,30 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>人物关系图</title>
   <style>
+    @font-face {
+      font-family: "Yozai";
+      src: url("fonts/Yozai-Regular.ttf") format("truetype");
+      font-weight: 400;
+      font-style: normal;
+    }
+    @font-face {
+      font-family: "Yozai";
+      src: url("fonts/Yozai-Medium.ttf") format("truetype");
+      font-weight: 500 700;
+      font-style: normal;
+    }
     :root {
       color-scheme: light;
       --paper: #ffffff;
       --ink: #171715;
-      --muted: #77756f;
+      --muted: #171715;
       --rule: rgba(124, 207, 223, 0.24);
       --border: rgba(23, 23, 21, 0.24);
-      --accent: #7ccfdf;
+      --accent: #171715;
       --relationship: #171715;
       --panel: rgba(255, 255, 255, 0.96);
-      --ui-font: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC",
-        "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
-      --hand-font: "Kaiti SC", "STKaiti", "KaiTi", "Comic Sans MS", cursive;
+      --ui-font: "Yozai", sans-serif;
+      --hand-font: "Yozai", sans-serif;
     }
 
     * {
@@ -83,7 +94,7 @@
       bottom: 0;
       left: 54px;
       width: 1px;
-      background: rgba(124, 207, 223, 0.28);
+      background: transparent;
       pointer-events: none;
     }
 
@@ -125,7 +136,7 @@
       left: -5px;
       height: 8px;
       border-radius: 50%;
-      background: rgba(124, 207, 223, 0.68);
+      background: transparent;
       transform: rotate(-1deg);
     }
 
@@ -222,7 +233,7 @@
     }
 
     .control:focus-visible {
-      outline: 3px solid rgba(124, 207, 223, 0.5);
+      outline: 3px solid var(--ink);
       outline-offset: 2px;
     }
 
@@ -258,7 +269,7 @@
       min-width: 68px;
       height: 34px;
       padding: 3px 9px;
-      border: 2px solid #3899ad;
+      border: 2px solid var(--ink);
       border-radius: 9px;
       outline: 0;
       background: #ffffff;
@@ -271,7 +282,7 @@
     }
 
     .edge-label-editor:focus {
-      box-shadow: 0 0 0 4px rgba(124, 207, 223, 0.28), 3px 4px 0 rgba(23, 23, 21, 0.14);
+      box-shadow: 0 0 0 4px rgba(23, 23, 21, 0.12), 3px 4px 0 rgba(23, 23, 21, 0.14);
     }
 
     .hint {
@@ -280,7 +291,7 @@
       bottom: 22px;
       left: 30px;
       padding: 8px 11px 7px;
-      border-bottom: 4px solid rgba(124, 207, 223, 0.62);
+      border-bottom: 4px solid var(--ink);
       background: rgba(255, 255, 255, 0.9);
       font-family: var(--hand-font);
       font-size: 15px;
@@ -322,7 +333,7 @@
       left: -2px;
       height: 6px;
       border-radius: 50%;
-      background: rgba(124, 207, 223, 0.7);
+      background: transparent;
     }
 
     .inspector-actions {
@@ -379,7 +390,7 @@
       background-repeat: no-repeat;
       background-size: cover;
       background-position: center;
-      box-shadow: 0 0 0 5px rgba(124, 207, 223, 0.22);
+      box-shadow: 0 0 0 5px rgba(23, 23, 21, 0.12);
       font-family: var(--hand-font);
       font-size: 32px;
       font-weight: 700;
@@ -448,7 +459,7 @@
     .field input:focus,
     .field textarea:focus,
     .field select:focus {
-      box-shadow: 0 0 0 3px rgba(124, 207, 223, 0.34);
+      box-shadow: 0 0 0 3px rgba(23, 23, 21, 0.16);
     }
 
     .field-help {
@@ -838,6 +849,23 @@
 
       <div id="person-details" class="details-view">
         <section class="info-section">
+          <h3>人物档案</h3>
+          <p id="approval-copy" class="empty-note"></p>
+          <ul id="appearance-list" class="info-list"></ul>
+        </section>
+
+        <section class="info-section">
+          <h3>人物标准卡</h3>
+          <img id="standard-card" alt="" hidden style="width:100%;border:1px solid var(--line);border-radius:12px;background:#fff;">
+          <p id="standard-card-empty" class="empty-note"></p>
+        </section>
+
+        <section class="info-section">
+          <h3>首次出现</h3>
+          <p id="first-appearance" class="empty-note"></p>
+        </section>
+
+        <section class="info-section">
           <h3>外观锚点</h3>
           <ul id="anchor-list" class="info-list"></ul>
         </section>
@@ -1105,6 +1133,11 @@
       var personDetails = document.getElementById("person-details");
       var anchorList = document.getElementById("anchor-list");
       var notesList = document.getElementById("notes-list");
+      var approvalCopy = document.getElementById("approval-copy");
+      var appearanceList = document.getElementById("appearance-list");
+      var standardCard = document.getElementById("standard-card");
+      var standardCardEmpty = document.getElementById("standard-card-empty");
+      var firstAppearance = document.getElementById("first-appearance");
       var personForm = document.getElementById("person-form");
       var editName = document.getElementById("edit-name");
       var editRole = document.getElementById("edit-role");
@@ -1199,7 +1232,7 @@
 
       function edgeColor(edge, emphasized) {
         if (emphasized) {
-          return "#3899ad";
+          return "#171715";
         }
         if (edge.type === "family" || edge.type === "care") {
           return "#171715";
@@ -1300,7 +1333,7 @@
 
       function nodeLabelWidth(node) {
         ctx.save();
-        ctx.font = '700 22px "Kaiti SC", "STKaiti", "KaiTi", cursive';
+        ctx.font = '700 22px "Yozai", sans-serif';
         var width = ctx.measureText(node.name).width;
         ctx.restore();
         return width;
@@ -1992,7 +2025,7 @@
         }
         var point = quadraticPoint(geometry.start, geometry.control, geometry.end, 0.5);
         ctx.save();
-        ctx.font = '700 16px "Kaiti SC", "STKaiti", "KaiTi", cursive';
+        ctx.font = '700 16px "Yozai", sans-serif';
         var width = ctx.measureText(edge.label).width + 18;
         ctx.restore();
         return {
@@ -2031,7 +2064,7 @@
         }
         var screen = worldToScreen(layout.point);
         ctx.save();
-        ctx.font = '700 16px "Kaiti SC", "STKaiti", "KaiTi", cursive';
+        ctx.font = '700 16px "Yozai", sans-serif';
         var draftWidth = ctx.measureText(edgeLabelEditor.value || edge.label).width + 28;
         ctx.restore();
         edgeLabelEditor.style.left = screen.x + "px";
@@ -2112,13 +2145,13 @@
 
         var labelLayout = edgeLabelLayout(edge);
         var labelPoint = labelLayout.point;
-        ctx.font = '700 16px "Kaiti SC", "STKaiti", "KaiTi", cursive';
+        ctx.font = '700 16px "Yozai", sans-serif';
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         var labelWidth = labelLayout.width;
         ctx.fillStyle = "#ffffff";
         var editingThisLabel = edgeLabelEdit && edgeLabelEdit.edgeIndex === edgeIndex;
-        ctx.strokeStyle = editingThisLabel || emphasized ? "#3899ad" : "rgba(23,23,21,0.52)";
+        ctx.strokeStyle = editingThisLabel || emphasized ? "#171715" : "rgba(23,23,21,0.52)";
         ctx.lineWidth = editingThisLabel ? 2 : 1.2;
         roundRect(ctx, labelPoint.x - labelWidth / 2, labelPoint.y - 14, labelWidth, 28, 9);
         ctx.fill();
@@ -2134,12 +2167,12 @@
         ctx.arc(point.x, point.y, 7, 0, Math.PI * 2);
         ctx.fillStyle = "#ffffff";
         ctx.fill();
-        ctx.strokeStyle = emphasized ? "#3899ad" : "#171715";
+        ctx.strokeStyle = "#171715";
         ctx.lineWidth = emphasized ? 2.4 : 1.8;
         ctx.stroke();
         ctx.beginPath();
         ctx.arc(point.x, point.y, 2.2, 0, Math.PI * 2);
-        ctx.fillStyle = emphasized ? "#3899ad" : "#171715";
+        ctx.fillStyle = "#171715";
         ctx.fill();
         ctx.restore();
       }
@@ -2165,9 +2198,9 @@
         ctx.save();
         ctx.beginPath();
         ctx.arc(port.x, port.y, 9, 0, Math.PI * 2);
-        ctx.fillStyle = selectedId === node.id ? "#3899ad" : "#ffffff";
+        ctx.fillStyle = selectedId === node.id ? "#171715" : "#ffffff";
         ctx.fill();
-        ctx.strokeStyle = "#3899ad";
+        ctx.strokeStyle = "#171715";
         ctx.lineWidth = 2;
         ctx.stroke();
         ctx.beginPath();
@@ -2175,7 +2208,7 @@
         ctx.lineTo(port.x + 4, port.y);
         ctx.moveTo(port.x, port.y - 4);
         ctx.lineTo(port.x, port.y + 4);
-        ctx.strokeStyle = selectedId === node.id ? "#ffffff" : "#3899ad";
+        ctx.strokeStyle = selectedId === node.id ? "#ffffff" : "#171715";
         ctx.lineWidth = 1.7;
         ctx.stroke();
         ctx.restore();
@@ -2223,7 +2256,7 @@
           var targetPoint = gesture.target
             ? snapPointForTarget(gesture.start, gesture.target)
             : gesture.current;
-          drawPreviewLine(gesture.start, targetPoint, "#3899ad");
+          drawPreviewLine(gesture.start, targetPoint, "#171715");
         } else if (gesture.type === "detach") {
           var edge = edges[gesture.edgeIndex];
           var geometry = edge && edgeGeometry(edge);
@@ -2231,7 +2264,7 @@
             return;
           }
           var fixed = gesture.endpoint === "source" ? geometry.end : geometry.start;
-          drawPreviewLine(fixed, gesture.current, "#c4493d");
+          drawPreviewLine(fixed, gesture.current, "#171715");
         }
       }
 
@@ -2478,12 +2511,12 @@
         ctx.fill();
 
         if (selectedId === node.id) {
-          ctx.strokeStyle = "#3899ad";
+          ctx.strokeStyle = "#171715";
           ctx.lineWidth = 3;
           ctx.stroke();
           ctx.beginPath();
           ctx.arc(node.x, node.y, radius + 10, 0.1, Math.PI * 1.92);
-          ctx.strokeStyle = "rgba(124,207,223,0.7)";
+          ctx.strokeStyle = "rgba(23,23,21,0.44)";
           ctx.lineWidth = 1.5;
           ctx.stroke();
         } else {
@@ -2516,7 +2549,7 @@
             );
           } else {
             ctx.fillStyle = "#171715";
-            ctx.font = '700 30px "Kaiti SC", "STKaiti", "KaiTi", cursive';
+            ctx.font = '700 30px "Yozai", sans-serif';
             ctx.textAlign = "center";
             ctx.textBaseline = "middle";
             ctx.fillText(node.name.slice(0, 1), node.x, node.y);
@@ -2525,7 +2558,7 @@
         ctx.restore();
 
         ctx.fillStyle = "#171715";
-        ctx.font = '700 22px "Kaiti SC", "STKaiti", "KaiTi", cursive';
+        ctx.font = '700 22px "Yozai", sans-serif';
         ctx.textAlign = "center";
         ctx.textBaseline = "top";
         ctx.fillText(node.name, node.x, node.y + radius + 10);
@@ -2537,7 +2570,7 @@
         ctx.fillStyle = "#171715";
         ctx.fill();
         ctx.fillStyle = "#ffffff";
-        ctx.font = '700 12px -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+        ctx.font = '700 12px "Yozai", sans-serif';
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         ctx.fillText(String(relationCount(node.id)), badgeX, badgeY + 0.5);
@@ -2663,6 +2696,24 @@
         editNotes.value = (node.notes || []).join("\n");
         renderTextList(anchorList, node.anchors || [], "暂无外观锚点");
         renderTextList(notesList, node.notes || [], "暂无人物备注");
+        var profile = node.profile || {};
+        approvalCopy.textContent = profile.approval === "approved"
+          ? "可用于正式成品"
+          : profile.approval === "draft"
+            ? "新角色草稿：先确认人物小卡，再用于正式成品。"
+            : "尚未建立人物档案。";
+        renderTextList(appearanceList, profile.appearance || [], "暂无人物档案说明");
+        firstAppearance.textContent = profile.firstAppearance || "暂无首次出现日记";
+        if (profile.standardCardSrc) {
+          standardCard.src = profile.standardCardSrc;
+          standardCard.alt = node.name + "人物标准卡";
+          standardCard.hidden = false;
+          standardCardEmpty.textContent = "";
+        } else {
+          standardCard.removeAttribute("src");
+          standardCard.hidden = true;
+          standardCardEmpty.textContent = "暂无人物标准卡";
+        }
         fillRelationshipTargets(node);
 
         var avatar = document.getElementById("profile-avatar");

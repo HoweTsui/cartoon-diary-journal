@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "canvas": {"ratio": "3:4", "width": 1200, "height": 1600},
+  "reservedZones": {
+    "header": {"x": 0.10, "y": 0.025, "width": 0.80, "height": 0.12},
+    "illustration": {"x": 0.06, "y": 0.17, "width": 0.67, "height": 0.78},
+    "captionLane": {"x": 0.76, "y": 0.19, "width": 0.18, "height": 0.74}
+  },
+  "notes": "Reserve the caption lane free of illustration, but continue horizontal paper rules through it. No vertical divider or opaque caption panel. After inspecting each generated scene, record one sceneCenters fraction per event relative to FULL image height; never reuse fixed offsets across images or scene counts."
+}

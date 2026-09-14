@@ -2,9 +2,9 @@
 
 ## Local handwriting font
 
-ZCOOL KuaiLe (站酷快乐体), Copyright 2018 The ZCOOL KuaiLe Project Authors.
-Distributed locally as WOFF under SIL Open Font License 1.1.
-Complete license: fonts/OFL.txt. Source and conversion provenance: fonts/PROVENANCE.md.
+Yozai / 悠哉, from https://github.com/lxgw/yozai-font.
+Distributed locally as TrueType under SIL Open Font License 1.1.
+Complete license: fonts/Yozai-OFL.txt. Source and provenance: fonts/PROVENANCE.md.
 
 Derived from HaichaoLihc/create-photo-flipbook-ui, examples/3d-book-2.
 Snapshot: 53a9df7d5b13ef2d7a1f6bf5011c1fad570e021c
