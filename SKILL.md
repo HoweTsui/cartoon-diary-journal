@@ -15,6 +15,9 @@ description: 把日记整理为原创黑白角色卡、表情动作预览与3:4�
 4. 写 brief 后运行 `scripts/build_diary_prompt.py` 和 `scripts/preflight_check.py`。生成器会自动注入并校验固定参考包；调用生图工具时必须把输出中列出的每张图实际附上。角色比例唯一以 `references/geometry.json` 为准，旧图错误不得沿袭。
 5. 先生成**无文字**插画：顶部预留日期/标题，右侧不画人物道具，但浅青横线完整贯穿右侧。检查成图后逐场记录整页归一化高度 `sceneCenters`，一条备注对应一个场景中心；用 `scripts/build_diary_text_layer.py --anchors <坐标JSON>` 放置悠哉文字。文字层透明、无竖分隔线，不用白面板遮挡插画或横线。若右侧被插画侵占，先修复插画留白。不能让生成模型直接渲染日期、标题或备注。
 6. 更新实际人物图谱：用 `scripts/build_character_graph.py` 输出时会随HTML复制悠哉字体。将每篇正式日记按日期导入同一本日记本；`scripts/build_diary_reader.py` 会在缺失日期生成只含日期的留白页。旧版兼容构建器见 `references/diary-book-system.md`。
+7. 阅读 `references/diary-document.md`，将完成文字合成的 PNG 压缩后直接嵌入对应日期日记正文，不能只交付链接。正文按“日记内容 → 完整海报 → 全部原照片三列宫格”排列，照片按输入顺序、用压缩件、不裁切。原件与高清海报保留，压缩后重新解码并对照检查异常变黑、空白、方向或失真。按目标工具的原生嵌图语法入库并实际预览；本地可用 `scripts/build_diary_document.py`。日记本汇编不能替代正文入库。
+
+日记正文可轻润色语序、错别字和标点；正文及海报标题、备注、场景须逐条对照 `sourceText`，保留事实、因果、否定、情绪强度和用户立场，不新增情节或强行升华。字数限制不能成为改变原意的理由。
 
 正式生图要求 `identity.status=confirmed`、`version=approvedVersion`、`approvedBy=user` 和 `identity-approved` 图片。脚本不替用户作审批；替换正式资产或推送仓库仍要取得本次任务明确授权。
 

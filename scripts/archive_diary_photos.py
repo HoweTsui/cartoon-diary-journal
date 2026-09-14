@@ -8,6 +8,9 @@ import json
 import shutil
 import subprocess
 import sys
+import datetime
+from diary_images import normalized, validate_copy
+from PIL import Image
 from pathlib import Path
 
 
@@ -29,29 +32,21 @@ def unique_path(folder: Path, stem: str, suffix: str) -> Path:
 
 
 def compress(source: Path, destination: Path) -> str:
-    if shutil.which("sips"):
-        subprocess.run(
-            ["sips", "-Z", str(MAX_EDGE), "-s", "format", "jpeg", "-s", "formatOptions", JPEG_QUALITY, str(source), "--out", str(destination)],
-            check=True, capture_output=True, text=True,
-        )
-        return "sips"
-    if shutil.which("magick"):
-        subprocess.run(
-            ["magick", str(source), "-resize", f"{MAX_EDGE}x{MAX_EDGE}>", "-quality", JPEG_QUALITY, str(destination)],
-            check=True, capture_output=True, text=True,
-        )
-        return "ImageMagick"
-    try:
-        from PIL import Image
-    except ImportError as exc:
-        raise ValueError("Photo compression needs macOS sips, ImageMagick, or Pillow") from exc
-    with Image.open(source) as image:
-        image.thumbnail((MAX_EDGE, MAX_EDGE), Image.Resampling.LANCZOS)
-        image.convert("RGB").save(destination, "JPEG", quality=int(JPEG_QUALITY), optimize=True)
-    return "Pillow"
+    image = normalized(source)
+    image.thumbnail((MAX_EDGE, MAX_EDGE), Image.Resampling.LANCZOS)
+    for quality in (85, 95):
+        image.save(destination, 'JPEG', quality=quality, subsampling=0, optimize=True)
+        try:
+            validate_copy(source, destination)
+            return f'Pillow-JPEG-{quality}'
+        except ValueError:
+            if quality == 95:
+                raise
 
 
 def archive(date: str, character_id: str, photos: list[Path], output: Path) -> dict:
+    if datetime.date.fromisoformat(date).isoformat() != date:
+        raise ValueError('date must be YYYY-MM-DD')
     if output.exists():
         raise ValueError("archive output directory already exists; do not overwrite a photo archive")
     if not photos:
@@ -64,12 +59,14 @@ def archive(date: str, character_id: str, photos: list[Path], output: Path) -> d
     reference_dir.mkdir()
     records = []
     try:
-        for source in photos:
+        for index, source in enumerate(photos, 1):
             original = unique_path(original_dir, source.stem, source.suffix.lower())
             shutil.copy2(source, original)
-            compressed = unique_path(reference_dir, source.stem, ".jpg")
+            compressed = reference_dir / f'{date}-照片-{index:03d}.jpg'
             tool = compress(original, compressed)
             records.append({
+                "order": index,
+                "validation": validate_copy(original, compressed),
                 "originalPath": original.relative_to(output).as_posix(),
                 "compressedPath": compressed.relative_to(output).as_posix(),
                 "originalSha256": sha256(original),
@@ -77,7 +74,7 @@ def archive(date: str, character_id: str, photos: list[Path], output: Path) -> d
                 "originalBytes": original.stat().st_size,
                 "compressedBytes": compressed.stat().st_size,
                 "maxEdge": MAX_EDGE,
-                "jpegQuality": int(JPEG_QUALITY),
+                "jpegQuality": int(tool.rsplit('-', 1)[-1]),
                 "compressor": tool,
             })
     except Exception:

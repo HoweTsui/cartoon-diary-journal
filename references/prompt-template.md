@@ -1,5 +1,7 @@
 # Schema v2 与 CLI
 
+正文入库及文案核对见 `diary-document.md`。正文允许轻润色，但标题、备注与场景均须有 sourceText 原文依据，保留否定、因果、先后和情绪强度。不能为了四到十字备注新增事实或改写用户立场。
+
 ## 强制固定参考与照片归档
 
 `assets/style-reference/reference-manifest.json` 是内置参考包，脚本会按 `kind` 自动加入：onboarding/expression/diary 均附人物几何、人类表情、动物表情；diary 额外附3:4无人物横线模板。调用生图工具时必须实际附上输出 references 中所有 `origin=bundled` 图片，不能仅在提示词里提及，不能用用户照片或旧成果替换它们。
