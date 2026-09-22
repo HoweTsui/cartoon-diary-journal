@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "path": "master-approved-v1.png",
+  "sha256": "c5f9b46836b82a3b2614ce500492654720ef86f3316c2346cc3eb849e548f66a",
+  "status": "approved",
+  "approvedBy": "user",
+  "approvedOn": "2026-09-20",
+  "sourcePreview": "master-applied-v4.png",
+  "scope": "Unified human, expression, cat and dog master only. Derived templates require separate confirmation.",
+  "constraints": [
+    "Open human eyes are equally sized round black dots; closed eyes remain paired arcs.",
+    "Both open human nose root endpoints lie between eye centerlines; nose tip may protrude outward. Mirror for opposite facing direction.",
+    "Pet leg shafts remain slim double contours with white interiors, distinct from wider paws.",
+    "Preserve approved head shapes, individual expressions and clean black-and-white linework."
+  ]
+}

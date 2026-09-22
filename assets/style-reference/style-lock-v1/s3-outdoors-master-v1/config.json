@@ -1,0 +1,98 @@
+{
+  "id": "s3-outdoors",
+  "title": "出门走走",
+  "composition": "solo",
+  "tags": [
+    "outdoors",
+    "walk"
+  ],
+  "scenes": [
+    "一人在门边穿鞋",
+    "同一人在一棵简化小树旁散步",
+    "带着小纸袋回家"
+  ],
+  "captions": [
+    "穿好鞋再出门",
+    "沿着小路走走",
+    "拎着小袋回家"
+  ],
+  "rowBoundaries": [
+    0,
+    0.35,
+    0.667,
+    1
+  ],
+  "styleVersion": "style-lock-v1",
+  "masterSource": "master-approved-v1.png",
+  "masterSha256": "c5f9b46836b82a3b2614ce500492654720ef86f3316c2346cc3eb849e548f66a",
+  "sourceSha256": "dc271b992271acdc7cfb9d9cfd59e8c7ecbe5c0604140d42355ed15ac2e5d88b",
+  "sourceText": "一人在门边穿鞋。同一人在一棵简化小树旁散步。带着小纸袋回家。",
+  "fictional": true,
+  "sceneCount": 3,
+  "sceneBoxes": [
+    [
+      0.06,
+      0.1875,
+      0.67,
+      0.225
+    ],
+    [
+      0.06,
+      0.44750000000000006,
+      0.67,
+      0.225
+    ],
+    [
+      0.06,
+      0.7075,
+      0.67,
+      0.225
+    ]
+  ],
+  "sceneCenters": [
+    0.3,
+    0.56,
+    0.82
+  ],
+  "placedBounds": [
+    [
+      252,
+      300,
+      445,
+      360
+    ],
+    [
+      226,
+      716,
+      495,
+      360
+    ],
+    [
+      260,
+      1132,
+      427,
+      360
+    ]
+  ],
+  "sourceRects": [
+    [
+      314,
+      66,
+      808,
+      466
+    ],
+    [
+      292,
+      551,
+      831,
+      943
+    ],
+    [
+      318,
+      991,
+      801,
+      1398
+    ]
+  ],
+  "status": "draft"
+}

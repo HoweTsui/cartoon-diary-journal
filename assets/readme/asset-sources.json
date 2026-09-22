@@ -1,0 +1,153 @@
+{
+  "scope": "fictional-public-example",
+  "generationCalls": 0,
+  "description": "Existing approved sprites; uniform scale, translation and Yozai text layout only.",
+  "master": "assets/style-reference/style-lock-v1/master-approved-v1.png",
+  "actionLibrary": "assets/style-reference/style-lock-v1/action-library-v2.json",
+  "reuse": {
+    "status": "approved",
+    "approvedBy": "user",
+    "approvedOn": "2026-09-21",
+    "story": {
+      "header": "2026.09.21 周一",
+      "title": "走走再歇歇",
+      "fictional": true,
+      "sourceText": "我和狗一起慢慢走了一段。后来狗停下闻闻，猫在旁边走了几步。回去后我坐下看书，猫趴在身边休息。",
+      "events": [
+        {
+          "caption": "出门慢慢走"
+        },
+        {
+          "caption": "停下闻一闻"
+        },
+        {
+          "caption": "坐下翻几页"
+        }
+      ]
+    },
+    "sceneInstances": [
+      [
+        {
+          "id": "human-walk-right",
+          "image": {
+            "path": "actions-v1/components-v2/human-walk-right.png",
+            "sha256": "60fee2b9cb733b6c59dd62aebb467cca5b004c4e66d5988a2e06d9999c889f3d"
+          },
+          "scale": 0.41025641025641024,
+          "bounds": [
+            4,
+            4,
+            180,
+            320
+          ]
+        },
+        {
+          "id": "dog-walk-right",
+          "image": {
+            "path": "actions-v1/components-v2/dog-walk-right.png",
+            "sha256": "766b94c6159610550324ed092129e9e5dd18024c5bdff0ee91445187ab977924"
+          },
+          "scale": 0.3646833013435701,
+          "bounds": [
+            224,
+            134,
+            208,
+            190
+          ]
+        }
+      ],
+      [
+        {
+          "id": "cat-walk-right",
+          "image": {
+            "path": "actions-v1/components-v2/cat-walk-right.png",
+            "sha256": "c350385a78f9f24eb8294069567204e6f88b660769d7a01e76d2bb4f4496807f"
+          },
+          "scale": 0.33697632058287796,
+          "bounds": [
+            5,
+            5,
+            171,
+            185
+          ]
+        },
+        {
+          "id": "dog-sniff-right",
+          "image": {
+            "path": "actions-v1/components-v2/dog-sniff-right.png",
+            "sha256": "7a5e0963c98044b8857eb8ac789cd304a8cd29c8de8bc2f9205eddc495da0788"
+          },
+          "scale": 0.423728813559322,
+          "bounds": [
+            216,
+            15,
+            258,
+            175
+          ]
+        }
+      ],
+      [
+        {
+          "id": "human-read-right",
+          "image": {
+            "path": "actions-v1/components-v2/human-read-right.png",
+            "sha256": "fdd6827bab21ada95bd19d8a6feaa75d5e01f11ce3a128dfdbb284e3874d0608"
+          },
+          "scale": 0.40843214756258234,
+          "bounds": [
+            4,
+            4,
+            180,
+            310
+          ]
+        },
+        {
+          "id": "cat-lie-right",
+          "image": {
+            "path": "actions-v1/components-v2/cat-lie-right.png",
+            "sha256": "7744e4945e13469d476ebaae82ceb4a2024f36c10aa2cfb3d44a5a810c2818db"
+          },
+          "scale": 0.31893004115226337,
+          "bounds": [
+            224,
+            159,
+            195,
+            155
+          ]
+        }
+      ]
+    ],
+    "sceneCenters": [
+      0.3,
+      0.56,
+      0.82
+    ],
+    "placedBounds": [
+      [
+        256,
+        316,
+        436,
+        328
+      ],
+      [
+        236,
+        799,
+        476,
+        194
+      ],
+      [
+        262,
+        1153,
+        423,
+        318
+      ]
+    ],
+    "compositionGenerationCalls": 0,
+    "note": "Action sprites were generated once, then reused unchanged except uniform scale and translation."
+  },
+  "outputs": {
+    "cover.png": "c9dca149a23dbe7d60b769a445451619e11ebdf7be956c179ec55e185b174cd2",
+    "diary-poster.png": "b9b3f804bc02bbffa64daa705406bd921ad61bbea648c20230a6392f4d3d230f",
+    "action-library.png": "75352604ed42f62f90ce5939b30ea5e65aa1b0618d2b8fb4674f4c4b3ffe6c09"
+  }
+}

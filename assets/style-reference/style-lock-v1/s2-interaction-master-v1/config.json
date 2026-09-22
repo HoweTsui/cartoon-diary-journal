@@ -1,0 +1,76 @@
+{
+  "id": "s2-interaction",
+  "title": "碰面聊一聊",
+  "composition": "group",
+  "tags": [
+    "interaction",
+    "outdoors"
+  ],
+  "scenes": [
+    "短发主角与短波波头朋友面对面挥手打招呼",
+    "两人坐在长椅上聊天"
+  ],
+  "captions": [
+    "路上遇见朋友",
+    "坐下聊了一会"
+  ],
+  "rowBoundaries": [
+    0,
+    0.53,
+    1
+  ],
+  "styleVersion": "style-lock-v1",
+  "masterSource": "master-approved-v1.png",
+  "masterSha256": "c5f9b46836b82a3b2614ce500492654720ef86f3316c2346cc3eb849e548f66a",
+  "sourceSha256": "021672ce9b2ac1eb5c896e5d3c1c7eb4131f4b4cc619ada31799e46995fcb80b",
+  "sourceText": "短发主角与短波波头朋友面对面挥手打招呼。两人坐在长椅上聊天。",
+  "fictional": true,
+  "sceneCount": 2,
+  "sceneBoxes": [
+    [
+      0.06,
+      0.1875,
+      0.67,
+      0.355
+    ],
+    [
+      0.06,
+      0.5775,
+      0.67,
+      0.355
+    ]
+  ],
+  "sceneCenters": [
+    0.365,
+    0.755
+  ],
+  "placedBounds": [
+    [
+      111,
+      300,
+      726,
+      568
+    ],
+    [
+      90,
+      924,
+      767,
+      568
+    ]
+  ],
+  "sourceRects": [
+    [
+      133,
+      59,
+      997,
+      735
+    ],
+    [
+      143,
+      796,
+      953,
+      1396
+    ]
+  ],
+  "status": "draft"
+}

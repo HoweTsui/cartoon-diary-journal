@@ -35,7 +35,15 @@ def text_lines(draw, value, font, max_width):
             line = char
         else:
             line = candidate
-    return lines + ([line] if line else [])
+    lines += [line] if line else []
+    # Avoid a one-character last line in short diary captions. Keep every
+    # character and the original font size; move only the line break.
+    if len(lines) == 2 and len(lines[-1]) == 1 and len(lines[0]) > 2:
+        split = (len(value) + 1) // 2
+        balanced = [value[:split], value[split:]]
+        if all(draw.textbbox((0, 0), part, font=font)[2] <= max_width for part in balanced):
+            return balanced
+    return lines
 
 
 def render_png(brief, illustration, output, centers):

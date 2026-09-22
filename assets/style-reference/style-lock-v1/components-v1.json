@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "id": "components-v1",
+  "status": "approved",
+  "approvedBy": "user",
+  "approvedOn": "2026-09-21",
+  "approvalScope": "existing six components and component-trial-v2 combination only; excludes new actions",
+  "scope": "fictional-demo-only",
+  "source": "master-approved-v1.png",
+  "sourceSha256": "c5f9b46836b82a3b2614ce500492654720ef86f3316c2346cc3eb849e548f66a",
+  "sourceSize": [1536, 1024],
+  "transforms": ["uniform-scale", "translate"],
+  "components": [
+    {"id":"human-standing-right", "species":"human", "kind":"whole-character", "crop":[200,50,220,500], "pose":"standing", "facing":"reference-side-right"},
+    {"id":"cat-sitting-right", "species":"cat", "kind":"whole-character", "crop":[95,640,260,305], "pose":"sitting", "facing":"reference-side-right"},
+    {"id":"dog-sitting-right", "species":"dog", "kind":"whole-character", "crop":[825,600,270,345], "pose":"sitting", "facing":"reference-side-right"},
+    {"id":"human-face-neutral", "species":"human", "kind":"face-reference", "crop":[480,195,245,250], "pose":"neutral", "facing":"reference-side-right"},
+    {"id":"cat-face-neutral", "species":"cat", "kind":"face-reference", "crop":[378,703,199,177], "pose":"neutral", "facing":"reference-side-right"},
+    {"id":"dog-face-neutral", "species":"dog", "kind":"face-reference", "crop":[1153,760,255,183], "pose":"neutral", "facing":"reference-side-right"}
+  ]
+}

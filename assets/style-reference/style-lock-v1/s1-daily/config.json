@@ -1,0 +1,48 @@
+{
+  "id": "s1-daily",
+  "title": "慢慢吃早餐",
+  "composition": "solo",
+  "tags": [
+    "home",
+    "daily"
+  ],
+  "scenes": [
+    "坐在小桌前吃面包，旁边一个杯子"
+  ],
+  "captions": [
+    "慢慢吃早餐"
+  ],
+  "styleVersion": "style-lock-v1",
+  "masterSource": "master-draft.png",
+  "sourceText": "坐在小桌前吃面包，旁边一个杯子。",
+  "fictional": true,
+  "sceneCount": 1,
+  "sceneBoxes": [
+    [
+      0.06,
+      0.1875,
+      0.67,
+      0.745
+    ]
+  ],
+  "sceneCenters": [
+    0.56
+  ],
+  "placedBounds": [
+    [
+      72,
+      349,
+      804,
+      1094
+    ]
+  ],
+  "sourceRects": [
+    [
+      215,
+      311,
+      942,
+      1300
+    ]
+  ],
+  "status": "draft"
+}

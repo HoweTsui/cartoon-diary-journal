@@ -1,0 +1,197 @@
+{
+  "schemaVersion": 1,
+  "id": "actions-v1",
+  "status": "draft",
+  "requiredReferences": [
+    {
+      "path": "master-approved-v1.png",
+      "sha256": "c5f9b46836b82a3b2614ce500492654720ef86f3316c2346cc3eb849e548f66a"
+    },
+    {
+      "path": "actions-v1/reference-inputs/cat-face-neutral.png",
+      "sha256": "03e262e465e65256b1b7791a1c9c7572b89bd0962820f7bbd60f042d7a2f011c"
+    },
+    {
+      "path": "actions-v1/reference-inputs/cat-sitting-right.png",
+      "sha256": "e01ea7e6c29397c5126ba50fbfcd1ad6ace13e4c16a03c48eee6967416b1bce4"
+    },
+    {
+      "path": "actions-v1/reference-inputs/dog-face-neutral.png",
+      "sha256": "c31280c0a788523e18449d53a5bf08d396f78a71c52df6fe6ea2fa666286d728"
+    },
+    {
+      "path": "actions-v1/reference-inputs/dog-sitting-right.png",
+      "sha256": "14627cc6089bc7c107d9e65e49b0fe589577a47a97dc82459f899a81e8655482"
+    },
+    {
+      "path": "actions-v1/reference-inputs/human-face-neutral.png",
+      "sha256": "8872d0d99717dc7310003abe570da68566210460dfe03f2832781af60f1103b7"
+    },
+    {
+      "path": "actions-v1/reference-inputs/human-standing-right.png",
+      "sha256": "998191b2025c36e9660c4a2822901cc244590880b12441a72ff625d964d8bae6"
+    }
+  ],
+  "allowedTransforms": [
+    "uniform-scale",
+    "translate"
+  ],
+  "actions": [
+    {
+      "id": "human-walk-right",
+      "label": "人物 · 走路",
+      "species": "human",
+      "pose": "walking",
+      "facing": "reference-side-right",
+      "status": "draft",
+      "approvedBy": null,
+      "identityScope": "fictional-demo-only",
+      "source": {
+        "path": "actions-v1/sheets/human.png",
+        "sha256": "980b313f993f3337fdb9ab4e929083714d07da4f7e15d6718c2a4882b1958a6f"
+      },
+      "sourceRect": [
+        187,
+        158,
+        625,
+        938
+      ],
+      "background": "generated-alpha-preserved",
+      "facePreservation": "reference-guided-not-pixel-identical",
+      "image": {
+        "path": "actions-v1/components/human-walk-right.png",
+        "sha256": "60fee2b9cb733b6c59dd62aebb467cca5b004c4e66d5988a2e06d9999c889f3d"
+      }
+    },
+    {
+      "id": "human-read-right",
+      "label": "人物 · 坐着看书",
+      "species": "human",
+      "pose": "reading",
+      "facing": "reference-side-right",
+      "status": "draft",
+      "approvedBy": null,
+      "identityScope": "fictional-demo-only",
+      "source": {
+        "path": "actions-v1/sheets/human.png",
+        "sha256": "980b313f993f3337fdb9ab4e929083714d07da4f7e15d6718c2a4882b1958a6f"
+      },
+      "sourceRect": [
+        968,
+        180,
+        1408,
+        939
+      ],
+      "background": "generated-alpha-preserved",
+      "facePreservation": "reference-guided-not-pixel-identical",
+      "image": {
+        "path": "actions-v1/components/human-read-right.png",
+        "sha256": "fdd6827bab21ada95bd19d8a6feaa75d5e01f11ce3a128dfdbb284e3874d0608"
+      }
+    },
+    {
+      "id": "cat-walk-right",
+      "label": "猫 · 走路",
+      "species": "cat",
+      "pose": "walking",
+      "facing": "reference-side-right",
+      "status": "draft",
+      "approvedBy": null,
+      "identityScope": "fictional-demo-only",
+      "source": {
+        "path": "actions-v1/sheets/cat.png",
+        "sha256": "584a861a0d6d3cd1e57c885314c997839a8eb1a1051edcd5335173028d5d4b62"
+      },
+      "sourceRect": [
+        89,
+        238,
+        594,
+        787
+      ],
+      "background": "generated-alpha-preserved",
+      "facePreservation": "reference-guided-not-pixel-identical",
+      "image": {
+        "path": "actions-v1/components/cat-walk-right.png",
+        "sha256": "ae0ba059dccf5d920deb45a06b5099873405bdcaff66da345c6a67030e87bb27"
+      }
+    },
+    {
+      "id": "cat-lie-right",
+      "label": "猫 · 趴卧",
+      "species": "cat",
+      "pose": "lying-awake",
+      "facing": "reference-side-right",
+      "status": "draft",
+      "approvedBy": null,
+      "identityScope": "fictional-demo-only",
+      "source": {
+        "path": "actions-v1/sheets/cat.png",
+        "sha256": "584a861a0d6d3cd1e57c885314c997839a8eb1a1051edcd5335173028d5d4b62"
+      },
+      "sourceRect": [
+        855,
+        290,
+        1466,
+        776
+      ],
+      "background": "generated-alpha-preserved",
+      "facePreservation": "reference-guided-not-pixel-identical",
+      "image": {
+        "path": "actions-v1/components/cat-lie-right.png",
+        "sha256": "f4d273050f24d73a541c78e68f0619097e454002d631d5717ac6b9934fadbcaa"
+      }
+    },
+    {
+      "id": "dog-walk-right",
+      "label": "狗 · 走路",
+      "species": "dog",
+      "pose": "walking",
+      "facing": "reference-side-right",
+      "status": "draft",
+      "approvedBy": null,
+      "identityScope": "fictional-demo-only",
+      "source": {
+        "path": "actions-v1/sheets/dog.png",
+        "sha256": "a3db78c2f973c1004b89c8f5b29d207fce049891eb1576e4fa5100740a5e829b"
+      },
+      "sourceRect": [
+        128,
+        280,
+        698,
+        801
+      ],
+      "background": "generated-alpha-preserved",
+      "facePreservation": "reference-guided-not-pixel-identical",
+      "image": {
+        "path": "actions-v1/components/dog-walk-right.png",
+        "sha256": "766b94c6159610550324ed092129e9e5dd18024c5bdff0ee91445187ab977924"
+      }
+    },
+    {
+      "id": "dog-sniff-right",
+      "label": "狗 · 低头闻闻",
+      "species": "dog",
+      "pose": "sniffing",
+      "facing": "reference-side-right",
+      "status": "draft",
+      "approvedBy": null,
+      "identityScope": "fictional-demo-only",
+      "source": {
+        "path": "actions-v1/sheets/dog.png",
+        "sha256": "a3db78c2f973c1004b89c8f5b29d207fce049891eb1576e4fa5100740a5e829b"
+      },
+      "sourceRect": [
+        871,
+        388,
+        1481,
+        801
+      ],
+      "background": "generated-alpha-preserved",
+      "facePreservation": "reference-guided-not-pixel-identical",
+      "image": {
+        "path": "actions-v1/components/dog-sniff-right.png",
+        "sha256": "7a5e0963c98044b8857eb8ac789cd304a8cd29c8de8bc2f9205eddc495da0788"
+      }
+    }
+  ]
+}

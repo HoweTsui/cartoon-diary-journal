@@ -261,6 +261,49 @@ def geometry(data):
         raise ValueError("arm/leg widths must match within 10% and retain white channels")
     return value
 
+
+def validate_reference_mapping(references, events, character_ids):
+    """Check authored reference scope; never infer it from image content."""
+    ref_ids, scene_ids, by_asset = set(), set(), {}
+    for ref in references:
+        rid = ref.get('id')
+        if 'id' in ref:
+            if not isinstance(rid, str) or not rid.strip() or rid != rid.strip() or len(rid) > 64:
+                raise ValueError('reference.id must be a non-empty ID of at most 64 characters without outer whitespace')
+            if rid in ref_ids:
+                raise ValueError('duplicate reference.id: ' + rid)
+            ref_ids.add(rid)
+        if ref['role'] == 'scene':
+            if rid is None:
+                raise ValueError('scene reference requires id and explicit event.referenceIds mapping')
+            scene_ids.add(rid)
+        if 'characterIds' in ref:
+            cids = ref['characterIds']
+            if (not ref['role'].startswith('identity-') or not isinstance(cids, list) or not cids or
+                    any(not isinstance(cid, str) or cid not in character_ids for cid in cids) or
+                    len(set(cids)) != len(cids)):
+                raise ValueError('reference.characterIds must be a non-empty unique list of registered IDs on identity references only')
+        # attach() deduplicates by path/role. Reject conflicting metadata before
+        # that can discard an event ID or silently change an identity's scope.
+        key = (ref['path'], ref['role'])
+        if key in by_asset and by_asset[key] != ref:
+            raise ValueError('duplicate reference path/role has conflicting mapping; reuse one reference across events/characters')
+        by_asset[key] = ref
+    used = set()
+    for index, event in enumerate(events, 1):
+        mapped = event.get('referenceIds', [])
+        if (not isinstance(mapped, list) or any(not isinstance(rid, str) for rid in mapped) or
+                len(set(mapped)) != len(mapped)):
+            raise ValueError(f'event {index}.referenceIds must be a unique list of scene reference IDs')
+        if set(mapped) - scene_ids:
+            raise ValueError(f'event {index}.referenceIds must name declared role=scene references: ' +
+                             ', '.join(sorted(set(mapped) - scene_ids)))
+        used.update(mapped)
+    if scene_ids - used:
+        raise ValueError('scene references require explicit event.referenceIds mapping; unmapped: ' +
+                         ', '.join(sorted(scene_ids - used)))
+
+
 def validate_brief(data, base, preview=False, graph=None):
     if any(key in data for key in ("images", "sourceImages", "text")):
         raise ValueError("migrate legacy text/images/sourceImages to sourceText and references")
@@ -324,13 +367,23 @@ def validate_brief(data, base, preview=False, graph=None):
         if origin == "user-photo":
             user_photo_paths.add(path)
         roles.add(ref["role"])
-        resolved.append({"path": str(full), "role": ref["role"], "origin": origin})
+        item = {"path": str(full), "role": ref["role"], "origin": origin}
+        for field in ('id', 'characterIds'):
+            if field in ref:
+                item[field] = list(ref[field]) if isinstance(ref[field], list) else ref[field]
+        resolved.append(item)
     validate_photo_archive(data, base, user_photo_paths)
     needed = {"identity-source"} if kind == "onboarding" else ({"identity-approved"} if not preview else {"identity-draft", "identity-approved"})
     if not roles.intersection(needed):
         raise ValueError("missing identity reference role: " + "/".join(sorted(needed)))
-    result = {"kind": kind, "role": "draft-preview" if preview else "production", "identity": identity, "protagonistId": data["protagonistId"], "characters": chars, "references": resolved + bundled_references(kind), "geometry": geometry(data)}
+    from diary_style_lock import DEFAULT_VERSION, attach
+    style_request = data.get('styleLock', {'version': DEFAULT_VERSION})
+    if not preview and identity.get('styleVersion') != DEFAULT_VERSION:
+        raise ValueError('identity.styleVersion must match the current master; calibrate the character card in preview first')
+    result = {"kind": kind, "role": "draft-preview" if preview else "production", "identity": identity, "protagonistId": data["protagonistId"], "characters": chars, "references": resolved, "geometry": geometry(data)}
     if kind == "onboarding":
+        validate_reference_mapping(resolved, [], ids)
+        attach(result, style_request, preview)
         return result
     if not isinstance(data.get("sourceText"), str) or not data["sourceText"].strip():
         raise ValueError("full sourceText required; do not truncate source")
@@ -357,6 +410,7 @@ def validate_brief(data, base, preview=False, graph=None):
         if not isinstance(cids, list) or not cids or any(not isinstance(c, str) or c not in ids for c in cids) or len(set(cids)) != len(cids):
             raise ValueError("event characters must be unique registered IDs")
         e["characters"] = cids
+        e['referenceIds'] = event.get('referenceIds', [])
         for field, allowed in (("eye_state", EYES), ("intensity", {"mild", "medium", "strong"}), ("eyebrows", {"none", "raised", "furrowed"})):
             if not isinstance(event.get(field), str) or event[field] not in allowed:
                 raise ValueError(field + " must be explicitly authored from allowed values")
@@ -385,28 +439,83 @@ def validate_brief(data, base, preview=False, graph=None):
                 raise ValueError("eyebrows require an explicitly authored strong expression for " + cid)
         selected.append(e)
     result["events"] = selected
+    validate_reference_mapping(resolved, selected, ids)
+    attach(result, style_request, preview)
     return result
 
 def build_prompt(brief):
     # Preserve sourceText in the input archive only, never in the render prompt.
     render = {k: v for k, v in brief.items() if k != "sourceText"}
-    rules = (SKILL_ROOT / "references/style-system.md").read_text(encoding="utf-8")
-    purpose = "Create one full-body character lineup. Correct old geometry while preserving broad identity features. No preexisting approved atlas required. Use neutral_dot and no eyebrows." if brief["kind"] == "onboarding" else ("Create an expression/action test sheet from selected scenes." if brief["kind"] == "expression" else "Create one complete 3:4 diary poster from selected scenes.")
+    from diary_style_lock import CONTRACT
+    rules = CONTRACT.read_text(encoding='utf-8')
+    purpose = "Create one full-body character lineup. Correct old geometry while preserving broad identity features. No preexisting approved atlas required. Use neutral_dot and no eyebrows." if brief["kind"] == "onboarding" else "Create an expression/action test sheet from selected scenes."
     bundled = [item for item in brief["references"] if item.get("origin") == "bundled"]
     fixed_pack = "\n".join(f"- {item.get('id')}: {item['path']} ({item['role']})" for item in bundled)
-    text_plan = "" if brief["kind"] != "diary" else (
-        "Before drawing, reserve the header and right caption lane defined in "
-        "assets/templates/diary-poster-text-layout.json. No objects in those zones; horizontal paper rules must continue through the caption lane. No vertical divider. "
-        "Generate the illustration with no letters, numbers, captions, dates, or title. "
-        "A local post-process applies the Yozai text layer after image approval."
-    )
+    text_plan = ''
+    if brief['kind'] == 'diary':
+        purpose = ('Create exactly ONE isolated scene illustration, no paper, text or panel borders. Keep all characters and props complete.'
+                   if len(brief['events']) == 1 else
+                   'Planning overview only: do not render these events together. Export each event with --scene N --request-output before generation.')
+        text_plan = ('Each single-scene request requires generous transparent margins on every side, '
+                     'preserving opaque WHITE character and prop interiors. '
+                     'Scene boxes are invisible placement limits, never rectangular image frames. Background lines end naturally '
+                     'around a small necessary prop; no full rooms, panoramic counters, walls or floors filling a band. '
+                     'Local composition fits complete scenes without cropping and adds paper rules and Yozai text. '
+                     'Do not draw dates, titles, captions, bubbles, labels, letters, numbers or paper lines.')
     return "\n".join([purpose, "Draft preview is not identity approval; never label it confirmed.", rules,
-        "Reference roles: identity-source supplies broad features only; identity-draft is provisional; identity-approved locks identity; style/layout supply their named role only; scene supplies facts. Attach every listed image, including the mandatory fixed pack below.",
+        "Reference roles: identity-source supplies broad features only; identity-draft is provisional; identity-approved locks identity features such as hairstyle, clothing and accessories, never old drawing geometry. The current master and canonical geometry define drawing style and proportions; scene supplies only the mapped event facts. An identity card without characterIds is a shared lineup: use only the event's listed characters. Scoped identity cards apply only to their characterIds. Attach every listed image, including the mandatory fixed pack below.",
         "Mandatory bundled reference pack (all must be attached):", fixed_pack,
         text_plan,
-        "Only header/title/caption/bubble/summary are renderable text; onboarding may label character names. All other metadata and scene descriptions are drawing instructions, never printed. No additional text.",
-        "Use each character's own species dimensions and anchors. Per-character expressions override event expression for that character; event expression applies only to characters without an override. Never spread one person's emotion to a pet with its own override. Selected eye_state overrides neutral expression only: open eye dots remain circular, lids only occlude them, closed eyes remain arcs. Temporary eyebrows require an explicitly authored strong exaggerated expression. Preserve identity, nose, upper contour gap and proportions; mouth length/shape follows the authored emotion at its low rear-side position.",
+        ("No text anywhere in style-lock illustration assets; all text is local composition." if 'styleLock' in brief else "Only header/title/caption/bubble/summary are renderable text; onboarding may label character names. All other metadata and scene descriptions are drawing instructions, never printed. No additional text."),
+        "Use each character's own species dimensions and observable identity anchors. Preserve hairstyle, clothing and accessories from identity references. Take nose shape, upper contour gap, eye structure and body proportions from the current master and canonical geometry, correcting conflicting old-card geometry even during onboarding or preview. Geometry dimensions use head width H as the unit. Per-character expressions override event expression for that character; event expression applies only to characters without an override. Never spread one person's emotion to a pet with its own override. Selected eye_state overrides neutral expression only: open eye dots remain circular, lids only occlude them, closed eyes remain arcs. Temporary eyebrows require an explicitly authored strong exaggerated expression. Mouth length/shape follows the authored emotion at its low rear-side position.",
         json.dumps(render, ensure_ascii=False, indent=2)])
+
+
+def generation_request(brief, scene=None):
+    """Return the exact built-in imagegen arguments, with a checked master first.
+
+    This prepares inputs; only the actual tool invocation proves transmission.
+    A diary call draws ONE isolated event to avoid dense strip/panel generation.
+    """
+    import copy
+    from diary_style_lock import LIBRARY, asset, load_library
+    expected = asset(LIBRARY.parent, load_library()['master'])
+    refs = brief['references']
+    if not refs or refs[0].get('id') != 'style-lock-master' or refs[0]['path'] != expected:
+        raise ValueError('generation request requires the current master as the first attachment')
+    selected = copy.deepcopy(brief)
+    if brief['kind'] == 'diary':
+        if isinstance(scene, bool) or not isinstance(scene, int) or not 1 <= scene <= len(brief['events']):
+            raise ValueError('diary generation request requires --scene 1..N; do not generate horizontal strips')
+        validate_reference_mapping(refs, brief['events'], {c['id'] for c in brief['characters']})
+        selected['events'] = [selected['events'][scene - 1]]
+        visible = set(selected['events'][0]['characters'])
+        selected['characters'] = [c for c in selected['characters'] if c['id'] in visible]
+        if selected['protagonistId'] not in visible:
+            selected['protagonistId'] = next(c['id'] for c in selected['characters'])
+        mapped = set(selected['events'][0].get('referenceIds', []))
+        selected['references'] = [r for r in selected['references']
+                                  if r['role'] != 'layout'
+                                  and (r['role'] != 'scene' or r['id'] in mapped)
+                                  and ('characterIds' not in r or visible.intersection(r['characterIds']))]
+        identity_roles = {'identity-approved'} if brief['role'] == 'production' else {'identity-draft', 'identity-approved'}
+        for cid in visible:
+            if not any(r['role'] in identity_roles and ('characterIds' not in r or cid in r['characterIds'])
+                       for r in selected['references']):
+                raise ValueError('selected scene has no matching identity reference for character: ' + cid)
+        selected['styleLock'] = {k:v for k,v in selected['styleLock'].items()
+                                 if k not in {'templateId','sceneCount','sceneBoxes'}}
+    elif scene is not None:
+        raise ValueError('--scene is only for diary')
+    prompt = build_prompt(selected)
+    if brief['kind'] == 'diary':
+        prompt += ('\nDraw exactly ONE isolated vignette, not a poster, strip, grid or contact sheet. '
+                   'Transparent exterior with generous transparent margins on every side; opaque WHITE interiors. '
+                   'One clear action focus with minimum props, entire heads/feet/tails intact. '
+                   'Facts not depictable in this one moment stay in the diary prose; do not invent extra panels. '
+                   'No paper lines, no text, no rectangular filled background or straight cut-off scenery edges.')
+    paths = list(dict.fromkeys(r['path'] for r in selected['references']))
+    return {'prompt': prompt + '\n', 'referenced_image_paths': paths}
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
@@ -414,16 +523,27 @@ def main():
     parser.add_argument("--output", type=Path)
     parser.add_argument("--graph", type=Path, help="Optional legacy graph; explicit species still required")
     parser.add_argument("--preview", action="store_true", help="User-requested draft; never grants approval")
+    parser.add_argument("--scene", type=int, help="Generate one isolated diary event, 1-based")
+    parser.add_argument("--request-output", type=Path, help="Exact imagegen argument JSON; use these attachments in the tool call")
     args = parser.parse_args()
     try:
         brief = validate_brief(load_brief(args.brief), args.brief.parent, args.preview, args.graph)
-        prompt = build_prompt(brief)
+        prompt = build_prompt(brief) + '\n'
+        if args.request_output:
+            destinations = [args.request_output.resolve()] + ([args.output.resolve()] if args.output else [])
+            if args.brief.resolve() in destinations or len(set(destinations)) != len(destinations):
+                raise ValueError('request, prompt and input brief paths must be different')
+            request = generation_request(brief, args.scene)
+            prompt = request['prompt']
+            args.request_output.write_text(json.dumps(request, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+        elif args.scene is not None:
+            raise ValueError('--scene requires --request-output')
         if args.output:
             if args.output.resolve() == args.brief.resolve():
                 raise ValueError("output must not overwrite source brief")
-            args.output.write_text(prompt + "\n", encoding="utf-8")
+            args.output.write_text(prompt, encoding="utf-8")
         else:
-            print(prompt)
+            print(prompt, end='')
     except (ValueError, OSError) as exc:
         print("error: " + str(exc), file=sys.stderr)
         return 2

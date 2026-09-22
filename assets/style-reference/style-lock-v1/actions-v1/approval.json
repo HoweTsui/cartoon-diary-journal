@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "library": "actions-v2",
+  "status": "approved",
+  "approvedBy": "user",
+  "approvedOn": "2026-09-21",
+  "scope": {
+    "actionIds": [
+      "human-walk-right",
+      "human-read-right",
+      "cat-walk-right",
+      "cat-lie-right",
+      "dog-walk-right",
+      "dog-sniff-right"
+    ],
+    "allowedTransforms": [
+      "uniform-scale",
+      "translate"
+    ],
+    "identityScope": "fictional-demo-only"
+  },
+  "excludes": [
+    "new actions",
+    "left-facing variants",
+    "head-body compositing",
+    "real user character identities"
+  ]
+}

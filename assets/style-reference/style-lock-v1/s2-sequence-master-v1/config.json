@@ -1,0 +1,77 @@
+{
+  "id": "s2-sequence",
+  "revision": "-v2",
+  "rowBoundaries": [
+    0,
+    0.535,
+    1
+  ],
+  "title": "雨停再出门",
+  "composition": "solo",
+  "tags": [
+    "outdoors",
+    "sequence"
+  ],
+  "scenes": [
+    "一人拿伞在窗前看雨",
+    "雨停了，同一人收起伞走出门"
+  ],
+  "captions": [
+    "先等等这场雨",
+    "雨停再出门"
+  ],
+  "styleVersion": "style-lock-v1",
+  "masterSource": "master-approved-v1.png",
+  "masterSha256": "c5f9b46836b82a3b2614ce500492654720ef86f3316c2346cc3eb849e548f66a",
+  "sourceSha256": "89635837f9d9d303f3a204a69291b2d4715fe3ebb320988e6cb126685ce58b85",
+  "sourceText": "一人拿伞在窗前看雨。雨停了，同一人收起伞走出门。",
+  "fictional": true,
+  "sceneCount": 2,
+  "sceneBoxes": [
+    [
+      0.06,
+      0.1875,
+      0.67,
+      0.355
+    ],
+    [
+      0.06,
+      0.5775,
+      0.67,
+      0.355
+    ]
+  ],
+  "sceneCenters": [
+    0.365,
+    0.7553125
+  ],
+  "placedBounds": [
+    [
+      112,
+      300,
+      723,
+      568
+    ],
+    [
+      72,
+      976,
+      804,
+      465
+    ]
+  ],
+  "sourceRects": [
+    [
+      171,
+      86,
+      1038,
+      767
+    ],
+    [
+      45,
+      818,
+      1051,
+      1400
+    ]
+  ],
+  "status": "draft"
+}

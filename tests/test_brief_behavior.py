@@ -38,11 +38,12 @@ class BriefTests(unittest.TestCase):
     def test_fixed_reference_pack_is_auto_attached(self):
         value = self.valid()
         bundled = [item for item in value["references"] if item.get("origin") == "bundled"]
-        self.assertEqual(len(bundled), 4)
-        self.assertEqual({item["role"] for item in bundled}, {"style", "layout"})
+        self.assertEqual([item['id'] for item in bundled], ['style-lock-master'])
+        self.assertEqual(value['references'][0]['id'], 'style-lock-master')
         prompt = build_prompt(value)
         self.assertIn("Mandatory bundled reference pack", prompt)
-        self.assertIn("approved-diary-layout-3x4.png", prompt)
+        self.assertIn("master-approved-v1.png", prompt)
+        self.assertNotIn("approved-human-geometry-v11.png", prompt)
     def test_user_photo_requires_archived_compressed_copy(self):
         self.data["references"][0]["origin"] = "user-photo"
         with self.assertRaisesRegex(ValueError, "photoArchive"):
@@ -55,7 +56,7 @@ class BriefTests(unittest.TestCase):
         (reference / "identity.jpg").write_bytes((SKILL_ROOT / "assets/style-reference/character-lineup-demo.png").read_bytes())
         (archive / "archive-manifest.json").write_text(json.dumps({"schemaVersion": 1, "photos": [{"compressedPath": "reference/identity.jpg"}]}), encoding="utf-8")
         self.data["photoArchive"] = {"manifest": "archive/archive-manifest.json"}
-        self.assertEqual(self.valid()["references"][0]["origin"], "user-photo")
+        self.assertEqual(self.valid()["references"][1]["origin"], "user-photo")
     def test_text_layer_uses_local_yozai_and_reserves_caption_lane(self):
         output = self.base / "poster-layer"
         (self.base / "brief.json").write_text(json.dumps(self.data, ensure_ascii=False), encoding="utf-8")
@@ -76,7 +77,7 @@ class BriefTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "approvedVersion"):
             self.valid(False)
     def test_confirmed_production_allowed(self):
-        self.data["identity"] = {"status": "confirmed", "version": "v1", "approvedVersion": "v1", "approvedBy": "user"}
+        self.data["identity"] = {"status": "confirmed", "version": "v1", "approvedVersion": "v1", "approvedBy": "user", "styleVersion": "style-lock-v1"}
         self.data["references"][0]["role"] = "identity-approved"
         self.assertEqual(self.valid(False)["role"], "production")
     def test_onboarding_without_graph(self):

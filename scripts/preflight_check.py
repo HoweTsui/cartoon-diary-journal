@@ -34,6 +34,9 @@ REQUIRED_FILES = (
     "agents/openai.yaml",
     "references/character-library.md",
     "references/style-system.md",
+    "references/style-contract.md",
+    "references/style-lock.md",
+    "scripts/diary_style_lock.py",
     "references/visual-atoms.md",
     "references/visual-gate.md",
     "references/prompt-template.md",
@@ -213,14 +216,12 @@ def check_package(failures: list[str]) -> None:
             fail(f"SKILL.md points to missing path: {reference}", failures)
 
     try:
-        reference_manifest = json.loads((SKILL_ROOT / "assets/style-reference/reference-manifest.json").read_text(encoding="utf-8"))
-        if reference_manifest.get("schemaVersion") != 1 or len(reference_manifest.get("references", [])) < 4:
-            raise ValueError("expected four approved references")
-        for item in reference_manifest["references"]:
-            relative = valid_relative_asset_path(item.get("path"), "reference manifest path")
-            if not (SKILL_ROOT / relative).is_file():
-                raise ValueError("missing " + relative)
-        print("PASS  approved fixed reference pack")
+        from diary_style_lock import LIBRARY, attach
+        sample = {'kind': 'onboarding', 'references': []}
+        attach(sample, {'version': 'style-lock-v1'}, True, LIBRARY)
+        if sample['references'][0]['id'] != 'style-lock-master':
+            raise ValueError('default master is not the first reference')
+        print("PASS  approved default master (integrity only; not image style approval)")
     except (OSError, ValueError, json.JSONDecodeError) as exc:
         fail(f"fixed reference pack invalid: {exc}", failures)
 

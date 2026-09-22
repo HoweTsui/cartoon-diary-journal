@@ -71,7 +71,7 @@ v0.3.0 默认展示入口为 [手写3D日记本](diary-reader-v3.md)，导入下
       "title": "背单词、双周会和三杯鸡",
       "posterSrc": "assets/entries/2026-08-28.png",
       "summary": "一天里的几个小转折。",
-      "characterIds": ["aha", "ayan"],
+      "characterIds": ["example-person", "example-friend"],
       "tags": ["工作", "晚饭"]
     }
   ]

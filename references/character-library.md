@@ -2,7 +2,7 @@
 
 新图brief的characters使用精确id、name、species和身份anchors，protagonistId不得靠列表首项推断。角色卡与表情按style-system.md及geometry.json构造，每个角色使用自己的物种尺寸。
 
-新角色先以identity-source和--preview生成draft人物形象卡：一张图内清楚展示全身、脸部细节与从输入照片/文字提取的可观察锚点（发型、眼镜、服装、耳尾等），并附固定参考包。用户确认卡片的当前版本后才记录confirmed、approvedVersion和approvedBy=user；之后正式海报直接复用该身份版本，不逐篇重新确认。图谱status=actual仅说明实际数据，不代表用户审批。
+新角色先以identity-source和--preview生成draft人物形象卡：一张图内清楚展示全身、脸部细节与从输入照片/文字提取的可观察锚点（发型、眼镜、服装、耳尾等），第一张附件始终为当前已确认母版。旧画风角色卡先按母版校准，不能继承错误五官。用户确认卡片的当前版本后才记录confirmed、approvedVersion、approvedBy=user和identity.styleVersion=style-lock-v1；之后正式海报直接复用该身份版本，不逐篇重新确认。图谱status=actual仅说明实际数据，不代表用户审批。
 
 图谱兼容assets/templates/character-graph-data.example.json和原build_character_graph.py接口：atlas.src/cols/rows；nodes的id/name/role/col/row/x/y/anchors；edges的source/target/label/type/curve。新节点可带profile：approval 为 draft 或 approved、appearance 为固定外观列表、standardCardSrc 为相对图谱的标准卡图片、firstAppearance 为首次出现的日记说明。右侧详情以“新角色草稿”或“可用于正式成品”展示，避免抽象状态名。图谱anchors仍至少四条；brief允许两条起步，入图库前补齐实际可见特征。不借用模板人物。仅记录用户提供或确认的关系；未说明的关系不画边、不猜标签。
 

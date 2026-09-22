@@ -1,0 +1,547 @@
+{
+  "schemaVersion": 1,
+  "styleVersion": "style-lock-v1",
+  "status": "draft",
+  "master": {
+    "path": "master-approved-v1.png",
+    "sha256": "c5f9b46836b82a3b2614ce500492654720ef86f3316c2346cc3eb849e548f66a",
+    "status": "approved",
+    "approvedBy": "user",
+    "approvedOn": "2026-09-20"
+  },
+  "templates": [
+    {
+      "id": "s1-daily",
+      "sceneCount": 1,
+      "composition": "solo",
+      "generic": true,
+      "tags": [
+        "home",
+        "daily"
+      ],
+      "status": "draft",
+      "illustration": {
+        "path": "s1-daily-master-v1/illustration.png",
+        "sha256": "bdf5f3e121eaae9834b79ad4c8caa17cea59c0a754a8a823c04f7ee132d915d2"
+      },
+      "poster": {
+        "path": "s1-daily-master-v1/poster.png",
+        "sha256": "4a87a129a044013c932d501725d63614760d8765827bdebb9dce746a0ac0b1c5"
+      },
+      "config": {
+        "path": "s1-daily-master-v1/config.json",
+        "sha256": "7e4c786835a13622d096f115d518c522c0ff573370f32a04672425732fbb4acf"
+      },
+      "sceneBoxes": [
+        [
+          0.06,
+          0.1875,
+          0.67,
+          0.745
+        ]
+      ]
+    },
+    {
+      "id": "s1-emotion",
+      "sceneCount": 1,
+      "composition": "solo",
+      "generic": true,
+      "tags": [
+        "emotion",
+        "home"
+      ],
+      "status": "draft",
+      "illustration": {
+        "path": "s1-emotion-master-v1/illustration.png",
+        "sha256": "9e53353380e367108bd15881d69c89fca93d660adb4b6a768588029544b0141b"
+      },
+      "poster": {
+        "path": "s1-emotion-master-v1/poster.png",
+        "sha256": "9430bbb25d7eda776772293f49cf2219f5d848697092b94bc904a34481800b30"
+      },
+      "config": {
+        "path": "s1-emotion-master-v1/config.json",
+        "sha256": "570f27d73684fe11b2a9f173d6497f0259ce0d7d5ffb13a950a4ed3d77499f8f"
+      },
+      "sceneBoxes": [
+        [
+          0.06,
+          0.1875,
+          0.67,
+          0.745
+        ]
+      ]
+    },
+    {
+      "id": "s2-sequence",
+      "sceneCount": 2,
+      "composition": "solo",
+      "generic": true,
+      "tags": [
+        "outdoors",
+        "sequence"
+      ],
+      "status": "draft",
+      "illustration": {
+        "path": "s2-sequence-master-v1/illustration.png",
+        "sha256": "2af21d0e4fe270d087c65590bca0b68411904e236decc04992cbbb8451e5c97e"
+      },
+      "poster": {
+        "path": "s2-sequence-master-v1/poster.png",
+        "sha256": "ae3b6e88184838fa1e6186eaa1f2c87204a785e7d215440e58400e6328bce5cc"
+      },
+      "config": {
+        "path": "s2-sequence-master-v1/config.json",
+        "sha256": "d27a15b6294128b63efd15c841f98718469055aad4732a8547a63877cc60607e"
+      },
+      "sceneBoxes": [
+        [
+          0.06,
+          0.1875,
+          0.67,
+          0.355
+        ],
+        [
+          0.06,
+          0.5775,
+          0.67,
+          0.355
+        ]
+      ]
+    },
+    {
+      "id": "s2-interaction",
+      "sceneCount": 2,
+      "composition": "group",
+      "generic": false,
+      "tags": [
+        "interaction",
+        "outdoors"
+      ],
+      "status": "draft",
+      "illustration": {
+        "path": "s2-interaction-master-v1/illustration.png",
+        "sha256": "12857531bc9622e727dedf1ce6dc9a2f85ade62c72681e693976627be4da488e"
+      },
+      "poster": {
+        "path": "s2-interaction-master-v1/poster.png",
+        "sha256": "d52161330212f065fefe67b920091fc2f6e43c48cd7e32f11a46591cf0ea0de7"
+      },
+      "config": {
+        "path": "s2-interaction-master-v1/config.json",
+        "sha256": "f4be1faf2f0ec6832d8b399f9ae6725fd3022625ae4c09a8df0e6ce32bd9bc19"
+      },
+      "sceneBoxes": [
+        [
+          0.06,
+          0.1875,
+          0.67,
+          0.355
+        ],
+        [
+          0.06,
+          0.5775,
+          0.67,
+          0.355
+        ]
+      ]
+    },
+    {
+      "id": "s3-work",
+      "sceneCount": 3,
+      "composition": "solo",
+      "generic": true,
+      "tags": [
+        "work",
+        "indoor"
+      ],
+      "status": "draft",
+      "illustration": {
+        "path": "s3-work-master-v1/illustration.png",
+        "sha256": "300e73ba9ddee15f4ffb13b6b1c3f9e95da843d86e34b76037b973bb99850262"
+      },
+      "poster": {
+        "path": "s3-work-master-v1/poster.png",
+        "sha256": "e7f8236f6e56e9423cf4f3a4e826863e46195571cba219fb34f846b4300509ae"
+      },
+      "config": {
+        "path": "s3-work-master-v1/config.json",
+        "sha256": "968fcc5f6656404a6ba3c893d684c777d39ad8fca0808779c9f1052bd99fab82"
+      },
+      "sceneBoxes": [
+        [
+          0.06,
+          0.1875,
+          0.67,
+          0.225
+        ],
+        [
+          0.06,
+          0.44750000000000006,
+          0.67,
+          0.225
+        ],
+        [
+          0.06,
+          0.7075,
+          0.67,
+          0.225
+        ]
+      ]
+    },
+    {
+      "id": "s3-home",
+      "sceneCount": 3,
+      "composition": "solo",
+      "generic": true,
+      "tags": [
+        "home",
+        "indoor"
+      ],
+      "status": "draft",
+      "illustration": {
+        "path": "s3-home-master-v1/illustration.png",
+        "sha256": "7fc11094fecf96538103c9b01918cf6d33c1cb994154f9f1bdbd0ba052391b6e"
+      },
+      "poster": {
+        "path": "s3-home-master-v1/poster.png",
+        "sha256": "18a74f2fdbadf7d613ea6966d3b09077043920bb1947fadcd660ae1b6111741e"
+      },
+      "config": {
+        "path": "s3-home-master-v1/config.json",
+        "sha256": "ac27ed28cec1df23921beb3cd77eec100c3fc4a03d4852c39ba70419deaa2c3c"
+      },
+      "sceneBoxes": [
+        [
+          0.06,
+          0.1875,
+          0.67,
+          0.225
+        ],
+        [
+          0.06,
+          0.44750000000000006,
+          0.67,
+          0.225
+        ],
+        [
+          0.06,
+          0.7075,
+          0.67,
+          0.225
+        ]
+      ]
+    },
+    {
+      "id": "s3-outdoors",
+      "sceneCount": 3,
+      "composition": "solo",
+      "generic": true,
+      "tags": [
+        "outdoors",
+        "walk"
+      ],
+      "status": "draft",
+      "illustration": {
+        "path": "s3-outdoors-master-v1/illustration.png",
+        "sha256": "9530eb22d4e8ed3ac3269fe43855eb1929988119b8181a03d84ce4615187f5ae"
+      },
+      "poster": {
+        "path": "s3-outdoors-master-v1/poster.png",
+        "sha256": "21180a25957c7d56e9e660788c2e4b3184bf85616bd8378fd66c51d379c74352"
+      },
+      "config": {
+        "path": "s3-outdoors-master-v1/config.json",
+        "sha256": "b1cfde99cace38311e60d251a1aead9b8e376dd67bb96be5fe8088a2ea0c896e"
+      },
+      "sceneBoxes": [
+        [
+          0.06,
+          0.1875,
+          0.67,
+          0.225
+        ],
+        [
+          0.06,
+          0.44750000000000006,
+          0.67,
+          0.225
+        ],
+        [
+          0.06,
+          0.7075,
+          0.67,
+          0.225
+        ]
+      ]
+    },
+    {
+      "id": "s3-pet",
+      "sceneCount": 3,
+      "composition": "pets",
+      "generic": false,
+      "tags": [
+        "home",
+        "cat"
+      ],
+      "status": "draft",
+      "illustration": {
+        "path": "s3-pet-master-v1/illustration.png",
+        "sha256": "7f50800319fd8232481764515a9b37d206add718b664f84c5194028c7a942ab1"
+      },
+      "poster": {
+        "path": "s3-pet-master-v1/poster.png",
+        "sha256": "eb85b0bd4cb504eb04b42a082a8a4d54ea138b3c5b3cfc5d5c8d7db84e96a639"
+      },
+      "config": {
+        "path": "s3-pet-master-v1/config.json",
+        "sha256": "8e9fe35e1e61554b126def6f820c188ae137cfcb792c51fb9b85e90cf90fa46b"
+      },
+      "sceneBoxes": [
+        [
+          0.06,
+          0.1875,
+          0.67,
+          0.225
+        ],
+        [
+          0.06,
+          0.44750000000000006,
+          0.67,
+          0.225
+        ],
+        [
+          0.06,
+          0.7075,
+          0.67,
+          0.225
+        ]
+      ]
+    },
+    {
+      "id": "s4-mixed",
+      "sceneCount": 4,
+      "composition": "solo",
+      "generic": true,
+      "tags": [
+        "work",
+        "home"
+      ],
+      "status": "draft",
+      "illustration": {
+        "path": "s4-mixed-master-v1/illustration.png",
+        "sha256": "931f2551d49a1b8876c48a5bc4f8a7a89fb1737cbadb4e8a1dee29e5c9d4937e"
+      },
+      "poster": {
+        "path": "s4-mixed-master-v1/poster.png",
+        "sha256": "f24dbb39230f52fa1d3d1d675a4e0fbabbbc4e4ea6fe3f18a2c32541f958f5bc"
+      },
+      "config": {
+        "path": "s4-mixed-master-v1/config.json",
+        "sha256": "c9ad225e9fc1ff7965eb70e87f8184e64a7e2c7685ee79b798f07fa6cfc02995"
+      },
+      "sceneBoxes": [
+        [
+          0.06,
+          0.1875,
+          0.67,
+          0.16
+        ],
+        [
+          0.06,
+          0.3825,
+          0.67,
+          0.16
+        ],
+        [
+          0.06,
+          0.5775,
+          0.67,
+          0.16
+        ],
+        [
+          0.06,
+          0.7725,
+          0.67,
+          0.16
+        ]
+      ]
+    },
+    {
+      "id": "s4-group",
+      "sceneCount": 4,
+      "composition": "pets",
+      "generic": false,
+      "tags": [
+        "group",
+        "dog",
+        "outdoors"
+      ],
+      "status": "draft",
+      "illustration": {
+        "path": "s4-group-master-v1/illustration.png",
+        "sha256": "93ca1d52faf765e3ea05f55e74e03fca9c4d85cc9a79e8af040a8316e3674674"
+      },
+      "poster": {
+        "path": "s4-group-master-v1/poster.png",
+        "sha256": "61674217258bc7162584ed8cd53771178b6428d9af7570c4b5096568c6f68437"
+      },
+      "config": {
+        "path": "s4-group-master-v1/config.json",
+        "sha256": "0ad19e41f551024b569497a8aec6825bb5c91316970a5384296cdc4c71cd870e"
+      },
+      "sceneBoxes": [
+        [
+          0.06,
+          0.1875,
+          0.67,
+          0.16
+        ],
+        [
+          0.06,
+          0.3825,
+          0.67,
+          0.16
+        ],
+        [
+          0.06,
+          0.5775,
+          0.67,
+          0.16
+        ],
+        [
+          0.06,
+          0.7725,
+          0.67,
+          0.16
+        ]
+      ]
+    },
+    {
+      "id": "s5-day",
+      "sceneCount": 5,
+      "composition": "solo",
+      "generic": true,
+      "tags": [
+        "daily",
+        "home"
+      ],
+      "status": "draft",
+      "illustration": {
+        "path": "s5-day-master-v1/illustration.png",
+        "sha256": "bb544fd7fce3412accbbb7793237e058df81aa77dbae4ab79051dd73d02b196a"
+      },
+      "poster": {
+        "path": "s5-day-master-v1/poster.png",
+        "sha256": "92957f3ba78ef3417fe5e224cc0fe1744ddd621b767d5121083bcdbd195548d1"
+      },
+      "config": {
+        "path": "s5-day-master-v1/config.json",
+        "sha256": "340471652f6fcb8a1c05d0c4b43b64d0e8ad8679838cf44e2022784a7ea40ff6"
+      },
+      "sceneBoxes": [
+        [
+          0.06,
+          0.18560000000000001,
+          0.67,
+          0.1248
+        ],
+        [
+          0.06,
+          0.3416,
+          0.67,
+          0.1248
+        ],
+        [
+          0.06,
+          0.4976,
+          0.67,
+          0.1248
+        ],
+        [
+          0.06,
+          0.6536,
+          0.67,
+          0.1248
+        ],
+        [
+          0.06,
+          0.8096,
+          0.67,
+          0.1248
+        ]
+      ]
+    },
+    {
+      "id": "s5-mixed",
+      "sceneCount": 5,
+      "composition": "pets",
+      "generic": false,
+      "tags": [
+        "group",
+        "cat",
+        "dog"
+      ],
+      "status": "draft",
+      "illustration": {
+        "path": "s5-mixed-master-v1/illustration.png",
+        "sha256": "fe5a0801c7145aa4b95fa0411d50ea6c626286cdbcf5e8632fe720e4709fab89"
+      },
+      "poster": {
+        "path": "s5-mixed-master-v1/poster.png",
+        "sha256": "fe655479c09d9fd906a9d4ddb6918001c1e90f4772ea744c83494cf1483f3e73"
+      },
+      "config": {
+        "path": "s5-mixed-master-v1/config.json",
+        "sha256": "4ced5a342ce2588bbd231cff6567f78829ac50daec9f1496c22e79734dcc536c"
+      },
+      "sceneBoxes": [
+        [
+          0.06,
+          0.18560000000000001,
+          0.67,
+          0.1248
+        ],
+        [
+          0.06,
+          0.3416,
+          0.67,
+          0.1248
+        ],
+        [
+          0.06,
+          0.4976,
+          0.67,
+          0.1248
+        ],
+        [
+          0.06,
+          0.6536,
+          0.67,
+          0.1248
+        ],
+        [
+          0.06,
+          0.8096,
+          0.67,
+          0.1248
+        ]
+      ]
+    }
+  ],
+  "provenance": {
+    "humanDirection": [
+      "A diary-poster",
+      "B diary-style-anchor",
+      "human-expressions-v5"
+    ],
+    "animalDirection": "User-selected cat and dog drawing language from local packaging photo, 2026-09-19",
+    "directionConfirmedBy": "user",
+    "generatedAssetsApprovedBy": null,
+    "sourcePhotoBundled": false,
+    "generation": "built-in image_gen",
+    "masterApprovedBy": "user",
+    "masterApprovedOn": "2026-09-20",
+    "masterReuse": "Every revised template received master-approved-v1.png and the approved face close-up directly"
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "id": "s1-emotion",
+  "title": "今天先歇会",
+  "composition": "solo",
+  "tags": [
+    "emotion",
+    "home"
+  ],
+  "scenes": [
+    "一人疲惫地靠着沙发坐下，放下包，安静休息"
+  ],
+  "captions": [
+    "今天先歇会"
+  ],
+  "styleVersion": "style-lock-v1",
+  "masterSource": "master-draft.png",
+  "sourceText": "一人疲惫地靠着沙发坐下，放下包，安静休息。",
+  "fictional": true,
+  "sceneCount": 1,
+  "sceneBoxes": [
+    [
+      0.06,
+      0.1875,
+      0.67,
+      0.745
+    ]
+  ],
+  "sceneCenters": [
+    0.56
+  ],
+  "placedBounds": [
+    [
+      72,
+      525,
+      804,
+      742
+    ]
+  ],
+  "sourceRects": [
+    [
+      37,
+      290,
+      1054,
+      1228
+    ]
+  ],
+  "status": "draft"
+}
