@@ -1,4 +1,4 @@
-![小屁孩日记：把日常画成一本日记](assets/readme/cover.png)
+![已确认的角色扩展：不同年龄与体型，同一套黑白侧向画法](assets/style-reference/character-extension-v1/appearance-unified-v3.png)
 
 # 小屁孩日记
 
@@ -18,50 +18,23 @@
 
 ## 先看效果
 
-### 一天，一张海报
+### 同一画风，保留每个人的不同
 
-这篇虚构小记记录了 **出门走走、停下闻闻、回家看书**。人物、猫和狗复用已确认的动作素材；右侧备注对应每个场景，文字统一使用随包提供的悠哉字体。
+页首为最新确认的角色扩展参考。发型、五官、年龄呈现和体型分别借鉴，再结合你上传的角色照片；不是从图里挑一个人直接照搬。新人物先确认形象卡，后续日记保持同一身份。
 
-<p align="center"><img src="assets/readme/diary-poster.png" alt="走走再歇歇：统一侧向画风的三场景日记海报" width="540"></p>
+人物和动物都按各自参考侧向展示，不出现正面。使用等粗圆头黑线、白色填充；猫狗保留自己的耳鼻、花纹和体型，不套用人的五官。
 
-白纸、黑色线条、浅青横线，保留充足留白。新人物先出形象卡，你确认后，后续日记继续复用。
+### 同一个角色，24种表情
 
-现在默认使用已确认的统一画风样板，无需额外说明“开启风格锁定”。每个场景单独画好，再完整放入同一张海报，不切成方框漫画。旧人物卡若与新样板不一致，会先给你看校准稿；确认前不会替换原来的正式日记。
+![已确认的24种表情：统一发型、脸型和线条，按情绪变化眼睛与嘴巴](assets/style-reference/style-lock-v1/human-expression-reference-v6.png)
 
-![已确认的六个常用动作](assets/readme/action-library.png)
+从平静、微笑到惊讶、委屈和困倦，按日记情绪选择；保留角色本来的样貌，不让所有场景都变成同一个笑脸。张嘴以黑色口腔配白色舌头或牙齿，瞪眼保留纯白眼白与圆瞳。
 
-现有动作可以直接复用，减少重复绘制。新人物或库里没有的动作，仍需参考统一样板和本次人物卡绘制、查看效果；不承诺任意新动作都会一次画对。
+### 一天一页，慢慢收成一本日记
 
-<details>
-<summary>也可以记录工作小事：Codex 额度重置</summary>
+白纸、黑线、浅青横线，一张海报记录1–5个场景，备注紧随对应画面。完整海报嵌入正文，并收进同一本可翻页日记本；人物关系图只记录你提供的关系。
 
-此前的工作日记示例：额度用完、等待重置、恢复后继续任务。用于说明如何把一段经历选成场景；新画风以本页上方样板为准。
-
-<p align="center"><img src="assets/readme/diary-poster-codex.png" alt="此前的 Codex 额度重置日记示例" width="540"></p>
-
-</details>
-
-### 连起来，就是一本日记
-
-![日记本桌面阅读效果](assets/readme/reader-v3-desktop.png)
-
-<p align="center"><img src="assets/readme/reader-v3-mobile.png" alt="日记本窄屏阅读效果" width="320"></p>
-
-可以翻页、按日期或内容搜索，点击“放大原图”看细节。设备不支持 3D 时，以完整平面海报阅读；原图不会被裁掉。
-
-这里保留额度重置日记的阅读器截图，展示打开、翻页和放大的方式；新生成海报采用上方的新画风。
-
-### 记住每一个角色
-
-![统一的人物与宠物画风样板](assets/style-reference/style-lock-v1/master-approved-v1.png)
-
-上图是绘画参考，不是你的身份卡。助手会保留照片中的发型、眼镜、服装、宠物特征，再按这套画法绘制。
-
-![人物关系图示例](assets/readme/character-graph.png)
-
-首次加入人物或宠物，告诉助手名字、关系并提供照片。先确认人物形象卡，再用于正式日记；已有角色不用每天重新确认。关系图只记录你提供的关系。
-
-关系图截图用于展示人物档案与关系的查看方式；你确认的新人物卡会记录到自己的图谱中，不使用示例人物冒充你。
+旧日记补充内容也使用这套画风，保留原有事实和未修改的内容。本页仅展示已确认的最新角色与表情参考，旧版海报、动作和阅读器截图暂不作为新版效果展示。
 
 ## 怎么开始？
 
@@ -101,7 +74,7 @@ https://github.com/HoweTsui/cartoon-diary-journal
 
 新角色先确认人物形象卡。随后看海报：人物像不像、事情有没有画对、文字有没有偏离原意。需要改哪里，直接说即可。
 
-确认后，助手会把成品放进指定位置。使用笔记或文档工具时，需要该工具已连接并有写入权限。
+确认后，助手会把成品放进你指定的笔记工具，并更新你原来的同一本 3D 日记本。首次使用时告诉它笔记软件、页面或文件夹，以及日记本位置；以后复用。使用云端笔记工具时，需要该工具已连接并有写入权限。没有完成入库或同步时，助手应明确告诉你缺哪一项，不能只给本地文件就说“已同步”。
 
 ## 日记保存在哪里？
 
@@ -128,14 +101,15 @@ https://github.com/HoweTsui/cartoon-diary-journal
 <details>
 <summary>想自己打开公开日记本示例？</summary>
 
-下载仓库，在仓库文件夹运行以下两行（输出文件夹需尚未存在）：
+下载仓库，在仓库文件夹运行以下命令（需 Python 与 Pillow；输出文件夹需尚未存在）：
 
 ```bash
-python3 scripts/build_diary_reader.py assets/diary-book/demo/index.html --output-dir task-output/reader-demo
+python3 scripts/build_readme_assets.py --output-dir task-output/readme-artwork --demo-output task-output/readme-demo
+python3 scripts/build_diary_reader.py task-output/readme-demo/index.html --output-dir task-output/reader-demo
 python3 -m http.server 8000 --bind 127.0.0.1 --directory task-output/reader-demo
 ```
 
-打开 [本机预览](http://127.0.0.1:8000/)。保持终端运行即可阅读，结束时按 Ctrl+C。旧公开日记用于体验翻页功能；本文截图展示新版示例。
+打开 [本机预览](http://127.0.0.1:8000/)。保持终端运行即可阅读，结束时按 Ctrl+C。该命令用于体验阅读功能；历史演示素材不作为当前角色画风标准，画风以本页已确认参考为准。
 
 </details>
 
@@ -151,13 +125,14 @@ python3 -m http.server 8000 --bind 127.0.0.1 --directory task-output/reader-demo
 
 **怎么更新？** 告诉助手“将 cartoon-diary-journal 更新到 GitHub 最新版本，保留我的日记、照片和人物资料”。
 
-## 最近更新 · v0.4.0
+## 最近更新 · v0.4.1
 
-- 默认使用统一画风样板，人物、宠物和六个常用动作随 Skill 提供。
-- 每场独立绘制再合成，修复旧画风入口与方框式截断问题。
-- 旧人物卡先校准，文字跟随场景排版；更新封面、海报和动作示例。
+- 更新角色扩展与24种表情参考，统一画风，保留各自的外貌、年龄呈现和体型。
+- 人物与动物统一侧向展示，使用等粗圆头线条和白色填充。
+- 补充旧日记也沿用当前画风，保留原文和未修改内容。
+- README 改用最新确认的参考图，不再混用旧版角色截图。
 
-正文嵌入完整海报、照片三列宫格、原图归档和文案保真规则保持不变。
+正文嵌入完整海报、照片三列宫格和日记本收藏功能保持不变。
 
 [更新记录](CHANGELOG.md) · [Skill 规则](SKILL.md) · [日记入库说明](references/diary-document.md)
 
