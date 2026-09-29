@@ -18,7 +18,7 @@ from diary_style_lock import asset
 
 ROOT = Path(__file__).resolve().parents[1]
 BASE = ROOT / 'assets/style-reference/style-lock-v1'
-LIBRARY = BASE / 'action-library-v2.json'
+LIBRARY = BASE / 'action-library-v3.json'
 JOBS = [
     ('human', [('human-walk-right', '人物 · 走路', 'walking'), ('human-read-right', '人物 · 坐着看书', 'reading')]),
     ('cat', [('cat-walk-right', '猫 · 走路', 'walking'), ('cat-lie-right', '猫 · 趴卧', 'lying-awake')]),
@@ -104,17 +104,20 @@ def arrange(items):
     sprites, instances = [], []
     for key, target_height in items:
         sprite, entry = load_action(key, preview=True)
-        scale = target_height / sprite.height
-        size = (round(sprite.width * scale), target_height)
+        # Measured source outline widths, not independent arbitrary sprite heights.
+        stroke = 10 if entry['species'] == 'human' else (10.5 if entry['species'] == 'cat' else 9)
+        scale = 2.6 / stroke
+        size = (round(sprite.width * scale), round(sprite.height * scale))
         sprites.append(sprite.resize(size, Image.Resampling.LANCZOS))
-        instances.append({'id':key, 'image':entry['image'], 'scale':scale})
-    result = Image.new('RGBA', (sum(s.width for s in sprites)+40*(len(sprites)-1)+20, 350), (255,255,255,0))
+        instances.append({'id':key, 'image':entry['image'], 'scale':scale, 'sourceStrokePx':stroke, 'targetStrokePx':2.6})
+    result = Image.new('RGBA', (sum(s.width for s in sprites)+32*(len(sprites)-1)+20, 520), (255,255,255,0))
     x = 10
     for sprite, record in zip(sprites, instances):
-        y = 340-sprite.height
+        ink = content_box(sprite)
+        y = 420-ink[3]
         result.alpha_composite(sprite, (x,y))
         record['bounds'] = [x,y,*sprite.size]
-        x += sprite.width+40
+        x += sprite.width+32
     bounds = content_box(result)
     if bounds is None:
         raise ValueError('empty composed scene')
@@ -160,14 +163,12 @@ def build(output):
         reference_cards=[]
         for species in ['human','cat','dog']:
             filename=species+'-face-neutral.png'
-            shutil.copyfile(BASE/'actions-v1/reference-inputs'/filename,dest/'references'/filename)
+            source = BASE/'master-approved-v2.png' if species == 'human' else BASE/'actions-v1/reference-inputs'/filename
+            shutil.copyfile(source,dest/'references'/filename)
             reference_cards.append(f'<article><img src="references/{filename}" alt="{species} 已确认五官"><p>已确认的五官参考</p></article>')
         boxes = scene_boxes(3)
-        for scene, box in zip(scenes, boxes):
-            center = box[1]+box[3]/2
-            box[3] = min(box[3],scene.height/1600)
-            box[1] = center-box[3]/2
-        image, centers, placed = compose(scenes,boxes)
+        common_scale = min(min(box[2]*1200/scene.width,box[3]*1600/scene.height) for scene,box in zip(scenes,boxes))
+        image, centers, placed = compose(scenes,boxes,strict=True,fit_visible=False,scale_limit=common_scale)
         image.convert('RGB').save(dest/'illustration.png',optimize=True)
         render_png(story,dest/'illustration.png',dest/'poster.png',centers)
         record={'status':'approved' if fully_approved else 'draft',

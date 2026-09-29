@@ -55,18 +55,30 @@ def render_png(brief, illustration, output, centers):
     if abs(width * 4 - height * 3) > 4:
         raise ValueError("final diary poster must be 3:4")
     scale = width / 1200
-    regular = ImageFont.truetype(str(FONT_DIR / "Yozai-Regular.ttf"), round(30 * scale))
-    title_font = ImageFont.truetype(str(FONT_DIR / "Yozai-Medium.ttf"), round(42 * scale))
-    caption_font = ImageFont.truetype(str(FONT_DIR / "Yozai-Regular.ttf"), round(28 * scale))
+    typography = json.loads(LAYOUT.read_text(encoding="utf-8"))["typography"]
+    regular = ImageFont.truetype(str(FONT_DIR / "Yozai-Regular.ttf"), round(typography["dateSize"] * scale))
+    title_font = ImageFont.truetype(str(FONT_DIR / "Yozai-Medium.ttf"), round(typography["titleSize"] * scale))
+    caption_font = ImageFont.truetype(str(FONT_DIR / "Yozai-Regular.ttf"), round(typography["captionSize"] * scale))
     draw = ImageDraw.Draw(image)
     ink = "#171715"
     draw.text((width / 2, height * .042), brief["header"], font=regular, fill=ink, anchor="ma")
     draw.text((width / 2, height * .079), brief["title"], font=title_font, fill=ink, anchor="ma")
     lane_width = width * .18
+    if len(centers) != len(brief["events"]):
+        raise ValueError("one scene center per caption required")
+    previous_bottom = height * .15
     for center, event in zip(centers, brief["events"]):
         lines = text_lines(draw, event["caption"], caption_font, lane_width)
-        draw.multiline_text((width * .85, height * center), "\n".join(lines), font=caption_font,
-                            fill=ink, anchor="mm", align="center", spacing=round(5 * scale))
+        spacing = round(typography["captionSpacing"] * scale)
+        label = "\n".join(lines)
+        bounds = draw.multiline_textbbox((width * .85, height * center), label,
+                    font=caption_font, anchor="mm", align="center", spacing=spacing)
+        if (bounds[0] < width * .76 or bounds[2] > width * .94 or
+                bounds[1] < previous_bottom or bounds[3] > height * .96):
+            raise ValueError("caption exceeds its safe zone or overlaps another caption; adjust scene placement or wording")
+        previous_bottom = bounds[3]
+        draw.multiline_text((width * .85, height * center), label, font=caption_font,
+                            fill=ink, anchor="mm", align="center", spacing=spacing)
     output.parent.mkdir(parents=True, exist_ok=True)
     image.convert("RGB").save(output, "PNG", optimize=True)
 
@@ -97,6 +109,7 @@ def build(brief_path: Path, illustration: Path, output: Path, preview: bool, anc
             any(a >= b for a, b in zip(centers, centers[1:]))):
         raise ValueError("sceneCenters must contain one increasing full-page y fraction per event")
     layout["sceneCenters"] = centers
+    typography = layout["typography"]
     output.mkdir(parents=True)
     fonts = output / "fonts"
     fonts.mkdir()
@@ -118,9 +131,9 @@ def build(brief_path: Path, illustration: Path, output: Path, preview: bool, anc
 #poster{{position:relative;width:1200px;height:1600px;overflow:hidden;background:#fff;color:#171715}}
 #illustration{{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0}}
 #header{{position:absolute;z-index:1;left:10%;top:2.5%;width:80%;height:12%;padding-top:7px;background:#fff;text-align:center;display:flex;flex-direction:column;align-items:center}}
-#date{{font-size:30px;line-height:1.35;letter-spacing:.07em}} #title{{font-size:42px;line-height:1.35;font-weight:500;letter-spacing:.05em}}
+#date{{font-size:{typography['dateSize']}px;line-height:1.35;letter-spacing:.07em}} #title{{font-size:{typography['titleSize']}px;line-height:1.35;font-weight:500;letter-spacing:.05em}}
 #captions{{position:absolute;z-index:1;inset:0;pointer-events:none}}
-.caption{{position:absolute;left:76%;width:18%;transform:translateY(-50%);margin:0;font-size:28px;line-height:1.42;overflow-wrap:anywhere}}
+.caption{{position:absolute;left:76%;width:18%;transform:translateY(-50%);margin:0;font-size:{typography['captionSize']}px;line-height:1.42;overflow-wrap:anywhere;text-align:center}}
 </style><body><main id="poster"><img id="illustration" src="{e(illustration_copy.name)}" alt="日记插画">
 <section id="header"><div id="date">{e(brief['header'])}</div><div id="title">{e(brief['title'])}</div></section>
 <aside id="captions" aria-label="场景备注">{captions}</aside></main></body></html>\n""", encoding="utf-8")

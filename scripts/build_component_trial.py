@@ -129,8 +129,13 @@ def build(output):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output-dir', type=Path, required=True)
+    parser.add_argument('--legacy', action='store_true', help='Explicit historical v1 reproduction only')
     args = parser.parse_args()
     try:
-        print(build(args.output_dir))
+        if args.legacy:
+            print(build(args.output_dir))
+        else:
+            from build_action_trial import build as build_current
+            print(build_current(args.output_dir))
     except (ValueError, OSError, KeyError) as exc:
         parser.exit(2, str(exc)+'\n')

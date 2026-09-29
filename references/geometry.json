@@ -9,7 +9,7 @@
     "noseHeight": 0.12,
     "eyeDiameter": 0.035,
     "noseUpperGap": 0.08,
-    "neckWidth": 0.14,
+    "neckWidth": 0,
     "headHeight": 1,
     "standingHeight": 3,
     "torsoWidth": 0.5,
@@ -18,6 +18,11 @@
     "legLength": 1,
     "handWidth": 0.16,
     "footLength": 0.36
+  },
+  "bodyProfiles": {
+    "slender": {"torsoWidth": 0.32},
+    "regular": {"torsoWidth": 0.5},
+    "full": {"torsoWidth": 0.7}
   },
   "cat": {
     "headHeight": 0.85,

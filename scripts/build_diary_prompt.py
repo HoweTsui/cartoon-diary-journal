@@ -251,7 +251,7 @@ def geometry(data):
                 raise ValueError(label + " requires all canonical dimensions")
             for k, v in target.items():
                 check(actual[k], v, label + "." + k)
-        elif isinstance(actual, bool) or not isinstance(actual, (float, int)) or not math.isfinite(actual) or abs(actual / target - 1) > .100001:
+        elif isinstance(actual, bool) or not isinstance(actual, (float, int)) or not math.isfinite(actual) or (actual != 0 if target == 0 else abs(actual / target - 1) > .100001):
             raise ValueError(label + " must be within 10% of canonical target")
     check(value, canonical, "geometry")
     if not math.isclose(value["outerWidth"], 2 * value["stroke"] + value["innerGap"], abs_tol=1e-8):
@@ -279,7 +279,8 @@ def validate_reference_mapping(references, events, character_ids):
             scene_ids.add(rid)
         if 'characterIds' in ref:
             cids = ref['characterIds']
-            if (not ref['role'].startswith('identity-') or not isinstance(cids, list) or not cids or
+            scoped_style = ref.get('origin') == 'bundled' and ref['role'] == 'style'
+            if ((not ref['role'].startswith('identity-') and not scoped_style) or not isinstance(cids, list) or not cids or
                     any(not isinstance(cid, str) or cid not in character_ids for cid in cids) or
                     len(set(cids)) != len(cids)):
                 raise ValueError('reference.characterIds must be a non-empty unique list of registered IDs on identity references only')
@@ -338,6 +339,18 @@ def validate_brief(data, base, preview=False, graph=None):
         if cid in ids or not isinstance(c.get("species"), str) or c["species"] not in {"human", "cat", "dog"}:
             raise ValueError("unique character id and explicit human/cat/dog species required")
         ids.add(cid)
+        age = c.get('ageGroup', 'unknown')
+        if c.get('bodyType', 'regular') not in {'slender', 'regular', 'full'}:
+            raise ValueError('bodyType must be slender/regular/full')
+        if age not in {'child', 'adolescent', 'adult', 'unknown'}:
+            raise ValueError('ageGroup must be child/adolescent/adult/unknown, based on user information')
+        stage = c.get('ageStage')
+        if stage is not None and (age != 'adult' or stage not in {'young-adult', 'middle-aged', 'older-adult'}):
+            raise ValueError('ageStage requires adult ageGroup and young-adult/middle-aged/older-adult')
+        if c.get('chestContour', 'neutral') not in {'neutral', 'subtle-clothed'}:
+            raise ValueError('chestContour must be neutral or subtle-clothed')
+        if c.get('chestContour') == 'subtle-clothed' and age != 'adult':
+            raise ValueError('subtle-clothed chest contour requires user-stated adult ageGroup')
         anchors = c.get("anchors")
         if not isinstance(anchors, list) or not 2 <= len(anchors) <= 12 or any(not isinstance(a, str) or not a.strip() or len(a) > 160 for a in anchors):
             raise ValueError("character anchors require 2-12 short observable identity features")
@@ -443,14 +456,52 @@ def validate_brief(data, base, preview=False, graph=None):
     attach(result, style_request, preview)
     return result
 
+def validate_identity_coverage(brief):
+    if brief['kind'] == 'onboarding':
+        allowed_roles = {'identity-source'}
+    elif brief['role'] == 'production':
+        allowed_roles = {'identity-approved'}
+    else:
+        allowed_roles = {'identity-draft', 'identity-approved'}
+    for character in brief['characters']:
+        character_id = character['id']
+        if not any(reference['role'] in allowed_roles
+                   and ('characterIds' not in reference or character_id in reference['characterIds'])
+                   for reference in brief['references']):
+            raise ValueError('no matching identity reference for character: ' + character_id)
+
+
 def build_prompt(brief):
     # Preserve sourceText in the input archive only, never in the render prompt.
     render = {k: v for k, v in brief.items() if k != "sourceText"}
-    from diary_style_lock import CONTRACT
+    from diary_style_lock import (CONTRACT, load_library,
+                                  validate_human_component_references, validate_species_references)
+    validate_identity_coverage(brief)
+    human_ids = [character['id'] for character in brief['characters']
+                 if character['species'] == 'human']
+    validate_human_component_references(brief['references'], human_ids)
+    validate_species_references(brief['references'], brief['characters'])
     rules = CONTRACT.read_text(encoding='utf-8')
+    rules += ('\nEXISTING POSTER / ADDITION RULE: These same style requirements apply to edits, '
+              'additions and replacements, not just new posters. Scene references, including old posters, '
+              'supply facts, actions and composition ONLY, never drawing style. Re-render the requested '
+              'scene in the current reference language, including both existing and added visible humans '
+              'and pets; do not paste a new-style figure into an old-style scene. Preserve identities, '
+              'age/body anchors, events and requested expressions. Human facial, hair and limb rules '
+              'apply ONLY to humans; cats and dogs must follow their attached species guides, not the '
+              'human nose, hair, hands or expression atlas. Keep each pet\'s own markings, ears, tail '
+              'and body identity. Unrelated scenes and diary text remain unchanged in local composition.')
     purpose = "Create one full-body character lineup. Correct old geometry while preserving broad identity features. No preexisting approved atlas required. Use neutral_dot and no eyebrows." if brief["kind"] == "onboarding" else "Create an expression/action test sheet from selected scenes."
     bundled = [item for item in brief["references"] if item.get("origin") == "bundled"]
     fixed_pack = "\n".join(f"- {item.get('id')}: {item['path']} ({item['role']})" for item in bundled)
+    style_library = load_library()
+    vocabulary = style_library.get('expressionVocabulary', [])
+    if human_ids and len(vocabulary) != 24:
+        raise ValueError('human expression reference must define exactly 24 named expressions')
+    expression_map = "\n".join(
+        f"- {index:02d} {item['name']} ({item['id']}): eyes={item['eye_state']}; "
+        f"brows={item['eyebrows']}; mouth={item['mouth']}"
+        for index, item in enumerate(vocabulary, 1))
     text_plan = ''
     if brief['kind'] == 'diary':
         purpose = ('Create exactly ONE isolated scene illustration, no paper, text or panel borders. Keep all characters and props complete.'
@@ -463,8 +514,11 @@ def build_prompt(brief):
                      'Local composition fits complete scenes without cropping and adds paper rules and Yozai text. '
                      'Do not draw dates, titles, captions, bubbles, labels, letters, numbers or paper lines.')
     return "\n".join([purpose, "Draft preview is not identity approval; never label it confirmed.", rules,
-        "Reference roles: identity-source supplies broad features only; identity-draft is provisional; identity-approved locks identity features such as hairstyle, clothing and accessories, never old drawing geometry. The current master and canonical geometry define drawing style and proportions; scene supplies only the mapped event facts. An identity card without characterIds is a shared lineup: use only the event's listed characters. Scoped identity cards apply only to their characterIds. Attach every listed image, including the mandatory fixed pack below.",
-        "Mandatory bundled reference pack (all must be attached):", fixed_pack,
+        "HARD IDENTITY AND STYLE LOCK (zero-tolerance acceptance): preserve each mapped character's recognizable visible features from that character's own uploaded source image or user-approved identity card, including face silhouette, hairline/hairstyle, glasses, age presentation, body type and clothing/accessory anchors. Do not transfer features between people. Use the approved master and every mandatory Reference image as binding, component-specific visual constraints; do not intentionally simplify, redesign or introduce a visibly different face, age/body proportion, line language or expression. If any required anchor or expression is visibly wrong, the result fails review and must not be called complete. Reference characters are examples of separate components, never identities or complete character templates. Compare and translate feature-by-feature; never copy any example person's whole appearance.",
+        "Identity translation: preserve observed face silhouette, hair, glasses, clothing and body shape from each person's own photo/card. Keep the round-face baseline, short non-drooping open nose with upper gap, equal ROUND dot eyes of equal diameter, modest eye spacing, outermost small ear. All open pupils are true circles, never ovals. Mouth stays visibly below and separate from the nose, in the lower face. No separate neck: visible jaw/clothing boundary, side-facing body, fine white double-line limbs; far arm hidden unless action exposes it. All skin and uninked clothing interiors are opaque pure white, without gray shading, gradients or texture. Fuller figures have a visible clothed belly curve. ageGroup and optional adult ageStage come only from user information, default unknown. Use age-proportions-v1 only for relative age/height; appearance-variants-v1 for observed hair/clothing/accessory variety; age-variety-example-v2 only as an open-ended face/age/body component reference, never as a roster, age assignment or complete identity; human-expression-reference-v6 for the corresponding emotion's eye/mouth design. The approved master always governs drawing language and geometry. Do not use expression-draft-v2. Children, adolescents and unknown ages have neutral loose tops. Only explicitly adult women may have a subtle clothed chest contour. Never infer age or add anatomical detail. For onboarding show full body AND face detail, no generated labels. Feature examples never substitute a user's identity.",
+        "Reference roles: identity-source supplies the character's uploaded source appearance; identity-draft is provisional; identity-approved locks the user-confirmed identity, never obsolete drawing geometry. Current master defines drawing grammar. geometry.human is the regular baseline; use geometry.bodyProfiles[bodyType].torsoWidth for the specified body type, keeping limbs fine. neckWidth=0 means no separate neck, NOT missing head/body boundary. Scene references supply the mapped environment, key objects and spatial relationships; simplify details without replacing the location. An identity card without characterIds is an explicitly shared lineup: use only event characters. Attach every listed image and use each only for its declared duty.",
+        "Mandatory bundled reference pack (all must be attached for each visible human; master is not a substitute for component references):", fixed_pack,
+        "Approved 24-expression vocabulary in chart order; map each visible human's intended emotion to the closest matching eye/mouth combination, preserving the described emotion. Do not add a third eye, unrelated wink, or expression detail absent from the selected match:", expression_map,
         text_plan,
         ("No text anywhere in style-lock illustration assets; all text is local composition." if 'styleLock' in brief else "Only header/title/caption/bubble/summary are renderable text; onboarding may label character names. All other metadata and scene descriptions are drawing instructions, never printed. No additional text."),
         "Use each character's own species dimensions and observable identity anchors. Preserve hairstyle, clothing and accessories from identity references. Take nose shape, upper contour gap, eye structure and body proportions from the current master and canonical geometry, correcting conflicting old-card geometry even during onboarding or preview. Geometry dimensions use head width H as the unit. Per-character expressions override event expression for that character; event expression applies only to characters without an override. Never spread one person's emotion to a pet with its own override. Selected eye_state overrides neutral expression only: open eye dots remain circular, lids only occlude them, closed eyes remain arcs. Temporary eyebrows require an explicitly authored strong exaggerated expression. Mouth length/shape follows the authored emotion at its low rear-side position.",

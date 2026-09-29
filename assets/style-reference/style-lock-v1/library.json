@@ -1,14 +1,50 @@
 {
   "schemaVersion": 1,
-  "styleVersion": "style-lock-v1",
+  "styleVersion": "style-lock-v2",
   "status": "draft",
   "master": {
-    "path": "master-approved-v1.png",
-    "sha256": "c5f9b46836b82a3b2614ce500492654720ef86f3316c2346cc3eb849e548f66a",
+    "path": "master-approved-v2.png",
+    "sha256": "0f156a35e635eb86a7ee8e1fdf4b57dca6f26d874976e8a5a6c95334a08199e2",
     "status": "approved",
     "approvedBy": "user",
-    "approvedOn": "2026-09-20"
+    "approvedOn": "2026-09-27",
+    "approvalScope": "integrated-body-12-v3; human style, not user identities or newly generated actions"
   },
+  "expressionReference": {
+    "path": "human-expression-reference-v6.png",
+    "sha256": "3d37f0d7d7068c37bb2d89d8cc7df5bf368da5f5fd44f8093f1b14a1caf8cb26",
+    "status": "approved",
+    "approvedBy": "user",
+    "approvedOn": "2026-09-29",
+    "useFor": "mandatory component reference in every human generation; selects the matching eye, eye-white, pupil, brow and mouth state for each intended emotion while retaining the mapped identity card and style-lock-v2 master",
+    "notFor": "replacing a user identity, changing approved face geometry, mixing unrelated expressions, or copying a complete example character"
+  },
+  "expressionVocabulary": [
+    {"id": "calm", "name": "平静", "eye_state": "neutral_dot", "eyebrows": "none", "mouth": "low small relaxed"},
+    {"id": "soft-smile", "name": "轻松微笑", "eye_state": "soft_lid_dot", "eyebrows": "none", "mouth": "low warm curve"},
+    {"id": "curious-up", "name": "好奇上望", "eye_state": "upward_round", "eyebrows": "none", "mouth": "low small smile"},
+    {"id": "confident-grin", "name": "自信露齿笑", "eye_state": "neutral_dot", "eyebrows": "raised", "mouth": "low outlined white toothy grin"},
+    {"id": "big-laugh", "name": "开怀大笑", "eye_state": "closed_arc", "eyebrows": "none", "mouth": "low black open laugh"},
+    {"id": "closed-teeth-smile", "name": "闭眼露齿笑", "eye_state": "closed_arc", "eyebrows": "none", "mouth": "low outlined white toothy grin"},
+    {"id": "eyes-smile", "name": "眯眼微笑", "eye_state": "closed_arc", "eyebrows": "none", "mouth": "low soft curve"},
+    {"id": "playful-tongue", "name": "调皮吐舌", "eye_state": "neutral_dot", "eyebrows": "none", "mouth": "low black open mouth with white tongue"},
+    {"id": "pucker", "name": "嘟嘴", "eye_state": "neutral_dot", "eyebrows": "none", "mouth": "low pursed lips"},
+    {"id": "embarrassed", "name": "尴尬冒汗", "eye_state": "neutral_dot", "eyebrows": "none", "mouth": "low uneasy curve with one sweat drop"},
+    {"id": "cheek-puff", "name": "鼓腮", "eye_state": "closed_arc", "eyebrows": "none", "mouth": "low puffed cheeks"},
+    {"id": "nervous-teeth", "name": "紧张咬牙", "eye_state": "neutral_dot", "eyebrows": "none", "mouth": "low outlined clenched teeth"},
+    {"id": "mild-surprise", "name": "轻微惊讶", "eye_state": "wide_round", "eyebrows": "none", "mouth": "low small open oval"},
+    {"id": "shocked", "name": "惊吓", "eye_state": "wide_round", "eyebrows": "none", "mouth": "low black open oval with white tongue"},
+    {"id": "worried", "name": "担忧", "eye_state": "wide_round", "eyebrows": "raised", "mouth": "low downward curve"},
+    {"id": "unimpressed", "name": "不耐烦", "eye_state": "half_lid", "eyebrows": "none", "mouth": "low tense line"},
+    {"id": "hurt", "name": "委屈", "eye_state": "neutral_dot", "eyebrows": "raised", "mouth": "low subdued downward curve"},
+    {"id": "side-eye", "name": "侧目疑惑", "eye_state": "side_round", "eyebrows": "none", "mouth": "low uncertain curve"},
+    {"id": "crying", "name": "哭泣", "eye_state": "neutral_dot", "eyebrows": "none", "mouth": "low sad curve with tears"},
+    {"id": "sobbing", "name": "崩溃大哭", "eye_state": "closed_arc", "eyebrows": "none", "mouth": "low black open cry with tears"},
+    {"id": "holding-back", "name": "憋闷", "eye_state": "closed_arc", "eyebrows": "none", "mouth": "low wavy tense line"},
+    {"id": "angry-shout", "name": "怒喊", "eye_state": "neutral_dot", "eyebrows": "furrowed", "mouth": "low black open shout"},
+    {"id": "sleepy-yawn", "name": "困倦哈欠", "eye_state": "closed_arc", "eyebrows": "none", "mouth": "low black open yawn with white tongue"},
+    {"id": "smug-grin", "name": "得意坏笑", "eye_state": "neutral_dot", "eyebrows": "furrowed", "mouth": "low outlined white toothy grin"}
+  ],
   "templates": [
     {
       "id": "s1-daily",
@@ -39,7 +75,8 @@
           0.67,
           0.745
         ]
-      ]
+      ],
+      "styleVersion": "style-lock-v1"
     },
     {
       "id": "s1-emotion",
@@ -70,7 +107,8 @@
           0.67,
           0.745
         ]
-      ]
+      ],
+      "styleVersion": "style-lock-v1"
     },
     {
       "id": "s2-sequence",
@@ -107,7 +145,8 @@
           0.67,
           0.355
         ]
-      ]
+      ],
+      "styleVersion": "style-lock-v1"
     },
     {
       "id": "s2-interaction",
@@ -144,7 +183,8 @@
           0.67,
           0.355
         ]
-      ]
+      ],
+      "styleVersion": "style-lock-v1"
     },
     {
       "id": "s3-work",
@@ -187,7 +227,8 @@
           0.67,
           0.225
         ]
-      ]
+      ],
+      "styleVersion": "style-lock-v1"
     },
     {
       "id": "s3-home",
@@ -230,7 +271,8 @@
           0.67,
           0.225
         ]
-      ]
+      ],
+      "styleVersion": "style-lock-v1"
     },
     {
       "id": "s3-outdoors",
@@ -273,7 +315,8 @@
           0.67,
           0.225
         ]
-      ]
+      ],
+      "styleVersion": "style-lock-v1"
     },
     {
       "id": "s3-pet",
@@ -316,7 +359,8 @@
           0.67,
           0.225
         ]
-      ]
+      ],
+      "styleVersion": "style-lock-v1"
     },
     {
       "id": "s4-mixed",
@@ -365,7 +409,8 @@
           0.67,
           0.16
         ]
-      ]
+      ],
+      "styleVersion": "style-lock-v1"
     },
     {
       "id": "s4-group",
@@ -415,7 +460,8 @@
           0.67,
           0.16
         ]
-      ]
+      ],
+      "styleVersion": "style-lock-v1"
     },
     {
       "id": "s5-day",
@@ -470,7 +516,8 @@
           0.67,
           0.1248
         ]
-      ]
+      ],
+      "styleVersion": "style-lock-v1"
     },
     {
       "id": "s5-mixed",
@@ -526,7 +573,8 @@
           0.67,
           0.1248
         ]
-      ]
+      ],
+      "styleVersion": "style-lock-v1"
     }
   ],
   "provenance": {
@@ -543,5 +591,27 @@
     "masterApprovedBy": "user",
     "masterApprovedOn": "2026-09-20",
     "masterReuse": "Every revised template received master-approved-v1.png and the approved face close-up directly"
-  }
+  },
+  "previousMaster": {
+    "path": "master-approved-v1.png",
+    "sha256": "c5f9b46836b82a3b2614ce500492654720ef86f3316c2346cc3eb849e548f66a",
+    "status": "approved",
+    "approvedBy": "user",
+    "approvedOn": "2026-09-20"
+  },
+  "speciesReferences": [
+    {
+      "id": "cat-style-reference",
+      "species": "cat",
+      "path": "actions-v1/reference-inputs/cat-sitting-right.png",
+      "sha256": "e01ea7e6c29397c5126ba50fbfcd1ad6ace13e4c16a03c48eee6967416b1bce4"
+    },
+    {
+      "id": "dog-style-reference",
+      "species": "dog",
+      "path": "actions-v1/reference-inputs/dog-sitting-right.png",
+      "sha256": "14627cc6089bc7c107d9e65e49b0fe589577a47a97dc82459f899a81e8655482"
+    }
+  ],
+  "legacyTemplatePolicy": "Historical style-lock-v1 templates; unavailable as generation references under v2."
 }

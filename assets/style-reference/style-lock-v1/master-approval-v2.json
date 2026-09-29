@@ -1,0 +1,8 @@
+{
+  "path": "master-approved-v2.png",
+  "sha256": "0f156a35e635eb86a7ee8e1fdf4b57dca6f26d874976e8a5a6c95334a08199e2",
+  "status": "approved",
+  "approvedBy": "user",
+  "approvedOn": "2026-09-27",
+  "approvalScope": "integrated-body-12-v3; human style, not user identities or newly generated actions"
+}

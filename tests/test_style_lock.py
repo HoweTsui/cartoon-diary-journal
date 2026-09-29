@@ -80,6 +80,7 @@ class PackagedLibraryTests(unittest.TestCase):
         library = load_library()
         self.assertEqual(sorted(t['sceneCount'] for t in library['templates']), [1,1,2,2,3,3,3,3,4,4,5,5])
         asset(LIBRARY.parent, library['master'])
+        asset(LIBRARY.parent, library['expressionReference'])
         for template in library['templates']:
             for key in ['illustration', 'poster', 'config']:
                 asset(LIBRARY.parent, template[key])
@@ -93,12 +94,14 @@ class PackagedLibraryTests(unittest.TestCase):
         self.assertEqual(data, original)
         self.assertEqual(brief['sourceText'], original['sourceText'])
         refs = [r for r in brief['references'] if r.get('origin')=='bundled']
-        self.assertEqual([r['id'] for r in refs], ['style-lock-master'])
+        self.assertEqual([r['id'] for r in refs], [
+            'style-lock-master', 'appearance-variants-v1', 'age-proportions-v1',
+            'age-variety-example-v2', 'human-expression-reference-v6'])
         self.assertNotIn(original['sourceText'], build_prompt(brief))
 
     def test_confirmed_identity_does_not_approve_explicit_draft_template(self):
         data = json.loads((LIBRARY.parent/'preview-brief.json').read_text())
-        data['identity'].update(status='confirmed', approvedVersion=data['identity']['version'], approvedBy='user', styleVersion='style-lock-v1')
+        data['identity'].update(status='confirmed', approvedVersion=data['identity']['version'], approvedBy='user', styleVersion='style-lock-v2')
         data['references'][0]['role']='identity-approved'
         data['styleLock']['templateId']='s3-work'
         with self.assertRaisesRegex(ValueError, 'template is not user-approved'):

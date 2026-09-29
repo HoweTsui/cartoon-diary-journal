@@ -21,7 +21,7 @@ def scene_boxes(count):
         raise ValueError('scene count must be 1-5')
     zone = json.loads(LAYOUT.read_text())['reservedZones']['illustration']
     step = zone['height'] / count
-    gap = min(.035, step / 5)
+    gap = min(.012, step / 8)
     return [[zone['x'], zone['y'] + i * step + gap / 2,
              zone['width'], step - gap] for i in range(count)]
 
@@ -109,7 +109,7 @@ def extract_rows(source, count, boundaries=None, *, strict=False):
     return scenes, rects
 
 
-def compose(scenes, boxes, *, strict=False):
+def compose(scenes, boxes, *, strict=False, fit_visible=False, scale_limit=None):
     """Place scenes using uniform scaling and translation only.
 
     strict=False retains historical opaque-sheet support and image-center
@@ -119,6 +119,8 @@ def compose(scenes, boxes, *, strict=False):
     if (not isinstance(boxes, (list, tuple)) or
             len(scenes) != len(boxes) or not 1 <= len(scenes) <= 5):
         raise ValueError('one scene per box required')
+    if scale_limit is not None and (isinstance(scale_limit, bool) or not isinstance(scale_limit, (int,float)) or not math.isfinite(scale_limit) or scale_limit <= 0):
+        raise ValueError('scale_limit must be positive and finite')
     canvas = paper()
     zone = json.loads(LAYOUT.read_text())['reservedZones']['illustration']
     placed, centers = [], []
@@ -129,6 +131,14 @@ def compose(scenes, boxes, *, strict=False):
                 scene = validate_scene(scene)
             except ValueError as exc:
                 raise ValueError(f'scene {index}: {exc}') from exc
+        if fit_visible:
+            if not strict:
+                raise ValueError('visible fitting requires validated transparent scenes')
+            # Trim exactly-zero-alpha outer padding only, keeping every painted
+            # pixel, opaque white interior and antialiased edge unchanged.
+            bounds = scene.getchannel('A').getbbox()
+            scene = scene.crop((max(0, bounds[0]-3), max(0, bounds[1]-3),
+                                min(scene.width, bounds[2]+3), min(scene.height, bounds[3]+3)))
         if not isinstance(box, (list, tuple)) or len(box) != 4 or any(isinstance(n, bool) or not isinstance(n, (int, float)) or not math.isfinite(n) for n in box):
             raise ValueError('invalid scene box')
         x, y, w, h = box
@@ -144,6 +154,8 @@ def compose(scenes, boxes, *, strict=False):
         if bw < 1 or bh < 1:
             raise ValueError('scene box must contain at least one pixel per dimension')
         scale = min(bw / scene.width, bh / scene.height)
+        if scale_limit is not None:
+            scale = min(scale, scale_limit)
         size = (max(1, round(scene.width * scale)), max(1, round(scene.height * scale)))
         resized = scene.convert('RGBA').resize(size, Image.Resampling.LANCZOS)
         left = bx0 + (bw - size[0]) // 2
@@ -199,8 +211,9 @@ def diary_header(config):
 def build_scenes(scenes, config, output, *, strict=True):
     """Build from ordered image paths or PIL images and a config/diary brief.
 
-    Inputs are never modified. Strict assembly keeps the full image and alpha;
-    only uniform resizing and translation are allowed. Output must be new.
+    Inputs are never modified. Strict assembly fits the full painted subject,
+    trimming only transparent outer padding before uniform resizing.
+    Output must be new.
     """
     captions = validate_config(config)
     if len(scenes) != len(captions):
@@ -229,7 +242,7 @@ def _build(scenes, config, output, *, strict, source_rects):
     captions = validate_config(config)
     count = len(captions)
     boxes = config.get('sceneBoxes', scene_boxes(count))
-    image, centers, placed = compose(scenes, boxes, strict=strict)
+    image, centers, placed = compose(scenes, boxes, strict=strict, fit_visible=strict)
     output.parent.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory(dir=output.parent) as tmp:
         dest = Path(tmp) / 'result'
@@ -240,7 +253,8 @@ def _build(scenes, config, output, *, strict, source_rects):
                  'events': [{'caption': c} for c in captions]}
         render_png(brief, illustration, dest / 'poster.png', centers)
         record = dict(config, sceneCount=count, sceneBoxes=boxes, sceneCenters=centers,
-                      placedBounds=placed, sourceRects=source_rects, strictScenes=strict, status='draft')
+                      placedBounds=placed, sourceRects=source_rects, strictScenes=strict,
+                      sizingMode='visible-alpha-fit' if strict else 'legacy-full-canvas', status='draft')
         (dest / 'config.json').write_text(json.dumps(record, ensure_ascii=False, indent=2) + '\n')
         dest.rename(output)
     return output

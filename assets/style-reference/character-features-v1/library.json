@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "status": "approved",
+  "approvedBy": "user",
+  "scope": "original-fictional-feature-examples-only",
+  "styleVersion": "style-lock-v2",
+  "sheet": {
+    "path": "feature-sheet-approved-v2.png",
+    "sha256": "0f156a35e635eb86a7ee8e1fdf4b57dca6f26d874976e8a5a6c95334a08199e2",
+    "columns": 4,
+    "rows": 3
+  },
+  "supersededDraft": "feature-sheet-draft.png",
+  "hairRule": "Sparse simple black strokes with white interiors; no solid black hair fills or dense strands.",
+  "features": [
+    "寸短发",
+    "侧分短发",
+    "中分短发",
+    "短卷发",
+    "短波波头",
+    "齐刘海长发",
+    "高马尾",
+    "低马尾",
+    "丸子头",
+    "长波浪发",
+    "圆框眼镜",
+    "方框眼镜"
+  ],
+  "usage": "Approved fictional appearance and body-type reference. Match user photos; never substitute example identities. Old drafts are inactive.",
+  "source": "Generated with built-in ImageGen on 2026-09-26 using approved master and user-supplied visual diversity reference; no original relationship labels or graph reused.",
+  "approvedOn": "2026-09-27"
+}

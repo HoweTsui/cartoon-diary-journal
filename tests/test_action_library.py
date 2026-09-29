@@ -43,23 +43,27 @@ class ActionLibraryTests(unittest.TestCase):
                 self.assertFalse(path.startswith('task-output/'))
                 self.assertTrue((root / path).is_file(), path)
 
-    def test_six_approved_actions_keep_alpha_and_load_for_production(self):
+    def test_updated_demos_preserve_alpha_without_claiming_new_approval(self):
         catalog=json.loads(LIBRARY.read_text())
-        self.assertEqual(catalog['status'],'approved')
-        self.assertEqual(catalog['approvedBy'],'user')
+        self.assertEqual(catalog['status'],'draft')
+        self.assertIsNone(catalog['approvedBy'])
         self.assertEqual(len(catalog['actions']),6)
         self.assertEqual(len({item['id'] for item in catalog['actions']}),6)
         for item in catalog['actions']:
-            self.assertEqual(item['status'],'approved')
-            self.assertEqual(item['approvedBy'],'user')
-            image,entry=load_action(item['id'])
+            if item['species'] == 'human':
+                self.assertEqual(item['status'],'draft')
+                with self.assertRaisesRegex(ValueError, 'draft'):
+                    load_action(item['id'])
+            image,entry=load_action(item['id'],preview=True)
             self.assertEqual(image.mode,'RGBA')
             low,high=image.getchannel('A').getextrema()
             self.assertEqual(low,0)
             # Generated alpha can peak at 254; retain it, never hard-quantize it.
             self.assertGreaterEqual(high,250)
             with Image.open(LIBRARY.parent/entry['source']['path']) as source:
-                expected=source.convert('RGBA').crop(entry['sourceRect'])
+                expected=source.convert('RGBA')
+                if 'sourceRect' in entry:
+                    expected=expected.crop(entry['sourceRect'])
                 self.assertEqual(image.tobytes(),expected.tobytes())
             self.assertGreater(min(image.size),100)
             self.assertEqual(entry['facing'],'reference-side-right')

@@ -1,0 +1,47 @@
+{
+  "schemaVersion": 1,
+  "assets": [
+    {
+      "id": "appearance-variants-v1",
+      "path": "appearance-variants.png",
+      "sha256": "4178ca06a612d7fbe7ec33b9fc369957e9e56f07b6c64192a862f1f5ed2e72a9",
+      "status": "user-selected-features",
+      "useFor": "mandatory component reference in every human generation: observable hair, clothing, accessories and appearance variation",
+      "notFor": "identity substitution, body proportions, overriding approved drawing grammar or copying a complete example identity"
+    },
+    {
+      "id": "age-proportions-v1",
+      "path": "age-proportions.png",
+      "sha256": "95dce83be8e63620ad9aaf55ff1174a402946b90b6623f9182ee63071eab8efb",
+      "status": "user-approved-proportions",
+      "useFor": "mandatory component reference in every human generation: relative age-stage height and head-to-body proportions, grounded in user information and the mapped identity image",
+      "notFor": "identity or age assignment, hairstyle, guessing actual age, or replacing canonical drawing grammar"
+    },
+    {
+      "id": "expression-draft-v2",
+      "path": "expression-draft-v2.png",
+      "sha256": "6c558d0a89d55ae150ebaff78e3b5efd11551a31df44ec352b33d181c047598d",
+      "status": "draft-preview",
+      "useFor": "expression previews only until user approval; round equal open-eye pupils, master-based face, low mouth",
+      "notFor": "automatic production attachment or changing identity"
+    },
+    {
+      "id": "age-variety-example-v2",
+      "path": "age-variety-example-v2.png",
+      "sha256": "d43274a452569688686c0e70c9dab76d391a36bd7e2c9b8c4993c788ecbafc90",
+      "status": "draft-preview",
+      "useFor": "mandatory component reference in every human generation by user instruction: open-ended face, age-presentation, body-type, hair and clothing examples with pure-white skin fill; select features individually",
+      "notFor": "copying any complete example character, treating the sheet as a fixed roster or age/identity assignment, overriding the approved master, or approving example characters"
+    }
+  ],
+  "expressionVocabulary": [
+    {"id": "neutral", "eye_state": "neutral_dot", "eyebrows": "none", "mouth": "low small relaxed"},
+    {"id": "gentle-smile", "eye_state": "neutral_dot", "eyebrows": "none", "mouth": "low slight upward curve"},
+    {"id": "happy-laugh", "eye_state": "neutral_dot", "eyebrows": "none", "mouth": "low open smile"},
+    {"id": "surprise", "eye_state": "wide_round", "eyebrows": "none", "mouth": "low small open oval"},
+    {"id": "worry", "eye_state": "neutral_dot", "eyebrows": "none", "mouth": "low subdued downward curve"},
+    {"id": "sad", "eye_state": "closed_arc", "eyebrows": "none", "mouth": "low downward curve"},
+    {"id": "frustrated", "eye_state": "half_lid", "eyebrows": "none", "mouth": "low tense short line"},
+    {"id": "sleepy", "eye_state": "closed_arc", "eyebrows": "none", "mouth": "low relaxed line"}
+  ]
+}

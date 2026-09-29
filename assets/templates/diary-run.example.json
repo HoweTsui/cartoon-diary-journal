@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "date": "2026-09-21",
+  "photoCount": 0,
+  "poster": "poster.png",
+  "readerManifest": "reader/data/manifest.json",
+  "steps": [
+    {"id":"references","status":"pending","evidence":[]},
+    {"id":"photos","status":"not-needed","reason":"本次未提供照片","evidence":[]},
+    {"id":"identity","status":"pending","evidence":[]},
+    {"id":"scenes","status":"pending","evidence":[]},
+    {"id":"poster","status":"pending","evidence":[]},
+    {"id":"graph-book","status":"pending","evidence":[]},
+    {"id":"note","status":"pending","evidence":[]}
+  ],
+  "note": {"kind":"local-markdown","tool":"用户指定的本地笔记工具","document":"notes/2026-09-21.md","poster":"notes/attachments/2026-09-21/2026-09-21-海报.png","photos":[]},
+  "previews": {},
+  "contentReview": null
+}

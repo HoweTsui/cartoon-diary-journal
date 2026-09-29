@@ -19,16 +19,18 @@ class DefaultStyleTests(unittest.TestCase):
         self.data=json.loads((LIBRARY.parent/'preview-brief.json').read_text())
         self.data.pop('styleLock')
 
-    def test_no_opt_in_still_uses_only_approved_master(self):
+    def test_no_opt_in_uses_approved_master_and_mandatory_human_pack(self):
         before=copy.deepcopy(self.data)
         value=validate_brief(self.data,LIBRARY.parent,True)
         self.assertEqual(self.data,before)
-        self.assertEqual(value['styleLock']['version'],'style-lock-v1')
-        self.assertEqual([r['id'] for r in value['references'] if r.get('origin')=='bundled'],['style-lock-master'])
+        self.assertEqual(value['styleLock']['version'],'style-lock-v2')
+        self.assertEqual([r['id'] for r in value['references'] if r.get('origin')=='bundled'],[
+            'style-lock-master', 'appearance-variants-v1', 'age-proportions-v1',
+            'age-variety-example-v2', 'human-expression-reference-v6'])
         self.assertNotIn('templateId',value['styleLock'])
 
     def test_approved_master_works_without_promoting_templates(self):
-        self.data['identity'].update(status='confirmed',approvedBy='user',approvedVersion=self.data['identity']['version'],styleVersion='style-lock-v1')
+        self.data['identity'].update(status='confirmed',approvedBy='user',approvedVersion=self.data['identity']['version'],styleVersion='style-lock-v2')
         self.data['references'][0]['role']='identity-approved'
         value=validate_brief(self.data,LIBRARY.parent,False)
         self.assertEqual(value['role'],'production')
@@ -60,7 +62,7 @@ class DefaultStyleTests(unittest.TestCase):
         before=copy.deepcopy(brief)
         request=generation_request(brief,2)
         self.assertEqual(brief,before)
-        self.assertEqual(Path(request['referenced_image_paths'][0]).name,'master-approved-v1.png')
+        self.assertEqual(Path(request['referenced_image_paths'][0]).name,'master-approved-v2.png')
         self.assertIn(brief['events'][1]['scene'],request['prompt'])
         self.assertNotIn(brief['events'][0]['scene'],request['prompt'])
         self.assertNotIn(brief['events'][2]['scene'],request['prompt'])
@@ -110,14 +112,21 @@ class ScopedRequestTests(unittest.TestCase):
         before = copy.deepcopy(self.data)
         brief = self.validate()
         validated_before = copy.deepcopy(brief)
+        human_pack = [r['path'] for r in brief['references'] if r.get('id') in {
+            'appearance-variants-v1', 'age-proportions-v1', 'age-variety-example-v2',
+            'human-expression-reference-v6'}]
         for number, person, background, excluded in (
                 (1, 'person.png', 'window.png', ['cat.png', 'garden.png']),
                 (2, 'cat.png', 'garden.png', ['person.png', 'window.png'])):
             with self.subTest(scene=number):
                 request = generation_request(brief, number)
-                self.assertEqual(request['referenced_image_paths'], [
-                    brief['references'][0]['path'], str(self.base / 'shared.png'),
-                    str(self.base / person), str(self.base / background)])
+                expected = [brief['references'][0]['path']]
+                if number == 2:
+                    expected.append(str(LIBRARY.parent/'actions-v1/reference-inputs/cat-sitting-right.png'))
+                if number == 1:
+                    expected.extend(human_pack)
+                expected.extend([str(self.base / 'shared.png'), str(self.base / person), str(self.base / background)])
+                self.assertEqual(request['referenced_image_paths'], expected)
                 for path in excluded:
                     self.assertNotIn(str(self.base / path), request['prompt'])
                 self.assertIn(brief['events'][number - 1]['scene'], request['prompt'])
@@ -133,10 +142,18 @@ class ScopedRequestTests(unittest.TestCase):
         for event in self.data['events']:
             event.pop('referenceIds')
         brief = self.validate()
+        human_pack = [r['path'] for r in brief['references'] if r.get('id') in {
+            'appearance-variants-v1', 'age-proportions-v1', 'age-variety-example-v2',
+            'human-expression-reference-v6'}]
         for scene in (1, 2):
             request = generation_request(brief, scene)
-            self.assertEqual(request['referenced_image_paths'], [
-                brief['references'][0]['path'], str(self.base / 'shared.png')])
+            expected = [brief['references'][0]['path']]
+            if scene == 1:
+                expected.extend(human_pack)
+            else:
+                expected.append(str(LIBRARY.parent/'actions-v1/reference-inputs/cat-sitting-right.png'))
+            expected.append(str(self.base / 'shared.png'))
+            self.assertEqual(request['referenced_image_paths'], expected)
 
     def test_invalid_or_missing_scene_mapping_fails_explicitly(self):
         cases = []
@@ -165,7 +182,9 @@ class ScopedRequestTests(unittest.TestCase):
         self.data['events'][1]['referenceIds'] = ['window', 'garden']
         request = generation_request(self.validate(), 1)
         self.assertEqual([Path(p).name for p in request['referenced_image_paths']],
-                         ['master-approved-v1.png', 'shared.png', 'person.png'])
+                         ['master-approved-v2.png', 'appearance-variants.png', 'age-proportions.png',
+                          'age-variety-example-v2.png', 'human-expression-reference-v6.png',
+                          'shared.png', 'person.png'])
 
     def test_scene_reference_can_be_explicitly_reused_across_events(self):
         self.data['references'] = [r for r in self.data['references'] if r.get('id') != 'garden']
@@ -193,7 +212,7 @@ class ScopedRequestTests(unittest.TestCase):
 
     def test_production_requires_approved_card_for_each_visible_character(self):
         self.data['identity'].update(status='confirmed', approvedBy='user',
-                                     approvedVersion=self.data['identity']['version'], styleVersion='style-lock-v1')
+                                     approvedVersion=self.data['identity']['version'], styleVersion='style-lock-v2')
         self.data['references'][1]['role'] = 'identity-approved'
         brief = validate_brief(self.data, self.base, False)
         generation_request(brief, 1)

@@ -2,16 +2,69 @@
   "schemaVersion": 2,
   "kind": "diary",
   "protagonistId": "sample-person",
-  "identity": {"status": "draft", "version": "style-lock-demo-v1"},
-  "characters": [{"id": "sample-person", "name": "虚构示例", "species": "human", "anchors": ["短黑发", "白色上衣和黑色短裤"]}],
-  "references": [{"path": "master-approved-v1.png", "role": "identity-draft"}],
-  "styleLock": {"version": "style-lock-v1", "tags": ["work"]},
+  "identity": {
+    "status": "draft",
+    "version": "style-lock-demo-v1"
+  },
+  "characters": [
+    {
+      "id": "sample-person",
+      "name": "虚构示例",
+      "species": "human",
+      "anchors": [
+        "侧分线条短发，内部留白",
+        "侧身白上衣、细长裤，无独立脖子"
+      ]
+    }
+  ],
+  "references": [
+    {
+      "path": "master-approved-v2.png",
+      "role": "identity-draft"
+    }
+  ],
+  "styleLock": {
+    "version": "style-lock-v2",
+    "tags": [
+      "work"
+    ]
+  },
   "date": "2026-09-19",
   "title": "慢慢做完",
   "sourceText": "虚构模板：在电脑前想了一会儿，把几个想法写在纸上。做完后合上电脑，伸了个懒腰。",
   "events": [
-    {"scene": "一人在电脑前思考", "caption": "对着屏幕想想", "characters": ["sample-person"], "emotion": "thinking", "intensity": "mild", "eye_state": "neutral_dot", "eyebrows": "none"},
-    {"scene": "一人在纸上写下想法，不绘制可读文字", "caption": "把想法写下来", "characters": ["sample-person"], "emotion": "focused", "intensity": "mild", "eye_state": "neutral_dot", "eyebrows": "none"},
-    {"scene": "完成后合上电脑伸懒腰", "caption": "终于做完一件", "characters": ["sample-person"], "emotion": "relieved", "intensity": "medium", "eye_state": "closed_arc", "eyebrows": "none"}
+    {
+      "scene": "一人在电脑前思考",
+      "caption": "对着屏幕想想",
+      "characters": [
+        "sample-person"
+      ],
+      "emotion": "thinking",
+      "intensity": "mild",
+      "eye_state": "neutral_dot",
+      "eyebrows": "none"
+    },
+    {
+      "scene": "一人在纸上写下想法，不绘制可读文字",
+      "caption": "把想法写下来",
+      "characters": [
+        "sample-person"
+      ],
+      "emotion": "focused",
+      "intensity": "mild",
+      "eye_state": "neutral_dot",
+      "eyebrows": "none"
+    },
+    {
+      "scene": "完成后合上电脑伸懒腰",
+      "caption": "终于做完一件",
+      "characters": [
+        "sample-person"
+      ],
+      "emotion": "relieved",
+      "intensity": "medium",
+      "eye_state": "closed_arc",
+      "eyebrows": "none"
+    }
   ]
 }

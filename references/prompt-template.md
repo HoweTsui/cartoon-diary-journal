@@ -8,6 +8,8 @@
 
 `assets/style-reference/style-lock-v1/library.json` 的 approved master 是默认固定参考，onboarding/expression/diary 均强制加入，不能仅提供图片路径文字。旧 reference-manifest.json 为历史包，新任务不再附上。使用 `--request-output` 的 referenced_image_paths 原样传给生图工具，并保留调用实参和结果路径。
 
+角色扩展包见 `assets/style-reference/character-extension-v1/library.json`。每个含 human 的 onboarding、expression、diary 请求均自动并实际附上外观变化、年龄比例、开放式脸型/年龄/体型组件示例，以及已批准的 `human-expression-reference-v6.png`；按角色 ID 限定，并在单场请求中只保留出镜人类对应的组件图。开放式组合示例虽然是草稿，但按用户要求作为组件参考；不因此批准其中角色或照搬完整造型。`expression-draft-v2.png` 不附加。附图不是身份图或画风批准；用户自己的上传图/已确认身份卡仍是每个角色的身份来源，批准母版仍锁定绘制画法。详情见 `identity-fidelity.md`。成年人的可选 `ageStage` 只接受 `young-adult/middle-aged/older-adult`，必须来自用户明确信息。
+
 用户照片先执行：
 ```bash
 python3 scripts/archive_diary_photos.py <photo...> --date 2026-09-13 --character-id <id> --output-dir task-output/2026-09-13/photo-archive
@@ -27,8 +29,8 @@ Agent 负责理解事实、选景、编写短文本与表情；脚本仅验证�
 - characters: [{id, name, species: human | cat | dog, anchors: 2–12个可观察身份特征}]
 - references: [{path: 相对 brief 所在目录的本地图片, role, origin?: task-asset | user-photo, id?: 引用ID, characterIds?: 身份卡适用角色ID列表}]
 
-confirmed 还需 approvedVersion=version、approvedBy=user；正式模式另需 identity.styleVersion=style-lock-v1。旧卡先校准再由用户确认；预览不能自动改状态。
-参考 role：identity-source、identity-draft、identity-approved、style、layout、scene。onboarding 必须 identity-source 且 --preview；expression/diary 预览需要 identity-draft 或 identity-approved，正式必须 identity-approved。用户提供的 references 是身份与事实来源；内置 style/layout 由脚本强制注入，无四图字段冗余写法。所有声明图片都校验存在，实际生图只附 request 中筛选后的图片，且清单图片全部附上。仅支持PNG/JPEG/GIF/WebP，禁止远程、绝对、父目录或逃逸符号链接路径。旧身份卡保留发型、服装和配饰；鼻形、鼻根断口、眼睛结构与比例按当前母版和 canonical geometry 修正，onboarding 和 preview 也不保留错误旧几何。
+confirmed 还需 approvedVersion=version、approvedBy=user；正式模式另需 identity.styleVersion=style-lock-v2。旧卡先校准再由用户确认；预览不能自动改状态。
+参考 role：identity-source、identity-draft、identity-approved、style、layout、scene。onboarding 必须 identity-source 且 --preview；expression/diary 预览需要 identity-draft 或 identity-approved，正式必须 identity-approved。每个实际出镜角色都必须有适用身份卡；每个人类请求还须通过脚本检查强制组件图齐全。用户提供的 identity references 是对应角色的身份来源；内置 style/layout 和角色组件图由脚本强制注入，不用 brief 字段冗余声明。所有声明图片都校验存在，实际生图只附 request 中筛选后的图片，且清单图片全部附上。仅支持PNG/JPEG/GIF/WebP，禁止远程、绝对、父目录或逃逸符号链接路径。旧身份卡保留发型、服装和配饰；鼻形、鼻根断口、眼睛结构和比例按当前母版与 canonical geometry 修正，onboarding 和 preview 也不保留错误旧几何。未逐角色对照身份、年龄体型和对应表情，不得标记通过。
 
 ### 参考图与事件映射
 
@@ -66,7 +68,7 @@ scene≤180字符，emotion≤40；caption为4–10，bubble≤6，顶层可选s
 每场可选 expressions 对象：键为该场角色ID，值为完整的 emotion/intensity/eye_state/eyebrows 四字段。角色覆盖优先于场景默认表情；例如 humans 使用 closed_arc，猫使用 {"emotion":"calm","intensity":"mild","eye_state":"neutral_dot","eyebrows":"none"}，不要把人的情绪复制给猫。
 geometry 可省略以采用 canonical；如提供覆盖，必须通过 geometry.json 的容差与正白缝检查。禁止反复相对缩放。
 
-眉毛限制按逐角色有效表情检查：mild/medium 必须 eyebrows=none；raised/furrowed 仅允许 strong，并由 Agent 核对事实确需夸张表达，不可为了通过校验改写情绪强度。眼珠保持正圆，半睁仅遮挡，闭眼仍是短弧。scene/emotion 应说明嘴长、弧度或张合，低位偏耳侧的嘴不再一律使用短弧。geometry.human.noseUpperGap 是鼻上缘与前脸线端的净白断口，neckWidth 是脖子外宽，均以头宽H为单位；新数值为设计目标而非图片测量。旧 geometry.human 完整覆盖对象需要补齐新增字段，通常省略 geometry 以采用当前定义。
+眉毛限制按逐角色有效表情检查：mild/medium 必须 eyebrows=none；raised/furrowed 仅允许 strong，并由 Agent 核对事实确需夸张表达，不可为了通过校验改写情绪强度。眼珠保持正圆，半睁仅遮挡，闭眼仍是短弧。scene/emotion 应说明嘴长、弧度或张合，低位偏耳侧的嘴不再一律使用短弧。geometry.human.noseUpperGap 是鼻上缘与前脸线端的净白断口，neckWidth 固定为0，表示不绘制独立脖子（头身仍须分界），不是把头身融合，均以头宽H为单位；新数值为设计目标而非图片测量。旧 geometry.human 完整覆盖对象需要补齐新增字段，通常省略 geometry 以采用当前定义。
 
 ```bash
 python3 scripts/build_diary_prompt.py task-output/brief.json --preview --scene 1 --request-output task-output/request-01.json --output task-output/prompt-01.txt

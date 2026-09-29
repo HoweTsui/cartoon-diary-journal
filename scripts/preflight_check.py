@@ -33,10 +33,23 @@ REQUIRED_FILES = (
     "CHANGELOG.md",
     "agents/openai.yaml",
     "references/character-library.md",
+    "references/character-features.md",
+    "references/identity-fidelity.md",
+    "references/task-delivery.md",
+    "scripts/verify_diary_delivery.py",
+    "assets/templates/diary-run.example.json",
+    "assets/style-reference/character-features-v1/library.json",
+    "assets/style-reference/character-features-v1/feature-sheet-approved-v2.png",
+    "assets/style-reference/character-extension-v1/library.json",
+    "assets/style-reference/character-extension-v1/appearance-variants.png",
+    "assets/style-reference/character-extension-v1/age-proportions.png",
+    "assets/style-reference/character-extension-v1/expression-draft-v2.png",
+    "assets/style-reference/character-extension-v1/age-variety-example-v2.png",
     "references/style-system.md",
     "references/style-contract.md",
     "references/style-lock.md",
     "scripts/diary_style_lock.py",
+    "assets/style-reference/style-lock-v1/human-expression-reference-v6.png",
     "references/visual-atoms.md",
     "references/visual-gate.md",
     "references/prompt-template.md",
@@ -218,7 +231,7 @@ def check_package(failures: list[str]) -> None:
     try:
         from diary_style_lock import LIBRARY, attach
         sample = {'kind': 'onboarding', 'references': []}
-        attach(sample, {'version': 'style-lock-v1'}, True, LIBRARY)
+        attach(sample, {'version': 'style-lock-v2'}, True, LIBRARY)
         if sample['references'][0]['id'] != 'style-lock-master':
             raise ValueError('default master is not the first reference')
         print("PASS  approved default master (integrity only; not image style approval)")

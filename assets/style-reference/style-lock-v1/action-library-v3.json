@@ -1,0 +1,183 @@
+{
+  "schemaVersion": 1,
+  "id": "actions-v3",
+  "status": "draft",
+  "approvedBy": null,
+  "approvedOn": null,
+  "approvalScope": "Updated public demonstration; new human actions await user approval, old animal approvals retained.",
+  "requiredReferences": [
+    {
+      "path": "master-approved-v2.png",
+      "sha256": "0f156a35e635eb86a7ee8e1fdf4b57dca6f26d874976e8a5a6c95334a08199e2"
+    },
+    {
+      "id": "cat-style-reference",
+      "species": "cat",
+      "path": "actions-v1/reference-inputs/cat-sitting-right.png",
+      "sha256": "e01ea7e6c29397c5126ba50fbfcd1ad6ace13e4c16a03c48eee6967416b1bce4"
+    },
+    {
+      "id": "dog-style-reference",
+      "species": "dog",
+      "path": "actions-v1/reference-inputs/dog-sitting-right.png",
+      "sha256": "14627cc6089bc7c107d9e65e49b0fe589577a47a97dc82459f899a81e8655482"
+    }
+  ],
+  "allowedTransforms": [
+    "uniform-scale",
+    "translate"
+  ],
+  "actions": [
+    {
+      "id": "human-walk-right",
+      "label": "人物 · 走路",
+      "species": "human",
+      "pose": "walking",
+      "facing": "reference-side-right",
+      "status": "draft",
+      "approvedBy": null,
+      "approvedOn": null,
+      "identityScope": "fictional-demo-only",
+      "source": {
+        "path": "actions-v3/human-walk-right.png",
+        "sha256": "aaddb3d3c98cc994ef810d13df01ab48237779eaf45336fddff334e74de63fab"
+      },
+      "background": "generated-alpha-preserved",
+      "facePreservation": "reference-guided-not-pixel-identical",
+      "image": {
+        "path": "actions-v3/human-walk-right.png",
+        "sha256": "aaddb3d3c98cc994ef810d13df01ab48237779eaf45336fddff334e74de63fab"
+      }
+    },
+    {
+      "id": "human-read-right",
+      "label": "人物 · 坐着看书",
+      "species": "human",
+      "pose": "reading",
+      "facing": "reference-side-right",
+      "status": "draft",
+      "approvedBy": null,
+      "approvedOn": null,
+      "identityScope": "fictional-demo-only",
+      "source": {
+        "path": "actions-v3/human-read-right.png",
+        "sha256": "4b011d6d1da4e6d51ef0efe5dac20ed1d08f2eb1bfcba92b360dbc102dd121dc"
+      },
+      "background": "generated-alpha-preserved",
+      "facePreservation": "reference-guided-not-pixel-identical",
+      "image": {
+        "path": "actions-v3/human-read-right.png",
+        "sha256": "4b011d6d1da4e6d51ef0efe5dac20ed1d08f2eb1bfcba92b360dbc102dd121dc"
+      }
+    },
+    {
+      "id": "cat-walk-right",
+      "label": "猫 · 走路",
+      "species": "cat",
+      "pose": "walking",
+      "facing": "reference-side-right",
+      "status": "approved",
+      "approvedBy": "user",
+      "approvedOn": "2026-09-21",
+      "identityScope": "fictional-demo-only",
+      "source": {
+        "path": "actions-v1/sheets/cat-v2.png",
+        "sha256": "a8a4dbb1a718b198169f7d294f4f89cf67c4c29c1e09d9b6606a7f4e22187618"
+      },
+      "sourceRect": [
+        89,
+        238,
+        595,
+        787
+      ],
+      "background": "generated-alpha-preserved",
+      "facePreservation": "reference-guided-not-pixel-identical",
+      "image": {
+        "path": "actions-v1/components-v2/cat-walk-right.png",
+        "sha256": "c350385a78f9f24eb8294069567204e6f88b660769d7a01e76d2bb4f4496807f"
+      }
+    },
+    {
+      "id": "cat-lie-right",
+      "label": "猫 · 趴卧",
+      "species": "cat",
+      "pose": "lying-awake",
+      "facing": "reference-side-right",
+      "status": "approved",
+      "approvedBy": "user",
+      "approvedOn": "2026-09-21",
+      "identityScope": "fictional-demo-only",
+      "source": {
+        "path": "actions-v1/sheets/cat-v2.png",
+        "sha256": "a8a4dbb1a718b198169f7d294f4f89cf67c4c29c1e09d9b6606a7f4e22187618"
+      },
+      "sourceRect": [
+        855,
+        290,
+        1466,
+        776
+      ],
+      "background": "generated-alpha-preserved",
+      "facePreservation": "reference-guided-not-pixel-identical",
+      "image": {
+        "path": "actions-v1/components-v2/cat-lie-right.png",
+        "sha256": "7744e4945e13469d476ebaae82ceb4a2024f36c10aa2cfb3d44a5a810c2818db"
+      }
+    },
+    {
+      "id": "dog-walk-right",
+      "label": "狗 · 走路",
+      "species": "dog",
+      "pose": "walking",
+      "facing": "reference-side-right",
+      "status": "approved",
+      "approvedBy": "user",
+      "approvedOn": "2026-09-21",
+      "identityScope": "fictional-demo-only",
+      "source": {
+        "path": "actions-v1/sheets/dog.png",
+        "sha256": "a3db78c2f973c1004b89c8f5b29d207fce049891eb1576e4fa5100740a5e829b"
+      },
+      "sourceRect": [
+        128,
+        280,
+        698,
+        801
+      ],
+      "background": "generated-alpha-preserved",
+      "facePreservation": "reference-guided-not-pixel-identical",
+      "image": {
+        "path": "actions-v1/components-v2/dog-walk-right.png",
+        "sha256": "766b94c6159610550324ed092129e9e5dd18024c5bdff0ee91445187ab977924"
+      }
+    },
+    {
+      "id": "dog-sniff-right",
+      "label": "狗 · 低头闻闻",
+      "species": "dog",
+      "pose": "sniffing",
+      "facing": "reference-side-right",
+      "status": "approved",
+      "approvedBy": "user",
+      "approvedOn": "2026-09-21",
+      "identityScope": "fictional-demo-only",
+      "source": {
+        "path": "actions-v1/sheets/dog.png",
+        "sha256": "a3db78c2f973c1004b89c8f5b29d207fce049891eb1576e4fa5100740a5e829b"
+      },
+      "sourceRect": [
+        871,
+        388,
+        1481,
+        801
+      ],
+      "background": "generated-alpha-preserved",
+      "facePreservation": "reference-guided-not-pixel-identical",
+      "image": {
+        "path": "actions-v1/components-v2/dog-sniff-right.png",
+        "sha256": "7a5e0963c98044b8857eb8ac789cd304a8cd29c8de8bc2f9205eddc495da0788"
+      }
+    }
+  ],
+  "styleVersion": "style-lock-v2"
+}

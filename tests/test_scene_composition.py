@@ -12,7 +12,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'scripts'))
 from build_diary_template import (build_scenes, compose, content_box,
                                   extract_rows, paper, scene_boxes, diary_header)
-from build_diary_text_layer import text_lines, FONT_DIR
+from build_diary_text_layer import text_lines, FONT_DIR, render_png
 from PIL import ImageFont
 
 
@@ -23,6 +23,18 @@ def cutout(size=(100, 100), bounds=(15, 10, 75, 50)):
 
 
 class StrictCompositionTests(unittest.TestCase):
+    def test_visible_fit_ignores_only_transparent_padding_and_keeps_source(self):
+        scene = cutout((600, 400), (220, 150, 360, 240))
+        before = scene.tobytes()
+        old, _, _ = compose([scene], scene_boxes(4)[:1], strict=True)
+        new, _, _ = compose([scene], scene_boxes(4)[:1], strict=True, fit_visible=True)
+        old_ink = ImageChops.difference(old.convert('RGB'), paper().convert('RGB')).getbbox()
+        new_ink = ImageChops.difference(new.convert('RGB'), paper().convert('RGB')).getbbox()
+        self.assertGreater(new_ink[3]-new_ink[1], 2*(old_ink[3]-old_ink[1]))
+        self.assertEqual(scene.tobytes(), before)
+        self.assertLessEqual(new_ink[2], 876)
+        self.assertGreaterEqual(new_ink[0], 72)
+
     def test_opaque_rgb_and_rgba_are_rejected_without_mutation(self):
         for mode in ('RGB', 'RGBA'):
             scene = Image.new(mode, (100, 100), 'white')
@@ -119,6 +131,24 @@ class StrictCompositionTests(unittest.TestCase):
 
 
 class SceneBuildTests(unittest.TestCase):
+    def test_large_captions_fit_five_scenes_without_painting_over_illustrations(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            source = root/'paper.png'
+            Image.new('RGB',(1200,1600),'white').save(source)
+            captions=['今天和小狗慢慢散步','坐下看看手里的书页','小猫门口抬头看我','停下闻一闻','坐下翻几页']
+            brief={'header':'2026.09.21 周一','title':'走走再歇歇','events':[{'caption':c} for c in captions]}
+            output=root/'poster.png'
+            render_png(brief,source,output,[.24,.39,.54,.69,.84])
+            with Image.open(output) as image:
+                ink=ImageChops.difference(image,Image.new('RGB',image.size,'white'))
+                bounds=ink.crop((0,250,1200,1600)).getbbox()
+                self.assertGreaterEqual(bounds[0],912)
+                self.assertLessEqual(bounds[2],1128)
+            with self.assertRaisesRegex(ValueError,'safe zone'):
+                render_png(brief,source,root/'overlap.png',[.24,.241,.54,.69,.84])
+            self.assertFalse((root/'overlap.png').exists())
+
     def test_caption_wrap_preserves_text_and_avoids_orphan_character(self):
         draw = ImageDraw.Draw(Image.new('RGB', (1200, 1600)))
         font = ImageFont.truetype(str(FONT_DIR / 'Yozai-Regular.ttf'), 28)

@@ -950,88 +950,112 @@
   },
   "nodes": [
     {
-      "id": "demo-main",
-      "name": "主角",
-      "role": "日记记录者",
+      "id": "paper-hao",
+      "name": "阿纸",
+      "role": "虚构日记角色",
       "col": 0,
       "row": 0,
-      "x": 0,
-      "y": 120,
+      "x": -200,
+      "y": 30,
       "anchors": [
-        "25-35度偏正半侧面、双正圆豆豆眼略高且外侧眼留白",
-        "四束稀疏翘发、后脑小块黑发与圆角头部",
-        "窄身板、固定细双线四肢（数值见references/geometry.json），内部纯白无第三条线与扁平鞋",
-        "鼻根上方明显净白断口、低位偏耳侧且随表情变化的嘴、横向宽扁C形鼻；圆头等粗描边、细脖子，中性无眉"
+        "侧分线条短发、内部留白",
+        "双圆点眼、短鼻与鼻根断口",
+        "头身有分界、无独立脖子",
+        "侧身白上衣与细长裤"
       ],
       "notes": [
-        "把普通小事写成简短吐槽"
+        "走走再歇歇 · 公开虚构示例"
       ],
-      "avatarFocusX": 0.5,
-      "avatarFocusY": 0.36
+      "avatarSrc": "avatars/paper-hao.png",
+      "species": "human",
+      "profile": {
+        "approval": "draft",
+        "appearance": [
+          "侧分线条短发、内部留白",
+          "双圆点眼、短鼻与鼻根断口",
+          "头身有分界、无独立脖子",
+          "侧身白上衣与细长裤"
+        ],
+        "firstAppearance": "走走再歇歇",
+        "standardCardSrc": "avatars/paper-hao.png"
+      }
     },
     {
-      "id": "demo-partner",
-      "name": "搭档",
-      "role": "共同记录者",
+      "id": "paper-cat",
+      "name": "小猫",
+      "role": "虚构日记角色",
       "col": 1,
       "row": 0,
-      "x": -240,
-      "y": -140,
+      "x": 0,
+      "y": -130,
       "anchors": [
-        "25-35度偏正半侧面、双正圆豆豆眼略高且外侧眼留白",
-        "耳上短波浪发、单枚发夹与圆角头部",
-        "窄身板、固定细双线四肢（数值见references/geometry.json），内部纯白无第三条线与扁平鞋；可见眼镜线宽与主体一致",
-        "鼻根上方明显净白断口、低位偏耳侧且随表情变化的嘴、横向宽扁C形鼻；圆头等粗描边、细脖子，中性无眉"
+        "两只三角耳",
+        "独立小黑鼻",
+        "短颊纹与圆润轮廓",
+        "细腿和较大爪掌"
       ],
       "notes": [
-        "负责提醒主角补充细节"
+        "走走再歇歇 · 公开虚构示例"
       ],
-      "avatarFocusX": 0.5,
-      "avatarFocusY": 0.36
+      "avatarSrc": "avatars/paper-cat.png",
+      "species": "cat",
+      "profile": {
+        "approval": "approved",
+        "appearance": [
+          "两只三角耳",
+          "独立小黑鼻",
+          "短颊纹与圆润轮廓",
+          "细腿和较大爪掌"
+        ],
+        "firstAppearance": "走走再歇歇",
+        "standardCardSrc": "avatars/paper-cat.png"
+      }
     },
     {
-      "id": "demo-cat",
-      "name": "猫咪",
-      "role": "宠物伙伴",
+      "id": "paper-dog",
+      "name": "小狗",
+      "role": "虚构日记角色",
       "col": 2,
       "row": 0,
-      "x": 240,
-      "y": -140,
+      "x": 200,
+      "y": 50,
       "anchors": [
-        "25-35度物种半侧面、大头窄身和黑色远耳耳尖",
-        "双眼下方中央的小黑色猫鼻",
-        "无毛光滑轮廓、短细双线四肢和夸张大爪（数值见references/geometry.json）和黑色尾尖",
-        "无写实毛发和眼睛高光"
+        "黑色下垂耳",
+        "椭圆黑鼻",
+        "圆点眼与白色身体",
+        "细腿和较大爪掌"
       ],
       "notes": [
-        "经常把纸张踩出新的故事"
+        "走走再歇歇 · 公开虚构示例"
       ],
-      "kind": "animal",
-      "species": "cat",
-      "avatarFocusX": 0.5,
-      "avatarFocusY": 0.62
+      "avatarSrc": "avatars/paper-dog.png",
+      "species": "dog",
+      "profile": {
+        "approval": "approved",
+        "appearance": [
+          "黑色下垂耳",
+          "椭圆黑鼻",
+          "圆点眼与白色身体",
+          "细腿和较大爪掌"
+        ],
+        "firstAppearance": "走走再歇歇",
+        "standardCardSrc": "avatars/paper-dog.png"
+      }
     }
   ],
   "edges": [
     {
-      "source": "demo-main",
-      "target": "demo-partner",
-      "label": "搭档",
-      "type": "partner",
-      "curve": 0
-    },
-    {
-      "source": "demo-main",
-      "target": "demo-cat",
-      "label": "照顾",
+      "source": "paper-hao",
+      "target": "paper-cat",
+      "label": "陪伴",
       "type": "care",
       "curve": 0
     },
     {
-      "source": "demo-partner",
-      "target": "demo-cat",
+      "source": "paper-hao",
+      "target": "paper-dog",
       "label": "陪伴",
-      "type": "friend",
+      "type": "care",
       "curve": 0
     }
   ]
@@ -1045,7 +1069,7 @@
       var graphData = JSON.parse(document.getElementById("graph-data").textContent);
       var atlasCols = graphData.atlas.cols;
       var atlasRows = graphData.atlas.rows;
-      var atlasSrc = graphData.atlas.src || "character-lineup.png";
+      var atlasSrc = graphData.atlas.src || "character-lineup-demo.png";
       var atlas = new Image();
       atlas.src = atlasSrc;
 
@@ -3154,6 +3178,12 @@
         }
       });
       window.addEventListener("resize", resize);
+      // Canvas keeps the first painted fallback font until explicitly redrawn.
+      if (document.fonts) {
+        document.fonts.load('700 22px "Yozai"', '人物关系').then(function () {
+          draw();
+        });
+      }
       if (!nodeById.has(selectedId)) {
         selectedId = nodes[0].id;
       }

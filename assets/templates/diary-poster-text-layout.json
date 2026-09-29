@@ -1,6 +1,7 @@
 {
   "schemaVersion": 1,
   "canvas": {"ratio": "3:4", "width": 1200, "height": 1600},
+  "typography": {"dateSize": 32, "titleSize": 48, "captionSize": 44, "captionSpacing": 8},
   "reservedZones": {
     "header": {"x": 0.10, "y": 0.025, "width": 0.80, "height": 0.12},
     "illustration": {"x": 0.06, "y": 0.17, "width": 0.67, "height": 0.78},

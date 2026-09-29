@@ -1,6 +1,6 @@
 # 视觉规范入口
 
-默认画风唯一以已确认的 assets/style-reference/style-lock-v1/master-approved-v1.png 和 style-contract.md 为准。生成器对所有 brief 自动附上母版。调用方式、角色校准和单场景合成见 style-lock.md；旧 reference-manifest.json 只保留历史用途，不再作为新任务的生成包。
+默认画风唯一以已确认的 assets/style-reference/style-lock-v1/master-approved-v2.png 和 style-contract.md 为准。生成器对所有 brief 自动附上母版。调用方式、角色校准和单场景合成见 style-lock.md；旧 reference-manifest.json 只保留历史用途，不再作为新任务的生成包。
 
 数值由 geometry.json 注入，以角色头宽 H 为单位；肢体的 stroke 是单根线宽，innerGap 是净白缝，outerWidth=2*stroke+innerGap。每段裸露肢体只有两条外轮廓，内部白色，不补中线；动作只改变走向，不相对上一张图反复缩短或加粗。新角色沿用母版画法并保留用户身份，不复制示例身份。
 
