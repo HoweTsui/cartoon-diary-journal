@@ -183,7 +183,7 @@ class ScopedRequestTests(unittest.TestCase):
         request = generation_request(self.validate(), 1)
         self.assertEqual([Path(p).name for p in request['referenced_image_paths']],
                          ['master-approved-v2.png', 'appearance-variants.png', 'age-proportions.png',
-                          'age-variety-example-v2.png', 'human-expression-reference-v6.png',
+                          'appearance-unified-v3.png', 'human-expression-reference-v6.png',
                           'shared.png', 'person.png'])
 
     def test_scene_reference_can_be_explicitly_reused_across_events(self):
