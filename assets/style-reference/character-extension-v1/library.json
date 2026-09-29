@@ -27,9 +27,11 @@
     },
     {
       "id": "age-variety-example-v2",
-      "path": "age-variety-example-v2.png",
-      "sha256": "d43274a452569688686c0e70c9dab76d391a36bd7e2c9b8c4993c788ecbafc90",
-      "status": "draft-preview",
+      "path": "appearance-unified-v3.png",
+      "sha256": "1d671526dc081e35dfdbcf960a634354bb93c36c15efca4a2425c0c6d57a48a9",
+      "status": "user-approved-components",
+      "revision": "appearance-unified-v3",
+      "compatibilityNote": "Stable reference id retained; supersedes age-variety-example-v2.png with the user-selected 12-character sheet.",
       "useFor": "mandatory component reference in every human generation by user instruction: open-ended face, age-presentation, body-type, hair and clothing examples with pure-white skin fill; select features individually",
       "notFor": "copying any complete example character, treating the sheet as a fixed roster or age/identity assignment, overriding the approved master, or approving example characters"
     }
